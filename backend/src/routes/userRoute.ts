@@ -11,7 +11,7 @@ const userService = new userServices(userRepositary);
 //UserService is injected into the userController's instance
 const userController = new UserController(userService);
 
-route.post("/signup",userController.register.bind(userController));
-
+route.post("/signup", userController.register.bind(userController));
+route.post("/verifyOtp", userController.verifyOtp.bind(userController));
 
 export default route;
