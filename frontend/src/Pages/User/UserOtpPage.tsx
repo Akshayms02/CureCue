@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import myImage from "../../assets/Screenshot_2024-08-15_191834-removebg-preview.png";
-import BackgroundImage from "../../assets/108364.jpg";
+import BackgroundImage from "../../assets/sebastian-svenson-LpbyDENbQQg-unsplash.jpg";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { resendOtp, verifyOtp } from "../../Redux/Actions/userActions";
 import { AppDispatch } from "../../Redux/store";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 
 const UserOtpPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -13,7 +13,7 @@ const UserOtpPage: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(Array(4).fill(""));
   const [timer, setTimer] = useState<number>(() => {
     const savedTimer = localStorage.getItem("otp-timer");
-    return savedTimer ? parseInt(savedTimer) : 30;
+    return savedTimer ? parseInt(savedTimer) : 60;
   });
   const [buttonText, setButtonText] = useState("Submit");
 
@@ -71,14 +71,24 @@ const UserOtpPage: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("hello from handlesubmit")
+    console.log("hello from handlesubmit");
     e.preventDefault();
     const otpValue = otp.join("");
+    if (buttonText == "Submit" && (otpValue == "" || otpValue.length !== 4)) {
+      if (otpValue.length > 0) {
+        toast.error("Please Fill all the fields");
+      } else {
+        toast.error("OTP field cannot be empty");
+      }
+
+      return;
+    }
 
     if (buttonText === "Resend OTP") {
       try {
-        const resendOtpStatus = await dispatch(resendOtp());
-        if (resendOtpStatus.status) {
+        const resendOtpStatus = await dispatch(resendOtp()).unwrap();
+        console.log(resendOtpStatus);
+        if (resendOtpStatus) {
           toast.success("OTP Resent");
           setOtp(Array(4).fill(""));
           setTimer(60);
@@ -87,6 +97,8 @@ const UserOtpPage: React.FC = () => {
       } catch (error: unknown) {
         if (error instanceof Error) {
           toast.error("Failed to resend OTP");
+        } else {
+          toast.error("Something went wrong");
         }
       }
     } else {
@@ -112,7 +124,6 @@ const UserOtpPage: React.FC = () => {
       className="w-full h-screen flex flex-col items-center justify-center px-4 bg-cover"
       style={{ backgroundImage: `url(${BackgroundImage})` }}
     >
-      <Toaster position="top-center" richColors />
       <div className="max-w-sm w-full text-gray-600 space-y-8">
         <div className="text-center">
           <img src={myImage} width={250} className="mx-auto" alt="Logo" />
@@ -134,14 +145,14 @@ const UserOtpPage: React.FC = () => {
                 value={digit}
                 onChange={(e) => handleChange(e, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
-                className="h-[60px] w-[60px] text-2xl text-center bg-transparent border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block dark:border-gray-600 dark:placeholder-gray-500 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-xl"
+                className="h-[60px] w-[60px] text-2xl text-center bg-transparent border border-gray-900 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block dark:border-gray-600 dark:placeholder-gray-500 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-xl"
               />
             ))}
           </div>
           <div className="flex justify-center">
             <button
               type="submit"
-              className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-[160px]"
+              className="text-white bg-black hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-[160px]"
             >
               {buttonText}
             </button>

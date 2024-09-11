@@ -1,15 +1,62 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
+
 import Myimage from "../../assets/Screenshot_2024-08-15_191834-removebg-preview.png";
-import BackgroundImage from "../../assets/108364.jpg";
+import BackgroundImage from "../../assets/sebastian-svenson-LpbyDENbQQg-unsplash.jpg";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../Redux/store";
 import { signUp } from "../../Redux/Actions/userActions";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
+import { Toaster } from "../../../components/ui/sonner";
+
+import { Button } from "../../../components/ui/button";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../../../components/ui/form";
+import { Input } from "../../../components/ui/input";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const formSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"), // Non-empty name
+    email: z
+      .string()
+      .email("Invalid email address")
+      .min(2, { message: "Email must be a minimum of 2 characters" })
+      .max(50, { message: "Email cannot exceed 50 characters" }),
+    phone: z
+      .string()
+      .min(10, "Phone number must be at least 10 digits")
+      .max(15, "Phone number cannot exceed 15 digits")
+      .regex(/^\d+$/, "Phone number must contain only digits"), // Only digits allowed
+    password: z.string().min(6, "Password must be at least 6 characters long"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords must match",
+    path: ["confirmPassword"],
+  });
 
 const UserSignup: React.FC = () => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      phone: "",
+      confirmPassword: "",
+    },
+  });
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const handleSignup = async (values: {
@@ -20,7 +67,6 @@ const UserSignup: React.FC = () => {
     confirmPassword: string;
   }) => {
     try {
-      toast.error("Hello");
       const result = await dispatch(signUp(values));
       console.log(result);
       if (result) {
@@ -35,7 +81,7 @@ const UserSignup: React.FC = () => {
   };
   return (
     <main
-      className="w-full h-screen flex flex-col items-center justify-center bg-gray-50 sm:px-4 bg-cover "
+      className="w-full h-full flex flex-col items-center justify-center bg-gray-50 sm:px-4 bg-cover pb-11 pt-5"
       style={{ backgroundImage: `url(${BackgroundImage})` }}
     >
       <Toaster position="top-center" richColors />
@@ -50,117 +96,118 @@ const UserSignup: React.FC = () => {
               Already have an account?{" "}
               <NavLink
                 to="/login"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
+                className="font-medium text-indigo-600 hover:text-white"
               >
                 Log in
               </NavLink>
             </p>
           </div>
         </div>
-        <div className="max-w-lg w-full text-gray-600">
-          <Formik
-            initialValues={{
-              name: "",
-              email: "",
-              password: "",
-              phone: "",
-              confirmPassword: "",
-            }}
-            validationSchema={Yup.object({
-              name: Yup.string().required("Name is required"),
-              email: Yup.string()
-                .email("Invalid email address")
-                .required("Email is required"),
-              password: Yup.string()
-                .required("Password is required")
-                .min(8, "Password must be at least 8 characters"),
-              phone: Yup.string()
-                .required("Phone number is required")
-                .matches(/^[0-9]{10}$/g, "Invalid Phone Number"),
-              confirmPassword: Yup.string()
-                .required("Confirm password is required")
-                .oneOf([Yup.ref("password")], "Passwords Doesnt Match"),
-            })}
-            onSubmit={handleSignup}
-          >
-            {({ isSubmitting }) => (
-              <Form>
-                <div>
-                  <label className="font-medium">Name</label>
-                  <Field
-                    type="text"
-                    name="name"
-                    className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-                  />
+        <div className="max-w-lg w-full  text-gray-600">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleSignup)}
+              className="mt-8 space-y-5"
+            >
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-black">Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="name"
+                        placeholder="Enter Your Full Name"
+                        {...field}
+                        className="p-4 h-12 border-gray-900 text-black placeholder:text-black text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-600" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-black">Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="Enter Your Email"
+                        {...field}
+                        className="p-4 h-12 border-gray-900 text-black placeholder:text-black text-sm"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-600" />
+                  </FormItem>
+                )}
+              />
 
-                  <ErrorMessage
-                    name="name"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="font-medium">Email</label>
-                  <Field
-                    type="email"
-                    name="email"
-                    className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-                  />
-                  <ErrorMessage
-                    name="email"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="font-medium">Phone</label>
-                  <Field
-                    type="text"
-                    name="phone"
-                    className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-                  />
-                  <ErrorMessage
-                    name="phone"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="font-medium">Password</label>
-                  <Field
-                    type="password"
-                    name="password"
-                    className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-                  />
-                  <ErrorMessage
-                    name="password"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="font-medium">Confirm Password</label>
-                  <Field
-                    type="password"
-                    name="confirmPassword"
-                    className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-                  />
-                  <ErrorMessage
-                    name="confirmPassword"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-600 rounded-lg duration-150 mt-5 mb-1"
-                >
-                  Create account
-                </button>
-              </Form>
-            )}
-          </Formik>
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem className="text-black">
+                    <FormLabel>Phone</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="Phone"
+                        placeholder="Enter Your Mobile Number"
+                        {...field}
+                        className="p-4 h-12  border-gray-900 text-black placeholder:text-black text-sm"
+                      />
+                    </FormControl>
+
+                    <FormMessage className="text-red-600" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem className="text-black">
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Enter Your Password"
+                        {...field}
+                        className="p-4 h-12  border-gray-900 text-black placeholder:text-black text-sm"
+                      />
+                    </FormControl>
+
+                    <FormMessage className="text-red-600" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem className="text-black">
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Re-enter Your Password"
+                        {...field}
+                        className="p-4 h-12  border-gray-900 text-black placeholder:text-black text-sm"
+                      />
+                    </FormControl>
+
+                    <FormMessage className="text-red-600" />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full bg-black text-white">
+                Sign in
+              </Button>
+            </form>
+          </Form>
           {/* <div className="mt-5">
             <button className="w-full flex items-center justify-center gap-x-3 py-2.5 mt-5 border rounded-lg text-sm font-medium hover:bg-gray-50 duration-150 active:bg-gray-100">
               <svg

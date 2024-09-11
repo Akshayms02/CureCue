@@ -15,8 +15,9 @@ export const signUp = (credentials: {
       const response = await axiosUrl.post(`${API}/signup`, credentials);
       console.log(response);
       if (response.data === true) {
-        console.log();
+        console.log("here");
         localStorage.setItem("userEmail", credentials.email);
+        return true;
       }
       return response;
     } catch (error: unknown) {
@@ -53,52 +54,44 @@ export const verifyOtp = (otp: string) => {
   };
 };
 
-export const resendOtp = () => {
-  return async () => {
+export const resendOtp = createAsyncThunk<boolean>(
+  "user/resendOtp",
+  async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("userOtp");
+      const email = localStorage.getItem("userEmail");
+      if (!email) throw new Error("No email found in localStorage");
 
-      const response = await axiosUrl.post(
-        "/resendOtp",
-        {},
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.data.status) {
-        localStorage.removeItem("userOtp");
-        const tokenNew = response.data.response.token;
-        console.log("newtoken", tokenNew);
-
-        localStorage.setItem("userOtp", tokenNew);
-        return { status: true };
-      }
-      return response;
+      const response = await axiosUrl.post(`${API}/resendOtp`, { email });
+      return response.status === 200;
     } catch (error: unknown) {
       if (error instanceof Error) {
-        throw new Error(error.message);
+        if(error.message=="No email found in localStorage"){
+          throw new Error("Invalid Entry")
+        }
+        throw new Error(`${error.message}`);
       } else {
-        throw new Error("Unknown error has occured");
+        return rejectWithValue("Failed to resend OTP");
       }
     }
-  };
-};
+  }
+);
 
 export const login = createAsyncThunk(
-  "auth/login",
+  "user/login",
   async (
     credentials: { email: string; password: string },
     { rejectWithValue }
   ) => {
     try {
+      console.log("hello from login");
       const response = await axiosUrl.post(`${API}/login`, credentials);
       console.log(response);
-      return response;
-    } catch (error: unknown) {
+      const { accessToken, userInfo } = response.data.Credentials;
+
+      return { accessToken, userInfo };
+    } catch (error: any) {
       console.log(error);
-      return rejectWithValue("Login failed");
+      return rejectWithValue(error.response.data.message || "Login failed");
     }
   }
 );

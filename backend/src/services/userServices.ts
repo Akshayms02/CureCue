@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import redisClient from "../utils/redisCaching";
 import sendEmailOtp from "../config/nodemailer";
+import { createToken } from "../config/jwtConfig";
+import jwt from "jsonwebtoken";
 
 export class userServices {
   constructor(private userRepositary: IUserRepositary) {}
@@ -15,6 +17,7 @@ export class userServices {
       if (existingUser) {
         throw Error("Email already in use");
       }
+      console.log(existingUser);
 
       const saltRounds: number = 10;
       const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
@@ -31,7 +34,7 @@ export class userServices {
       console.log(`tempUserData${userData.email}`);
       await redisClient.setEx(
         `tempUserData${userData.email}`,
-        300,
+        400,
         JSON.stringify(tempUserData)
       );
       const ttl = await redisClient.ttl(`tempUserData${userData.email}`);
@@ -39,7 +42,7 @@ export class userServices {
 
       const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
-      await redisClient.setEx(userData.email, 30, otp);
+      await redisClient.setEx(userData.email, 60, otp);
       console.log("otp : ", otp);
 
       sendEmailOtp(userData.email, otp);
@@ -47,7 +50,9 @@ export class userServices {
       return true;
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.log(error.message);
+        throw new Error(
+          `Error has occured in UserServices register:${error.message}`
+        );
       } else {
         console.log("An unknown error has occured");
       }
@@ -83,6 +88,67 @@ export class userServices {
         throw new Error(error.message);
       } else {
         throw new Error("unknown error has occured");
+      }
+    }
+  }
+
+  async verifyLogin(
+    email: string,
+    password: string
+  ): Promise<{
+    userInfo: { name: string; email: string };
+    accessToken: string;
+    refreshToken: string;
+  }> {
+    try {
+      const user = await this.userRepositary.userLoginValidate(email, password);
+      if (!user) {
+        throw new Error("Invalid Login Credentails");
+      }
+      const accessToken = createToken(user.userId as string);
+
+      const refreshToken = jwt.sign(
+        { id: user.userId, email: user.email },
+        process.env.JWT_SECRET!,
+        { expiresIn: "7d" }
+      );
+
+      const userInfo = {
+        name: user.name,
+        email: user.email,
+        userId: user.userId,
+        phone: user.phone,
+        isBlocked: user.isBlocked,
+      };
+
+      return { userInfo, accessToken, refreshToken };
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(`${error.message}`);
+      } else {
+        throw new Error("Unknown Error Occured from UserServices");
+      }
+    }
+  }
+
+  async resendOtp(email: string): Promise<boolean> {
+    try {
+      const otp = Math.floor(1000 + Math.random() * 9000).toString();
+
+      await redisClient.setEx(email, 60, otp);
+
+      sendEmailOtp(email, otp);
+
+      console.log("Resend generated OTP:", otp);
+
+      return true;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error(
+          "An unknow Error has occured in UserServices resendOtp"
+        );
       }
     }
   }

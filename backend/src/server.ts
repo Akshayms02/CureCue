@@ -5,9 +5,10 @@ import cors from "cors";
 const app = express();
 const port = process.env.PORT || 5000;
 import cookieParser from "cookie-parser";
-import userRoute from "../src/routes/userRoute"
+import userRoute from "../src/routes/userRoute";
+import doctorRoute from "../src/routes/doctorRoute";
 import connectDB from "./config/dataBase";
-connectDB()
+connectDB();
 
 app.use(cookieParser());
 const corsOptions = {
@@ -18,8 +19,8 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
-app.use(express.json({limit:"5gb"}));
-app.use(express.urlencoded({limit:"5gb",extended:true}))
+app.use(express.json({ limit: "5gb" }));
+app.use(express.urlencoded({ limit: "5gb", extended: true }));
 
 app.get("/", async (req, res) => {
   if (req.cookies.token) {
@@ -29,10 +30,8 @@ app.get("/", async (req, res) => {
   }
 });
 
-
-app.use("/api/user",userRoute);
-// app.use("/api/doctor");
-// app.use("/api/admin");
+app.use("/api/user", userRoute);
+app.use("/api/doctor", doctorRoute);
 
 app.listen(port, () => {
   console.log(`Server is running on port http://localhost:${port}/`);
