@@ -111,7 +111,7 @@ const LoginForm: React.FC = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem className="text-black">
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel className="text-black">Password</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
