@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { UserRepositary } from "../repositories/userRepositary";
+import { UserRepositary } from "../repositories/userRepository";
 import UserController from "../controllers/userController";
 import { userServices } from "../services/userServices";
 import { refreshTokenHandler } from "../config/refreshTokenConfig";

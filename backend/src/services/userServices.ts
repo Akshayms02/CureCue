@@ -1,4 +1,4 @@
-import { IUserRepositary } from "../interfaces/IUserRepositary";
+import { IUserRepositary } from "../interfaces/IUserRepository";
 import { IUser } from "../models/userModel";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";

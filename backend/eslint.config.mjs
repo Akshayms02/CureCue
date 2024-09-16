@@ -10,7 +10,8 @@ export default [
   {
     rules: {
       "no-console": "warn", //Warn if console is used
-      "react/prop-types": "off", //Disable prop-types rules for react
+      "react/prop-types": "off",
+      '@typescript-eslint/no-explicit-any': 'off' //Disable prop-types rules for react
     },
   },
 ];

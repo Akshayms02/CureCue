@@ -5,7 +5,7 @@ import redisClient from "../utils/redisCaching";
 import sendEmailOtp from "../config/nodemailer";
 import { createToken } from "../config/jwtConfig";
 import jwt from "jsonwebtoken";
-import { IDoctorRepositary } from "../interfaces/IDoctorRepositary";
+import { IDoctorRepositary } from "../interfaces/IDoctorRepository";
 
 export class doctorServices {
   constructor(private doctorRepositary: IDoctorRepositary) {}

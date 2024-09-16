@@ -1,34 +1,34 @@
-import { IDoctorRepositary } from "../interfaces/IDoctorRepositary";
-import doctorModel, { IDoctor } from "../models/doctorModel";
+import { IUserRepositary } from "../interfaces/IUserRepository";
+import userModel, { IUser } from "../models/userModel";
 import bcrypt from "bcrypt";
 
-export class DoctorRepositary implements IDoctorRepositary {
-  async existUser(email: string): Promise<IDoctor | null> {
-    console.log("hello from DoctorRepositary");
-    return await doctorModel.findOne({ email });
+export class UserRepositary implements IUserRepositary {
+  async existUser(email: string): Promise<IUser | null> {
+    console.log("hello from userRepositary");
+    return await userModel.findOne({ email });
   }
 
-  async createUser(userData: IDoctor): Promise<IDoctor> {
+  async createUser(userData: IUser): Promise<IUser> {
     try {
       console.log("Creating new user with :", userData);
-      const newUser = new doctorModel(userData);
+      const newUser = new userModel(userData);
       return await newUser.save();
     } catch (error: unknown) {
       if (error instanceof Error) {
-        throw new Error(`Error creating a new user: ${error.message}`);
+        throw new Error(`${error.message}`);
       } else {
         throw new Error("Unknown error has occured");
       }
     }
   }
 
-  async userLoginValidate(email: string, password: string): Promise<IDoctor> {
+  async userLoginValidate(email: string, password: string): Promise<IUser> {
     try {
-      const user = await doctorModel.findOne(
+      const user = await userModel.findOne(
         { email },
         {
           _id: 0,
-          doctorId: 1,
+          userId: 1,
           name: 1,
           email: 1,
           phone: 1,
@@ -55,7 +55,7 @@ export class DoctorRepositary implements IDoctorRepositary {
       if (error instanceof Error) {
         throw new Error(`${error.message}`);
       } else {
-        throw new Error("Unknown Error from DoctorRepositary");
+        throw new Error("Unknown Error from UserRepositary");
       }
     }
   }

@@ -1,34 +1,34 @@
-import { IUserRepositary } from "../interfaces/IUserRepositary";
-import userModel, { IUser } from "../models/userModel";
+import { IDoctorRepositary } from "../interfaces/IDoctorRepository";
+import doctorModel, { IDoctor } from "../models/doctorModel";
 import bcrypt from "bcrypt";
 
-export class UserRepositary implements IUserRepositary {
-  async existUser(email: string): Promise<IUser | null> {
-    console.log("hello from userRepositary");
-    return await userModel.findOne({ email });
+export class DoctorRepositary implements IDoctorRepositary {
+  async existUser(email: string): Promise<IDoctor | null> {
+    console.log("hello from DoctorRepositary");
+    return await doctorModel.findOne({ email });
   }
 
-  async createUser(userData: IUser): Promise<IUser> {
+  async createUser(userData: IDoctor): Promise<IDoctor> {
     try {
       console.log("Creating new user with :", userData);
-      const newUser = new userModel(userData);
+      const newUser = new doctorModel(userData);
       return await newUser.save();
     } catch (error: unknown) {
       if (error instanceof Error) {
-        throw new Error(`${error.message}`);
+        throw new Error(`Error creating a new user: ${error.message}`);
       } else {
         throw new Error("Unknown error has occured");
       }
     }
   }
 
-  async userLoginValidate(email: string, password: string): Promise<IUser> {
+  async userLoginValidate(email: string, password: string): Promise<IDoctor> {
     try {
-      const user = await userModel.findOne(
+      const user = await doctorModel.findOne(
         { email },
         {
           _id: 0,
-          userId: 1,
+          doctorId: 1,
           name: 1,
           email: 1,
           phone: 1,
@@ -55,7 +55,7 @@ export class UserRepositary implements IUserRepositary {
       if (error instanceof Error) {
         throw new Error(`${error.message}`);
       } else {
-        throw new Error("Unknown Error from UserRepositary");
+        throw new Error("Unknown Error from DoctorRepositary");
       }
     }
   }

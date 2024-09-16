@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { DoctorRepositary } from "../repositories/doctorRepositary";
+import { DoctorRepositary } from "../repositories/doctorRepository";
 import DoctorController from "../controllers/doctorController";
 import { doctorServices } from "../services/doctorServices";
 import { refreshTokenHandler } from "../config/refreshTokenConfig";
