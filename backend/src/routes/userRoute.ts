@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { UserRepositary } from "../repositories/userRepository";
+import { UserRepository } from "../repositories/userRepository";
 import UserController from "../controllers/userController";
 import { userServices } from "../services/userServices";
 import { refreshTokenHandler } from "../config/refreshTokenConfig";
 
 const route = Router();
 
-const userRepositary = new UserRepositary();
+const userRepositary = new UserRepository();
 const userService = new userServices(userRepositary);
 
 //UserService is injected into the userController's instance

@@ -1,15 +1,6 @@
 import mongoose, { Document, model, Schema } from "mongoose";
 
-// Define the enum for KYC status
-enum KYCStatus {
-  PENDING = "pending",
-  SUBMITTED = "submitted",
-  APPROVED = "approved",
-  REJECTED = "rejected",
-}
-
-// Define interfaces for the image objects
-interface IImage {
+export interface IImage {
   type: string;
   url: string;
 }
@@ -27,7 +18,7 @@ interface IDoctorApplication extends Document {
   name: string;
   DOB: Date;
   department: string;
-  gender: string;
+  gender?: string;
   image: IImage;
   fees: number;
   kycDetails: IKYCDetails;

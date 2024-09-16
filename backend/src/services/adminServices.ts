@@ -1,17 +1,24 @@
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { IAdmin } from "../models/adminModel";
+// import { IAdmin } from "../models/adminModel";
 import { IAdminRepository } from "../interfaces/IAdminRepository";
+import { AwsConfig } from "../config/awsConfig";
 
-export class adminService {
+export class adminServices {
   constructor(
-    private adminRepository: IAdminRepository
-  ) // S3ServiceInstance: S3Service
-  {}
+    private adminRepository: IAdminRepository,
+    private S3Service: AwsConfig
+  ) {}
 
-  async verifyAdmin(email: string, password: string): Promise<IAdmin> {
+  async verifyAdmin(
+    email: string,
+    password: string
+  ): Promise<{
+    adminInfo: { email: string };
+    accessToken: string;
+    refreshToken: string;
+  }> {
     try {
-      console.log("login adminService");
+      console.log("Hello from AdminServices verifyLogin");
       const adminData = await this.adminRepository.adminCheck(email);
       if (adminData) {
         if (password != adminData.password) {
@@ -43,7 +50,6 @@ export class adminService {
           refreshToken,
         };
       } else {
-        console.log("Admindata not found");
         throw new Error("Admin Doesn't exist");
       }
     } catch (error: any) {
@@ -51,6 +57,7 @@ export class adminService {
       throw new Error(error.message);
     }
   }
+
   async addSpecialization(name: string, description: string) {
     try {
       console.log("Entering addSpecialization method in adminService");

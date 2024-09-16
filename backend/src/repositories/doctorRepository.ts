@@ -1,10 +1,10 @@
-import { IDoctorRepositary } from "../interfaces/IDoctorRepository";
+import { IDoctorRepository } from "../interfaces/IDoctorRepository";
 import doctorModel, { IDoctor } from "../models/doctorModel";
 import bcrypt from "bcrypt";
 
-export class DoctorRepositary implements IDoctorRepositary {
+export class DoctorRepository implements IDoctorRepository {
   async existUser(email: string): Promise<IDoctor | null> {
-    console.log("hello from DoctorRepositary");
+    console.log("hello from DoctorRepository");
     return await doctorModel.findOne({ email });
   }
 

@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 import adminModel from "../models/adminModel";
 import specializationModel from "../models/specializationModel";
-import doctorApplicationModel from "../model/doctorApplicationModel";
+import doctorApplicationModel from "../models/doctorApplicationModel";
 import doctorModel from "../models/doctorModel";
-import RejectDoctorModel from "../model/RejectDoctorSchema";
+import rejectDoctorModel from "../models/rejectedDoctorModel";
+import { IAdminRepository } from "../interfaces/IAdminRepository";
 
-export class adminRepository {
+export class AdminRepository implements IAdminRepository {
   async adminCheck(email: string) {
     try {
       console.log("login adminrep");
@@ -28,10 +29,8 @@ export class adminRepository {
         description,
       });
 
-      // Save the document to the database
       const savedSpecialization = await newSpecialization.save();
 
-      // Optionally, return the saved document or some confirmation
       return savedSpecialization;
     } catch (error: any) {
       console.error("Error creating specialization:", error.message);
@@ -54,11 +53,10 @@ export class adminRepository {
         { _id: id },
         { name: name, description: description }
       );
-      console.log("qq", specializations);
 
       return specializations;
     } catch (error: any) {
-      console.error("Error getting specialization:", error.message);
+      console.error("Error updating specialization:", error.message);
       throw new Error(error.message);
     }
   }
@@ -148,13 +146,13 @@ export class adminRepository {
   }
   async rejectDoctorApplication(doctorId: string, reason: string) {
     try {
-      const rejectEntry = new RejectDoctorModel({
+      const rejectedEntry = new rejectDoctorModel({
         doctorId: new mongoose.Types.ObjectId(doctorId),
         reason,
       });
 
-      await rejectEntry.save();
-      const doctorUpdation = await doctorModel.findByIdAndUpdate(doctorId, {
+      await rejectedEntry.save();
+      await doctorModel.findByIdAndUpdate(doctorId, {
         kycStatus: "rejected",
       });
 

@@ -1,8 +1,8 @@
-import { IUserRepositary } from "../interfaces/IUserRepository";
+import { IUserRepository } from "../interfaces/IUserRepository";
 import userModel, { IUser } from "../models/userModel";
 import bcrypt from "bcrypt";
 
-export class UserRepositary implements IUserRepositary {
+export class UserRepository implements IUserRepository {
   async existUser(email: string): Promise<IUser | null> {
     console.log("hello from userRepositary");
     return await userModel.findOne({ email });

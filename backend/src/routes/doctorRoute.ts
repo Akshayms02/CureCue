@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { DoctorRepositary } from "../repositories/doctorRepository";
+import { DoctorRepository } from "../repositories/doctorRepository";
 import DoctorController from "../controllers/doctorController";
 import { doctorServices } from "../services/doctorServices";
 import { refreshTokenHandler } from "../config/refreshTokenConfig";
@@ -7,7 +7,7 @@ import { refreshTokenHandler } from "../config/refreshTokenConfig";
 
 const route = Router();
 
-const doctorRepositary = new DoctorRepositary();
+const doctorRepositary = new DoctorRepository();
 const doctorService = new doctorServices(doctorRepositary);
 
 //UserService is injected into the doctorController's instance

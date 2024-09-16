@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const bucketName = process.env.AWS_BUCKET_NAME as string ;
+const bucketName = process.env.AWS_BUCKET_NAME as string;
 const region = process.env.AWS_BUCKET_REGION as string;
 const accessKeyId = process.env.AWS_ACCESS_KEY as string;
 const secretAccessKey = process.env.AWS_SECRET_KEY as string;
@@ -27,7 +27,7 @@ export class AwsConfig {
     });
   }
 
-  async getfile(fileName: string, folder: string): Promise<string> {
+  async getFile(fileName: string, folder: string): Promise<string> {
     try {
       const options = {
         Bucket: this.bucketName,
