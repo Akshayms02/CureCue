@@ -3,11 +3,14 @@ import { UserRepository } from "../repositories/userRepository";
 import UserController from "../controllers/userController";
 import { userServices } from "../services/userServices";
 import { refreshTokenHandler } from "../config/refreshTokenConfig";
+import { AwsConfig } from "../config/awsConfig";
 
 const route = Router();
 
 const userRepositary = new UserRepository();
-const userService = new userServices(userRepositary);
+const S3ServiceInstance = new AwsConfig();
+const userService = new userServices(userRepositary,S3ServiceInstance);
+
 
 //UserService is injected into the userController's instance
 const userController = new UserController(userService);

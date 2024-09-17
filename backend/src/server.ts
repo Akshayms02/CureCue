@@ -7,13 +7,14 @@ const port = process.env.PORT || 5000;
 import cookieParser from "cookie-parser";
 import userRoute from "../src/routes/userRoute";
 import doctorRoute from "../src/routes/doctorRoute";
+import adminRoute from "../src/routes/adminRoute"
 import connectDB from "./config/dataBase";
 connectDB();
 
 app.use(cookieParser());
 const corsOptions = {
   origin: "http://localhost:5173",
-  methods: "GET,POST",
+  methods: "GET,POST,PUT",
   allowedHeaders: "Content-Type,Authorization",
   optionsSuccessStatus: 200,
   credentials: true,
@@ -32,6 +33,7 @@ app.get("/", async (req, res) => {
 
 app.use("/api/user", userRoute);
 app.use("/api/doctor", doctorRoute);
+app.use("/api/admin",adminRoute)
 
 app.listen(port, () => {
   console.log(`Server is running on port http://localhost:${port}/`);

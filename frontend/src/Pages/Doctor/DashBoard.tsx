@@ -1,4 +1,4 @@
-import DoctorDashboard from "../../Components/DoctorComponents/DoctorDashBoardComponent";
+import {DoctorDashboard} from "../../Components/DoctorComponents/DoctorDashBoardComponent";
 
 import { Outlet } from "react-router-dom";
 

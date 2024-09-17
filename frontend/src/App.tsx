@@ -4,6 +4,7 @@ import UserRoutes from "./Routes/UserRoutes";
 import DoctorRoutes from "./Routes/DoctorRoutes";
 import { Toaster } from "../components/ui/sonner";
 import { ThemeProvider } from "../components/ui/themeProvider";
+import AdminRoutes from "./Routes/AdminRoutes";
 
 function App() {
   return (
@@ -12,7 +13,8 @@ function App() {
         <Router>
           <Routes>
             <Route path="/*" element={<UserRoutes />} />
-            <Route path="/doctor*" element={<DoctorRoutes />} />
+            <Route path="/doctor/*" element={<DoctorRoutes />} />
+            <Route path="/admin/*" element={<AdminRoutes/>}></Route>
           </Routes>
         </Router>
         <Toaster position="top-right" />

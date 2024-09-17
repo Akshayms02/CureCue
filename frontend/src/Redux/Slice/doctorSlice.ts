@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { login } from "../Actions/doctorActions";
 
-interface User {
+interface Doctor {
   name: string;
   doctorId: string;
   phone: string;
@@ -9,16 +9,18 @@ interface User {
   isBlocked: boolean;
 }
 
-interface UserState {
-  doctorInfo: User | null;
+interface DocState {
+  doctorInfo: Doctor | null;
   loading: boolean;
   error: string | null;
+  docStatus: "pending";
 }
 
-const initialState: UserState = {
+const initialState: DocState = {
   doctorInfo: null,
   loading: false,
   error: null,
+  docStatus: "pending",
 };
 
 const doctorSlice = createSlice({
@@ -45,7 +47,7 @@ const doctorSlice = createSlice({
         login.fulfilled,
         (
           state,
-          action: PayloadAction<{ docaccessToken: string; doctorInfo: User }>
+          action: PayloadAction<{ docaccessToken: string; doctorInfo: Doctor }>
         ) => {
           const { docaccessToken, doctorInfo } = action.payload;
           state.doctorInfo = doctorInfo;

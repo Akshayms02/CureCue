@@ -1,6 +1,5 @@
 import axiosUrl from "../../Utils/axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-// const url = "http://localhost:5001"
 
 const API = "/api/admin";
 export const login = createAsyncThunk(
@@ -66,7 +65,7 @@ export const updateSpecialization = ({
     try {
       console.log(id, name, description);
 
-      const response = await axiosUrl.put("/admin/updateSpecialization", {
+      const response = await axiosUrl.put(`${API}/updateSpecialization`, {
         id,
         name,
         description,
@@ -87,11 +86,10 @@ export const listUnlistSpecialization = ({ id }: { id: number }): any => {
     try {
       console.log(id);
 
-      const response = await axiosUrl.put("/admin/listUnlistSpecialization", {
+      const response = await axiosUrl.put(`${API}/listUnlistSpecialization`, {
         id,
       });
       if (response) {
-        console.log("qqqqqqqq", response);
         return response;
       }
       return response;

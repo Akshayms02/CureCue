@@ -5,10 +5,10 @@ import redisClient from "../utils/redisCaching";
 import sendEmailOtp from "../config/nodemailer";
 import { createToken } from "../config/jwtConfig";
 import jwt from "jsonwebtoken";
-import { IDoctorRepositary } from "../interfaces/IDoctorRepository";
+import { IDoctorRepository } from "../interfaces/IDoctorRepository";
 
 export class doctorServices {
-  constructor(private doctorRepositary: IDoctorRepositary) {}
+  constructor(private doctorRepositary: IDoctorRepository) {}
 
   async registeUser(userData: IUser): Promise<void | boolean> {
     try {
@@ -32,6 +32,7 @@ export class doctorServices {
         phone: userData.phone,
         password: hashedPassword,
         createdAt: new Date(),
+        kycStatus:"pending"
       };
       console.log(`tempUserData${userData.email}`);
       await redisClient.setEx(

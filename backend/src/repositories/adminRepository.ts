@@ -1,10 +1,8 @@
-import mongoose from "mongoose";
 import adminModel from "../models/adminModel";
 import specializationModel from "../models/specializationModel";
-import doctorApplicationModel from "../models/doctorApplicationModel";
 import doctorModel from "../models/doctorModel";
-import rejectDoctorModel from "../models/rejectedDoctorModel";
 import { IAdminRepository } from "../interfaces/IAdminRepository";
+import userModel from "../models/userModel";
 
 export class AdminRepository implements IAdminRepository {
   async adminCheck(email: string) {
@@ -23,7 +21,6 @@ export class AdminRepository implements IAdminRepository {
   }
   async createSpecialization(name: string, description: string) {
     try {
-      // Create a new specialization document
       const newSpecialization = new specializationModel({
         name,
         description,
@@ -78,92 +75,64 @@ export class AdminRepository implements IAdminRepository {
       throw new Error(error.message);
     }
   }
-  async getAllApplication() {
-    try {
-      const applications = await doctorApplicationModel.find();
 
-      return applications;
+  async getAllUsers() {
+    try {
+      const users = await userModel.find();
+      console.log("users", users);
+
+      return users;
     } catch (error: any) {
-      console.error("Error getting specialization:", error.message);
+      console.error("Error getting users:", error.message);
       throw new Error(error.message);
     }
   }
-  async getApplication(doctorId: string) {
+  async getAllDoctors() {
     try {
-      const application = await doctorApplicationModel.findById(doctorId);
+      const doctors = await doctorModel.find({ kycStatus: "approved" });
+      console.log("doctors", doctors);
 
-      console.log("pppp", application);
-
-      return application;
+      return doctors;
     } catch (error: any) {
-      console.error("Error getting specialization:", error.message);
+      console.error("Error getting doctors:", error.message);
       throw new Error(error.message);
     }
   }
-  async approveDoctorApplication(doctorId: string) {
+
+  async changeUserStatus(id: string) {
     try {
-      // Fetch the doctor application by doctorId
-      const application = await doctorApplicationModel.findOne({
-        doctorId: doctorId,
-      });
-      if (!application) {
-        throw new Error("Doctor application not found");
+      const user = await userModel.findOne({ _id: id });
+      if (!user) {
+        throw new Error("user not found");
       }
 
-      console.log("Doctor application:", application);
+      user.isBlocked = !user.isBlocked;
 
-      // Update the doctor model with the details from the application, including setting KYC status to "approved"
-      const updatedDoctor = await doctorModel.findByIdAndUpdate(
-        doctorId,
-        {
-          name: application.name,
-          DOB: application.DOB,
-          department: application.department,
-          gender: application.gender,
-          image: application.image,
-          fees: application.fees,
-          kycDetails: application.kycDetails,
-          kycStatus: "approved", // Set the KYC status to "approved"
-        },
-        { new: true } // This option returns the updated document
-      );
+      const updatedUser = await user.save();
+      console.log("Updated user:", updatedUser);
 
-      if (!updatedDoctor) {
-        throw new Error("Doctor not found");
-      }
-
-      console.log("Updated doctor details:", updatedDoctor);
-
-      // Delete the approved doctor application
-      await doctorApplicationModel.deleteOne({ doctorId: doctorId });
-      console.log("Doctor application deleted");
-
-      return { status: true };
+      return updatedUser;
     } catch (error: any) {
-      console.error("Error approving doctor application:", error.message);
+      console.error("Error updating user:", error.message);
       throw new Error(error.message);
     }
   }
-  async rejectDoctorApplication(doctorId: string, reason: string) {
+  async changeDoctorStatus(id: string) {
     try {
-      const rejectedEntry = new rejectDoctorModel({
-        doctorId: new mongoose.Types.ObjectId(doctorId),
-        reason,
-      });
+      const doctor = await doctorModel.findOne({ _id: id });
+      if (!doctor) {
+        throw new Error("doctor not found");
+      }
 
-      await rejectedEntry.save();
-      await doctorModel.findByIdAndUpdate(doctorId, {
-        kycStatus: "rejected",
-      });
+      doctor.isBlocked = !doctor.isBlocked;
 
-      await doctorApplicationModel.deleteOne({ doctorId: doctorId });
+      const updatedDoctor = await doctor.save();
+      console.log("Updated doctor:", updatedDoctor);
 
-      return { success: true };
+      return updatedDoctor;
     } catch (error: any) {
-      console.error("Error rejecting doctor application:", error.message);
-      throw new Error(
-        "An error occurred while rejecting the doctor application."
-      );
+      console.error("Error updating doctor:", error.message);
+      throw new Error(error.message);
     }
   }
 }

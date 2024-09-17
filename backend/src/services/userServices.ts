@@ -1,14 +1,18 @@
-import { IUserRepositary } from "../interfaces/IUserRepository";
+import { IUserRepository } from "../interfaces/IUserRepository";
 import { IUser } from "../models/userModel";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import redisClient from "../utils/redisCaching";
 import sendEmailOtp from "../config/nodemailer";
+import { AwsConfig } from "../config/awsConfig";
 import { createToken } from "../config/jwtConfig";
 import jwt from "jsonwebtoken";
 
 export class userServices {
-  constructor(private userRepositary: IUserRepositary) {}
+  constructor(
+    private userRepositary: IUserRepository,
+    private S3Service: AwsConfig
+  ) {}
 
   async registeUser(userData: IUser): Promise<void | boolean> {
     try {

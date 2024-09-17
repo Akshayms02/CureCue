@@ -27,21 +27,15 @@ route.put(
   "/listUnlistSpecialization",
   adminController.listUnlistSpecialization.bind(adminController)
 );
-route.get(
-  "/getApplications",
-  adminController.getApplication.bind(adminController)
+route.get("/getUsers", adminController.getUsers.bind(adminController));
+route.put(
+  "/listUnlistUser/:userId",
+  adminController.listUnlistUser.bind(adminController)
 );
-route.get(
-  "/getDoctorApplication/:applicationId",
-  adminController.getDoctorApplication.bind(adminController)
-);
-route.post(
-  "/approveApplication/:doctorId",
-  adminController.approveApplication.bind(adminController)
-);
-route.delete(
-  "/rejectApplication/:doctorId",
-  adminController.rejectApplication.bind(adminController)
+route.get("/getDoctors", adminController.getDoctors.bind(adminController));
+route.put(
+  "/listUnlistDoctor/:doctorId",
+  adminController.listUnlistDoctor.bind(adminController)
 );
 
 export default route;

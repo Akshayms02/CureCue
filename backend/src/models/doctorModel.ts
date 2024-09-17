@@ -1,5 +1,9 @@
-import { Document, model, Schema } from "mongoose";
+import mongoose, { Document, model, Schema } from "mongoose";
 
+interface ImageField {
+  type: string;
+  url: string;
+}
 export interface IDoctor extends Document {
   doctorId: string;
   name: string;
@@ -7,15 +11,16 @@ export interface IDoctor extends Document {
   phone: string;
   password: string;
   DOB: Date;
-  department: string;
+  department: mongoose.Types.ObjectId;
   gender: string;
-  image: string;
+  image: ImageField;
   fees: number;
-  kycStatus: boolean;
+  kycStatus: KYCStatus;
   kycDetails: {
-    certificateImage: string;
-    qualificationImage: string;
-    yearOfExperience: number;
+    certificateImage: ImageField;
+    qualificationImage: ImageField;
+    adharFrontImage: ImageField;
+    adharBackImage: ImageField;
     adharNumber: number;
   };
   createdAt: Date;
@@ -23,6 +28,25 @@ export interface IDoctor extends Document {
   isBlocked: boolean;
 }
 
+enum KYCStatus {
+  PENDING = "pending",
+  SUBMITTED = "submitted",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+}
+
+const imageFieldSchema = new Schema<ImageField>({
+  type: {
+    type: String,
+    required: true,
+  },
+  url: {
+    type: String,
+    required: true,
+  },
+});
+
+// Define the main Doctor schema
 const doctorSchema = new Schema<IDoctor>({
   doctorId: {
     type: String,
@@ -49,29 +73,35 @@ const doctorSchema = new Schema<IDoctor>({
     type: Date,
   },
   department: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: "Specialization",
   },
   gender: {
     type: String,
   },
   image: {
-    type: String,
+    type: imageFieldSchema,
   },
   fees: {
     type: Number,
   },
   kycStatus: {
-    type: Boolean,
+    type: String,
+    enum: Object.values(KYCStatus),
+    default: KYCStatus.PENDING,
   },
   kycDetails: {
     certificateImage: {
-      type: String,
+      type: imageFieldSchema,
     },
     qualificationImage: {
-      type: String,
+      type: imageFieldSchema,
     },
-    yearOfExperience: {
-      type: Number,
+    adharFrontImage: {
+      type: imageFieldSchema,
+    },
+    adharBackImage: {
+      type: imageFieldSchema,
     },
     adharNumber: {
       type: Number,

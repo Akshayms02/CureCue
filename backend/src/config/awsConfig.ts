@@ -1,5 +1,11 @@
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import * as crypto from "crypto";
 
 import dotenv from "dotenv";
 
@@ -40,6 +46,44 @@ export class AwsConfig {
       return url;
     } catch (error) {
       console.error("Error generating signed URL:", error);
+      throw error;
+    }
+  }
+
+  async uploadFile(folderPath: string, file: any) {
+    const uniqueName =
+      crypto.randomBytes(16).toString("hex") + "-" + file.originalname;
+    const params = {
+      Bucket: this.bucketName,
+      Key: `${folderPath}${uniqueName}`,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    };
+
+    try {
+      const command = new PutObjectCommand(params);
+      await this.s3client.send(command);
+      console.log(`File uploaded successfully at `);
+      return uniqueName;
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      throw error;
+    }
+  }
+
+  async deleteFile(key: string) {
+    const params = {
+      Bucket: this.bucketName,
+      Key: key,
+    };
+
+    try {
+      const command = new DeleteObjectCommand(params);
+      const data = await this.s3client.send(command);
+      console.log(`File deleted successfully from ${key}`);
+      return data;
+    } catch (error) {
+      console.error("Error deleting file:", error);
       throw error;
     }
   }
