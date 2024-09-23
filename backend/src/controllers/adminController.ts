@@ -10,30 +10,27 @@ export default class AdminController {
 
   async loginAdmin(req: Request, res: Response): Promise<void> {
     try {
-      console.log("login adminController");
-
       const { email, password } = req.body;
 
       const loginResponse = await this.adminService.verifyAdmin(
         email,
         password
       );
-      console.log("controller res", loginResponse);
 
       const response = {
-        accessToken: loginResponse.accessToken,
+        adminAccessToken: loginResponse.adminAccessToken,
         adminInfo: loginResponse.adminInfo,
       };
-      console.log(res);
 
-      res.cookie("refreshToken", loginResponse.refreshToken, {
+      res.cookie("adminRefreshToken", loginResponse.adminRefreshToken, {
         httpOnly: true,
+        path: "/",
         maxAge: 7 * 24 * 60 * 60 * 1000,
+        sameSite: "strict",
       });
-      console.log("logindata", response);
+
       res.status(200).json({ message: "Login successful", response });
     } catch (error: any) {
-      console.log("controller error");
       if (error.message === "Admin Doesn't exist") {
         res.status(400).json({ message: "Admin Doesn't exist" });
       }
@@ -45,10 +42,23 @@ export default class AdminController {
       }
     }
   }
+
+  async adminLogout(req: Request, res: Response): Promise<void> {
+    try {
+      res.clearCookie("adminRefreshToken", {
+        httpOnly: true,
+        path: "/", // Ensure the cookie is cleared site-wide
+        sameSite: "strict",
+      });
+      res
+        .status(200)
+        .json({ message: "You have been logged Out Successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: `Something went wrong:${error}` });
+    }
+  }
   async addSpecialization(req: Request, res: Response): Promise<void> {
     try {
-      console.log("Entering addSpecialization method in adminController");
-
       const { name, description } = req.body;
 
       const response = await this.adminService.addSpecialization(
@@ -56,14 +66,10 @@ export default class AdminController {
         description
       );
 
-      console.log("Specialization successfully created:", response);
-
       res
         .status(200)
         .json({ message: "Specialization added successfully", response });
     } catch (error: any) {
-      console.error("Error in addSpecialization controller:", error.message);
-
       if (
         error.message ===
         "Something went wrong while creating the specialization."
@@ -81,18 +87,12 @@ export default class AdminController {
   }
   async getSpecialization(req: Request, res: Response): Promise<void> {
     try {
-      console.log("Entering addSpecialization method in adminController");
-
       const response = await this.adminService.getSpecialization();
-
-      console.log("Specialization successfully fetched", response);
 
       res
         .status(200)
         .json({ message: "Specialization added successfully", response });
     } catch (error: any) {
-      console.error("Error in addSpecialization controller:", error.message);
-
       if (
         error.message ===
         "Something went wrong while creating the specialization."
@@ -110,7 +110,6 @@ export default class AdminController {
   }
   async editSpecialization(req: Request, res: Response): Promise<void> {
     try {
-      console.log("Entering editSpecialization method in adminController");
       const { id, name, description } = req.body;
 
       const response = await this.adminService.editSpecialization(
@@ -119,14 +118,10 @@ export default class AdminController {
         description
       );
 
-      console.log("Specialization successfully edited", response);
-
       res
         .status(200)
         .json({ message: "Specialization updated successfully", response });
     } catch (error: any) {
-      console.error("Error in editSpecialization controller:", error.message);
-
       if (
         error.message ===
         "Something went wrong while creating the specialization."
@@ -144,19 +139,14 @@ export default class AdminController {
   }
   async listUnlistSpecialization(req: Request, res: Response): Promise<void> {
     try {
-      console.log("Entering editSpecialization method in adminController");
       const { id } = req.body;
 
       const response = await this.adminService.listUnlistSpecialization(id);
-
-      console.log("Specialization successfully edited", response);
 
       res
         .status(200)
         .json({ message: "Specialization updated successfully", response });
     } catch (error: any) {
-      console.error("Error in editSpecialization controller:", error.message);
-
       if (
         error.message ===
         "Something went wrong while creating the specialization."
@@ -172,20 +162,13 @@ export default class AdminController {
       }
     }
   }
- 
 
   async getUsers(req: Request, res: Response): Promise<void> {
     try {
-      console.log("Entering  method in adminController");
-
       const response = await this.adminService.getUsers();
-
-      console.log("Specialization successfully fetched", response);
 
       res.status(200).json({ message: "fetch users successfully", response });
     } catch (error: any) {
-      console.error("Error in addSpecialization controller:", error.message);
-
       if (
         error.message ===
         "Something went wrong while creating the specialization."
@@ -203,16 +186,10 @@ export default class AdminController {
   }
   async getDoctors(req: Request, res: Response): Promise<void> {
     try {
-      console.log("Entering  method in adminController");
-
       const response = await this.adminService.getDoctors();
-
-      console.log("Specialization successfully fetched", response);
 
       res.status(200).json({ message: "fetch Doctors successfully", response });
     } catch (error: any) {
-      console.error("Error in addSpecialization controller:", error.message);
-
       if (
         error.message ===
         "Something went wrong while creating the specialization."
@@ -231,17 +208,12 @@ export default class AdminController {
 
   async listUnlistUser(req: Request, res: Response): Promise<void> {
     try {
-      console.log("Entering editSpecialization method in adminController");
       const id = req.params.userId;
 
       const response = await this.adminService.listUnlistUser(id);
 
-      console.log("user successfully edited", response);
-
       res.status(200).json({ message: "user updated successfully", response });
     } catch (error: any) {
-      console.error("Error in edituser controller:", error.message);
-
       if (error.message === "Something went wrong while creating the user.") {
         res
           .status(400)
@@ -256,19 +228,14 @@ export default class AdminController {
   }
   async listUnlistDoctor(req: Request, res: Response): Promise<void> {
     try {
-      console.log("Entering editSpecialization method in adminController");
       const id = req.params.doctorId;
 
       const response = await this.adminService.listUnlistDoctor(id);
-
-      console.log("Doctor successfully edited", response);
 
       res
         .status(200)
         .json({ message: "Doctor updated successfully", response });
     } catch (error: any) {
-      console.error("Error in edituser controller:", error.message);
-
       if (error.message === "Something went wrong while creating the user.") {
         res
           .status(400)
@@ -279,6 +246,49 @@ export default class AdminController {
           error: error.message,
         });
       }
+    }
+  }
+  async getAllApplications(req: Request, res: Response): Promise<void> {
+    try {
+      const response = await this.adminService.getAllDoctorApplications();
+      if (response) {
+        res
+          .status(200)
+          .json({ message: "Data fetched successfully", response });
+      }
+    } catch (error: any) {
+      res.status(400).json({
+        message: `Something went wrong while fetching the doctors:${error}`,
+      });
+    }
+  }
+
+  async getDoctorApplication(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const response = await this.adminService.getDoctorApplication(id);
+      if (response) {
+        res
+          .status(200)
+          .json({ message: "Details fetched successfully", data: response });
+      }
+    } catch (error: any) {
+      res.status(400).json({
+        message: `Something went wrong while getting the details:${error}`,
+      });
+    }
+  }
+
+  async acceptApplication(req: Request, res: Response): Promise<void> {
+    try {
+      const { doctorId } = req.params;
+      const response = this.adminService.approveApplication(doctorId as string);
+
+      res
+        .status(200)
+        .json({ message: "Application approved successfully", response });
+    } catch (error: any) {
+      res.status(400).json(error);
     }
   }
 }

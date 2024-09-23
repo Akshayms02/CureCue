@@ -9,8 +9,6 @@ export const login = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      console.log("zzzzz");
-
       const response = await axiosUrl.post(`${API}/login`, { email, password });
       console.log("login thunk", response.data.response);
       return response.data.response;

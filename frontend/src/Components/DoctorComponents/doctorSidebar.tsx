@@ -5,10 +5,36 @@ import {
   CalendarIcon,
   ClipboardListIcon,
   UserIcon,
+  User,
 } from "lucide-react";
 import myImage from "../../assets/Screenshot_2024-08-15_191834-removebg-preview.png";
+import { useNavigate } from "react-router-dom";
+import axiosUrl from "../../Utils/axios";
+import { toast } from "sonner";
+import { clearUser } from "../../Redux/Slice/doctorSlice";
+import { useDispatch } from "react-redux";
 
 export function DoctorSideBar() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const handleLogout = async () => {
+    try {
+      const response = await axiosUrl.post("/api/doctor/logout", {
+        headers: {
+          "Token-Type": "doctor",
+        },
+      });
+      localStorage.removeItem("docaccessToken");
+      localStorage.removeItem("doctorInfo");
+      dispatch(clearUser());
+      toast.success("You have been successfully logged out");
+
+      navigate("/doctor/login");
+      console.log(response);
+    } catch (error: any) {
+      console.error("Logout failed", error);
+    }
+  };
   return (
     <div className="hidden border-r bg-muted/40 md:block">
       <div className="flex h-full max-h-screen flex-col gap-2">
@@ -32,6 +58,19 @@ export function DoctorSideBar() {
             >
               <Home className="h-6 w-6" />
               Dashboard
+            </NavLink>
+            <NavLink
+              to="/doctor/profile"
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
+                  isActive
+                    ? "text-primary bg-gray-300"
+                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
+                }`
+              }
+            >
+              <User className="h-6 w-6" />
+              Profile
             </NavLink>
             <NavLink
               to="/doctor/appointments"
@@ -72,19 +111,13 @@ export function DoctorSideBar() {
               <ClipboardListIcon className="h-6 w-6" />
               Reports
             </NavLink>
-            <NavLink
-              to="/doctor/logout"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold text-muted-foreground hover:text-primary hover:bg-accent/50"
             >
               <LucideLogOut className="h-6 w-6" />
               Logout
-            </NavLink>
+            </button>
           </nav>
         </div>
       </div>

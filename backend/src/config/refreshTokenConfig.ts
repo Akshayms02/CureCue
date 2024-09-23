@@ -22,7 +22,7 @@ const refreshTokenHandler = (req: Request, res: Response) => {
 
   jwt.verify(refreshToken, secret_key, (err: jwt.VerifyErrors | null) => {
     if (err) {
-      console.error("Error verifying refresh token:", err.message);
+      
       return res
         .status(401)
         .json({ message: "Invalid or expired refresh token." });

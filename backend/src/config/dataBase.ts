@@ -6,12 +6,11 @@ dotenv.config();
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI as string);
-    console.log("DataBase Connected Successfully");
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error(error.message);
+      throw new Error(error.message);
     } else {
-      console.log("Some unknown error occured");
+      throw new Error("Unknown error");
     }
   }
 };

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { MoreHorizontal } from "lucide-react";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
+
 import {
   Card,
   CardContent,
@@ -54,6 +55,12 @@ function DoctorManagement() {
   };
 
   useEffect(() => {
+    const adminAccessToken = localStorage.getItem("adminAccessToken");
+    if (!adminAccessToken) {
+      navigate("/admin/login");
+    }
+  }, [navigate]);
+  useEffect(() => {
     fetchDoctors();
   }, []);
 
@@ -72,7 +79,7 @@ function DoctorManagement() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <div className="flex flex-col items-center justify-start min-h-screen p-4">
       <div className="w-full max-w-4xl">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Doctors List</h1>

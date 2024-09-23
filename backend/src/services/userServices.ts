@@ -16,12 +16,10 @@ export class userServices {
 
   async registeUser(userData: IUser): Promise<void | boolean> {
     try {
-      console.log("hello from services");
       const existingUser = await this.userRepositary.existUser(userData.email);
       if (existingUser) {
         throw Error("Email already in use");
       }
-      console.log(existingUser);
 
       const saltRounds: number = 10;
       const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
@@ -35,19 +33,16 @@ export class userServices {
         password: hashedPassword,
         createdAt: new Date(),
       };
-      console.log(`tempUserData${userData.email}`);
+
       await redisClient.setEx(
         `tempUserData${userData.email}`,
         400,
         JSON.stringify(tempUserData)
       );
-      const ttl = await redisClient.ttl(`tempUserData${userData.email}`);
-      console.log("TTL:", ttl); // Should be close to 300 seconds
 
       const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
       await redisClient.setEx(userData.email, 60, otp);
-      console.log("otp : ", otp);
 
       sendEmailOtp(userData.email, otp);
 
@@ -58,7 +53,7 @@ export class userServices {
           `Error has occured in UserServices register:${error.message}`
         );
       } else {
-        console.log("An unknown error has occured");
+        throw new Error("Unknown Error")
       }
     }
   }
@@ -66,14 +61,14 @@ export class userServices {
   async otpVerify(email: string, inputOtp: string): Promise<boolean> {
     try {
       const cachedOtp = await redisClient.get(email);
-      console.log("Catched OTP: ", cachedOtp);
+
       if (!cachedOtp) {
         throw new Error("OTP Expired or not found");
       } else if (cachedOtp !== inputOtp) {
         throw new Error("Wrong OTP");
       } else {
         const tempUserData = await redisClient.get(`tempUserData${email}`);
-        console.log(`tempUserData${email}`, tempUserData);
+
         if (!tempUserData) {
           throw new Error("Temporary userData not found or Expired");
         }
@@ -87,7 +82,6 @@ export class userServices {
         return true;
       }
     } catch (error: unknown) {
-      console.log(error);
       if (error instanceof Error) {
         throw new Error(error.message);
       } else {
@@ -142,8 +136,6 @@ export class userServices {
       await redisClient.setEx(email, 60, otp);
 
       sendEmailOtp(email, otp);
-
-      console.log("Resend generated OTP:", otp);
 
       return true;
     } catch (error: unknown) {

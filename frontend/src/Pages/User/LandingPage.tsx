@@ -15,7 +15,7 @@ const LandingPage: React.FC = () => {
   };
 
   const handleProfileClick = () => {
-    console.log("Profile icon clicked");
+    navigate("/profile")
   };
 
   return (
@@ -28,13 +28,13 @@ const LandingPage: React.FC = () => {
               href="#features"
               className="text-gray-700 hover:text-blue-500 px-4"
             >
-              Features
+              Home
             </a>
             <a
               href="#testimonials"
               className="text-gray-700 hover:text-blue-500 px-4 "
             >
-              Testimonials
+              Booking
             </a>
 
             <a
@@ -51,7 +51,7 @@ const LandingPage: React.FC = () => {
                 onClick={handleProfileClick}
                 className="text-gray-700 hover:text-blue-500 px-4 "
               >
-                <FaUserCircle size={24} />
+                <FaUserCircle size={35} />
               </button>
             ) : (
               <button

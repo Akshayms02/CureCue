@@ -3,19 +3,18 @@ import specializationModel from "../models/specializationModel";
 import doctorModel from "../models/doctorModel";
 import { IAdminRepository } from "../interfaces/IAdminRepository";
 import userModel from "../models/userModel";
+import doctorApplicationModel from "../models/doctorApplicationModel";
 
 export class AdminRepository implements IAdminRepository {
   async adminCheck(email: string) {
     try {
-      console.log("login adminrep");
       const adminData = await adminModel.findOne({ email: email });
-      console.log(adminData);
+
       if (adminData) {
         return adminData;
       }
       throw new Error("Doctor Doesn't exist");
     } catch (error: any) {
-      console.log("rep error");
       throw new Error(error.message);
     }
   }
@@ -30,7 +29,6 @@ export class AdminRepository implements IAdminRepository {
 
       return savedSpecialization;
     } catch (error: any) {
-      console.error("Error creating specialization:", error.message);
       throw new Error(error.message);
     }
   }
@@ -40,7 +38,6 @@ export class AdminRepository implements IAdminRepository {
 
       return specializations;
     } catch (error: any) {
-      console.error("Error getting specialization:", error.message);
       throw new Error(error.message);
     }
   }
@@ -53,7 +50,6 @@ export class AdminRepository implements IAdminRepository {
 
       return specializations;
     } catch (error: any) {
-      console.error("Error updating specialization:", error.message);
       throw new Error(error.message);
     }
   }
@@ -67,11 +63,9 @@ export class AdminRepository implements IAdminRepository {
       specialization.isListed = !specialization.isListed;
 
       const updatedSpecialization = await specialization.save();
-      console.log("Updated Specialization:", updatedSpecialization);
 
       return updatedSpecialization;
     } catch (error: any) {
-      console.error("Error updating specialization:", error.message);
       throw new Error(error.message);
     }
   }
@@ -79,22 +73,18 @@ export class AdminRepository implements IAdminRepository {
   async getAllUsers() {
     try {
       const users = await userModel.find();
-      console.log("users", users);
 
       return users;
     } catch (error: any) {
-      console.error("Error getting users:", error.message);
       throw new Error(error.message);
     }
   }
   async getAllDoctors() {
     try {
       const doctors = await doctorModel.find({ kycStatus: "approved" });
-      console.log("doctors", doctors);
 
       return doctors;
     } catch (error: any) {
-      console.error("Error getting doctors:", error.message);
       throw new Error(error.message);
     }
   }
@@ -109,11 +99,9 @@ export class AdminRepository implements IAdminRepository {
       user.isBlocked = !user.isBlocked;
 
       const updatedUser = await user.save();
-      console.log("Updated user:", updatedUser);
 
       return updatedUser;
     } catch (error: any) {
-      console.error("Error updating user:", error.message);
       throw new Error(error.message);
     }
   }
@@ -127,12 +115,68 @@ export class AdminRepository implements IAdminRepository {
       doctor.isBlocked = !doctor.isBlocked;
 
       const updatedDoctor = await doctor.save();
-      console.log("Updated doctor:", updatedDoctor);
 
       return updatedDoctor;
     } catch (error: any) {
-      console.error("Error updating doctor:", error.message);
       throw new Error(error.message);
+    }
+  }
+  async getAllApplications() {
+    try {
+      const response = await doctorApplicationModel
+        .find()
+        .populate("department");
+
+      return response;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
+  async getSingleDoctorApplication(id: string) {
+    try {
+      const response = doctorApplicationModel
+        .findById(id)
+        .populate("department");
+      return response;
+    } catch (error: any) {
+      throw new Error(
+        `Something went wrong while fetching the details:${error}`
+      );
+    }
+  }
+
+  async approveDoctor(doctorId: string) {
+    try {
+      const response = await doctorApplicationModel.findOne({
+        doctorId: doctorId,
+      });
+      if (!response) {
+        throw new Error("Doctor application not found");
+      }
+
+      const updatedDoctor = await doctorModel.findByIdAndUpdate(
+        doctorId,
+        {
+          name: response.name,
+          DOB: response.DOB,
+          department: response.department,
+          gender: response.gender,
+          image: response.image,
+          fees: response.fees,
+          kycDetails: response.kycDetails,
+          kycStatus: "approved",
+        },
+        { new: true }
+      );
+
+      if (!updatedDoctor) {
+        throw new Error("Doctor not found");
+      }
+
+      return { status: true };
+    } catch (error: any) {
+      throw new Error(error);
     }
   }
 }

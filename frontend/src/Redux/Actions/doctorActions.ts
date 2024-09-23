@@ -81,13 +81,36 @@ export const login = createAsyncThunk(
     try {
       console.log("hello from doctorlogin");
       const response = await axiosUrl.post(`${API}/login`, credentials);
-      console.log("sfsfs",response);
+      console.log("sfsfs", response);
       const { docaccessToken, doctorInfo } = response.data.Credentials;
 
       return { docaccessToken, doctorInfo };
     } catch (error: any) {
-      console.log("eee",error.response.data.message);
-      return rejectWithValue(error.response.data.message||"Login failed");
+      console.log("eee", error.response.data.message);
+      return rejectWithValue(error.response.data.message || "Login failed");
+    }
+  }
+);
+
+export const uploadDoctorData = createAsyncThunk(
+  "doctor/uploadData",
+  async (formData: FormData, { rejectWithValue }) => {
+    try {
+      const response = await axiosUrl.post(
+        "/api/doctor/uploadDoctorKycDetails",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      const { kycStatus } = response.data;
+
+      return{kycStatus};
+    } catch (error: any) {
+      console.log(error);
+      return rejectWithValue(error.response || "Upload Failed");
     }
   }
 );

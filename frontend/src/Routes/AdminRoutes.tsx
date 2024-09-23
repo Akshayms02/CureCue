@@ -6,6 +6,8 @@ import AdminDashBoard from "../Pages/Admin/adminDashboard";
 import AdminUsers from "../Pages/Admin/adminUsers";
 import AdminDoctors from "../Pages/Admin/adminDoctors";
 import AdminDocSpecialization from "../Pages/Admin/adminDocSpecialization";
+import DoctorApplications from "../Components/AdminComponents/doctorApplications";
+import DoctorApplicationDetails from "../Components/AdminComponents/doctorApplicationDetails";
 
 function AdminRoutes() {
   return (
@@ -16,6 +18,8 @@ function AdminRoutes() {
         <Route path="users" element={<AdminUsers />}></Route>
         <Route path="doctors" element={<AdminDoctors />}></Route>
         <Route path="departments" element={<AdminDocSpecialization />} />
+        <Route path="applications" element={<DoctorApplications/>}></Route>
+        <Route path="viewApplication" element={<DoctorApplicationDetails/>}></Route>
         {/*<Route path="viewApplication" element={<ApplicationDetailspage />} /> */}
       </Route>
     </Routes>

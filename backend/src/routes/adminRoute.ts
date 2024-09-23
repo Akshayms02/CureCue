@@ -15,6 +15,7 @@ route.post(
   "/addSpecialization",
   adminController.addSpecialization.bind(adminController)
 );
+route.post("/logout", adminController.adminLogout.bind(adminController));
 route.get(
   "/getSpecializations",
   adminController.getSpecialization.bind(adminController)
@@ -36,6 +37,21 @@ route.get("/getDoctors", adminController.getDoctors.bind(adminController));
 route.put(
   "/listUnlistDoctor/:doctorId",
   adminController.listUnlistDoctor.bind(adminController)
+);
+
+route.get(
+  "/getApplications",
+  adminController.getAllApplications.bind(adminController)
+);
+
+route.get(
+  "/doctorApplication/:id",
+  adminController.getDoctorApplication.bind(adminController)
+);
+
+route.post(
+  "/accept-doctor/:doctorId",
+  adminController.acceptApplication.bind(adminController)
 );
 
 export default route;

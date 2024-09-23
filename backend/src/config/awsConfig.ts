@@ -44,9 +44,8 @@ export class AwsConfig {
         expiresIn: 60 * 60,
       });
       return url;
-    } catch (error) {
-      console.error("Error generating signed URL:", error);
-      throw error;
+    } catch (error: any) {
+      throw new Error(error);
     }
   }
 
@@ -63,11 +62,9 @@ export class AwsConfig {
     try {
       const command = new PutObjectCommand(params);
       await this.s3client.send(command);
-      console.log(`File uploaded successfully at `);
       return uniqueName;
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      throw error;
+    } catch (error: any) {
+      throw new Error(error);
     }
   }
 
@@ -80,11 +77,10 @@ export class AwsConfig {
     try {
       const command = new DeleteObjectCommand(params);
       const data = await this.s3client.send(command);
-      console.log(`File deleted successfully from ${key}`);
+
       return data;
-    } catch (error) {
-      console.error("Error deleting file:", error);
-      throw error;
+    } catch (error: any) {
+      throw new Error(error);
     }
   }
 }

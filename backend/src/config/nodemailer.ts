@@ -80,10 +80,9 @@ const sendEmailOtp = async (email: string, otp: number | string) => {
     </html>`,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("OTP sent to mail:", info.response);
-  } catch (error) {
-    console.error("Failed to send the mail", error);
+    await transporter.sendMail(mailOptions);
+  } catch (error: any) {
+    throw new Error(error);
   }
 };
 

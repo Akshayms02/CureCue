@@ -29,12 +29,16 @@ const adminSlice = createSlice({
       })
       .addCase(
         login.fulfilled,
-        (state, action: PayloadAction<{ adminInfo: Admin }>) => {
-          const { adminInfo } = action.payload;
+        (
+          state,
+          action: PayloadAction<{ adminInfo: Admin; adminAccessToken: string }>
+        ) => {
+          const { adminInfo, adminAccessToken } = action.payload;
           state.adminInfo = adminInfo;
           state.loading = false;
 
           localStorage.setItem("adminInfo", JSON.stringify(adminInfo));
+          localStorage.setItem("adminAccessToken", adminAccessToken);
         }
       )
       .addCase(login.rejected, (state, action) => {

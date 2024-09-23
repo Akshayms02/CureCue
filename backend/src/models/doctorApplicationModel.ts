@@ -17,7 +17,7 @@ interface IDoctorApplication extends Document {
   doctorId: mongoose.Types.ObjectId;
   name: string;
   DOB: Date;
-  department: string;
+  department: mongoose.Types.ObjectId;
   gender?: string;
   image: IImage;
   fees: number;
@@ -53,7 +53,9 @@ const doctorApplicationSchema = new Schema<IDoctorApplication>({
     type: Date,
   },
   department: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: "Specialization",
+    required: true,
   },
   gender: {
     type: String,

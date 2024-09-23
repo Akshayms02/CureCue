@@ -9,12 +9,10 @@ export default class UserController {
 
   async register(req: Request, res: Response) {
     try {
-      console.log("hello from controller");
       const user = await this.userService.registeUser(req.body);
       res.status(201).json(user);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.log("error has occured here");
         res.status(400).json({ message: error.message });
       } else {
         res.status(400).json({ message: "An unknow error has occured" });
@@ -25,11 +23,10 @@ export default class UserController {
   async verifyOtp(req: Request, res: Response): Promise<void> {
     try {
       const data = req.body;
-      console.log("userdata: ", data);
+
       await this.userService.otpVerify(data.email, data.otp);
       res.status(200).json({ message: "verified" });
     } catch (error: unknown) {
-      console.log(error);
       if (error instanceof Error) {
         throw new Error("somekind of error");
       } else {
@@ -40,7 +37,6 @@ export default class UserController {
 
   async verifyLogin(req: Request, res: Response): Promise<void> {
     try {
-     console.log("hello")
       const { email, password } = req.body;
       const result = await this.userService.verifyLogin(email, password);
       if (!result) {
@@ -58,7 +54,6 @@ export default class UserController {
       res.status(200).json({ message: "Login Successful", Credentials });
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.log(error)
         if (error.message === "User doesnt Exist") {
           res.status(400).json({ message: "User Doesnt Exist" });
         } else if (error.message === "Invalid Password") {

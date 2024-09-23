@@ -13,28 +13,21 @@ const createToken = (user_id: string): string => {
 
 const secret_key = process.env.JWT_SECRET as string;
 
-console.log("Secret key: ", secret_key);
-
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers["authorization"];
-  console.log("!authheader");
 
   if (!authHeader) {
     return res.status(401).send("Authorization failed.");
   }
 
   const token = authHeader.split(" ")[1];
-  console.log(token);
-
-  console.log("!token");
 
   if (!token) {
     return res.status(401).send("Authorization failed.");
   }
 
   jwt.verify(token, secret_key, (err: any) => {
-    console.log("error in verifying  jtoken");
-    return res.status(401).send("Authorization failed.");
+    return res.status(401).send(`Authorization failed : ${err}`);
   });
 };
 

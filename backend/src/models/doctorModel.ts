@@ -46,7 +46,7 @@ const imageFieldSchema = new Schema<ImageField>({
   },
 });
 
-// Define the main Doctor schema
+
 const doctorSchema = new Schema<IDoctor>({
   doctorId: {
     type: String,

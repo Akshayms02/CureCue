@@ -5,6 +5,8 @@ import DoctorLogin from "../Pages/Doctor/DoctorLogin";
 
 import DoctorLayout from "../Components/Common/DoctorLayout";
 import { DoctorDashboard } from "../Components/DoctorComponents/DoctorDashBoardComponent";
+import DoctorProtectedRoute from "./ProtectedRoutes/DoctorProtectedRoute";
+import ProfileCard from "../Pages/Doctor/Profile";
 
 function DoctorRoutes() {
   return (
@@ -13,7 +15,23 @@ function DoctorRoutes() {
       <Route path="/otp" element={<DoctorOtpPage />} />
       <Route path="/login" element={<DoctorLogin />} />
       <Route path="/" element={<DoctorLayout />}>
-        <Route index path="dashboard" element={<DoctorDashboard />} />
+        <Route
+          index
+          path="dashboard"
+          element={
+            <DoctorProtectedRoute>
+              <DoctorDashboard />
+            </DoctorProtectedRoute>
+          }
+        />
+        <Route
+          path="profile"
+          element={
+            <DoctorProtectedRoute>
+              <ProfileCard />
+            </DoctorProtectedRoute>
+          }
+        ></Route>
       </Route>
     </Routes>
   );
