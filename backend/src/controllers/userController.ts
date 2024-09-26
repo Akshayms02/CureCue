@@ -56,12 +56,12 @@ export default class UserController {
       if (error instanceof Error) {
         if (error.message === "User doesnt Exist") {
           res.status(400).json({ message: "User Doesnt Exist" });
+        } else if (error.message === "User is blocked") {
+          res.status(400).json({ message: "User is blocked" });
         } else if (error.message === "Invalid Password") {
           res.status(400).json({ message: "Password is wrong" });
         } else {
-          throw new Error(
-            "Unknown Error has Occured in UserController verify login"
-          );
+          res.status(500).json({ message: "Internal Server Error" });
         }
       }
     }
@@ -86,6 +86,41 @@ export default class UserController {
           "An unknow error has occured in resendOtp userController"
         );
       }
+    }
+  }
+  async checkStatus(req: Request, res: Response): Promise<void> {
+    try {
+      const { email } = req.params;
+      const response = await this.userService.checkStatus(email);
+      if (response) {
+        res.status(200).json({ isBlocked: response.isBlocked });
+      }
+    } catch (error: any) {
+      res.status(400).json({ message: `Something went wrong:${error}` });
+    }
+  }
+  async logoutUser(req: Request, res: Response): Promise<void> {
+    try {
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        path: "/", // Ensure the cookie is cleared site-wide
+        sameSite: "strict",
+      });
+      res
+        .status(200)
+        .json({ message: "You have been logged Out Successfully" });
+    } catch (error: any) {
+      res.status(500).json({
+        message: `Internal server error : ${error}`,
+      });
+    }
+  }
+  async getDoctors(req: Request, res: Response): Promise<void> {
+    try {
+      const response = await this.userService.getAllDoctors();
+      res.status(200).json(response);
+    } catch (error: any) {
+      res.status(400).json({ message: `Internal Server Error:${error}` });
     }
   }
 }

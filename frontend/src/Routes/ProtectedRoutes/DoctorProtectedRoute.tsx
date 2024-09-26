@@ -30,6 +30,7 @@ function DoctorProtectedRoute({ children }: DoctorProtectedRouteProps) {
             await axiosUrl.post("/api/doctor/logout");
             dispatch(clearUser());
             localStorage.removeItem("doctorInfo");
+            localStorage.removeItem("docaccessToken")
             navigate("/doctor/login");
           }
           dispatch(setDocStatus({ kycStatus: data.kycStatus }));

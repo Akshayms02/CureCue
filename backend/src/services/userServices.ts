@@ -14,6 +14,18 @@ export class userServices {
     private S3Service: AwsConfig
   ) {}
 
+  private getFolderPathByFileType(fileType: string): string {
+    switch (fileType) {
+      case "profile image":
+        return "cureCue/doctorProfileImages";
+      case "document":
+        return "cureCue/doctorDocuments";
+
+      default:
+        throw new Error(`Unknown file type: ${fileType}`);
+    }
+  }
+
   async registeUser(userData: IUser): Promise<void | boolean> {
     try {
       const existingUser = await this.userRepositary.existUser(userData.email);
@@ -53,7 +65,7 @@ export class userServices {
           `Error has occured in UserServices register:${error.message}`
         );
       } else {
-        throw new Error("Unknown Error")
+        throw new Error("Unknown Error");
       }
     }
   }
@@ -146,6 +158,44 @@ export class userServices {
           "An unknow Error has occured in UserServices resendOtp"
         );
       }
+    }
+  }
+
+  async checkStatus(email: string) {
+    try {
+      const response = this.userRepositary.existUser(email);
+      return response;
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
+  async getAllDoctors() {
+    try {
+      const response = await this.userRepositary.getDoctors();
+
+      const docs = await Promise.all(
+        response.map(async (doctor: any) => {
+          let profileUrl = "";
+          if (doctor?.image?.url) {
+            const filePath = this.getFolderPathByFileType(doctor?.image?.type);
+            profileUrl = await this.S3Service.getFile(
+              doctor?.image?.url,
+              filePath
+            );
+          }
+          return {
+            name: doctor?.name,
+            email: doctor?.email,
+            profileUrl: profileUrl,
+            doctorId: doctor?.doctorId,
+            department: doctor?.department.name,
+          };
+        })
+      );
+      return docs;
+    } catch (error: any) {
+      throw new Error(error);
     }
   }
 }

@@ -54,6 +54,7 @@ const LoginForm: React.FC = () => {
         navigate("/");
       }
     } catch (error: any) {
+      console.log(error)
       toast.error(error || "Login Failed");
     }
   };

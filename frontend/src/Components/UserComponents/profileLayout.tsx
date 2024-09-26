@@ -1,11 +1,36 @@
 import React from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { clearUser } from "../../Redux/Slice/userSlice";
+import axiosUrl from "../../Utils/axios";
+import { toast } from "sonner";
 
 const ProfileLayout: React.FC = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      const response = await axiosUrl.post("/api/user/logout", {
+        headers: {
+          "Token-Type": "user",
+        },
+      });
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("userInfo");
+      dispatch(clearUser());
+      toast.success("You have been successfully logged out");
+
+      navigate("/login");
+      console.log(response);
+    } catch (error: any) {
+      console.error("Logout failed", error);
+    }
+  };
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <nav className="w-1/5 bg-blue-700 text-white p-2 flex flex-col items-center space-y-4 rounded-3xl mt-5 ml-3 mb-5">
+      <nav className="w-1/5 bg-gradient-to-r from-stone-500 to-stone-700 text-white p-2 flex flex-col items-center space-y-4 rounded-3xl mt-5 ml-3 mb-5">
         <ul className="space-y-10 mt-12">
           <li className="flex items-center space-x-2">
             <svg
@@ -22,7 +47,7 @@ const ProfileLayout: React.FC = () => {
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
               />
             </svg>
-            <NavLink to="overview" className="hover:underline text-xl">
+            <NavLink to="profile" className="hover:underline text-xl">
               Profile Overview
             </NavLink>
           </li>
@@ -63,6 +88,12 @@ const ProfileLayout: React.FC = () => {
             <NavLink to="security" className="hover:underline text-xl">
               Security
             </NavLink>
+          </li>
+          <li className="flex items-center space-x-2">
+            <LogOut />
+            <button onClick={handleLogout} className="hover:underline text-xl">
+              Logout
+            </button>
           </li>
         </ul>
       </nav>

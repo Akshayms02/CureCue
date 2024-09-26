@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { defaultImg } from "../../assets/profile";
 
 interface UserInfo {
   name: string;
@@ -33,7 +34,7 @@ const ProfileOverview: React.FC = () => {
           <div className="flex items-center space-x-4">
             {/* Profile image */}
             <img
-              src="https://via.placeholder.com/150"
+              src={defaultImg}
               alt="Profile"
               className="w-24 h-24 rounded-full object-cover border-2 border-blue-500"
             />
@@ -46,7 +47,7 @@ const ProfileOverview: React.FC = () => {
             </div>
           </div>
           <div className="flex space-x-3">
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg">
+            <button className="px-4 py-2 bg-gradient-to-r from-stone-500 to-stone-700 text-white rounded-lg">
               Edit Profile
             </button>
           </div>

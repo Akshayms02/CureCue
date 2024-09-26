@@ -178,6 +178,4 @@ export default class DoctorController {
       }
     }
   }
-
-  
 }

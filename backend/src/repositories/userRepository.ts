@@ -1,6 +1,7 @@
 import { IUserRepository } from "../interfaces/IUserRepository";
 import userModel, { IUser } from "../models/userModel";
 import bcrypt from "bcrypt";
+import doctorModel from "../models/doctorModel";
 
 export class UserRepository implements IUserRepository {
   async existUser(email: string): Promise<IUser | null> {
@@ -56,5 +57,22 @@ export class UserRepository implements IUserRepository {
         throw new Error("Unknown Error from UserRepositary");
       }
     }
+  }
+
+  async getDoctors() {
+    const doctors = await doctorModel
+      .find(
+        { kycStatus: "approved" },
+        {
+          doctorId: 1,
+          name: 1,
+          email: 1,
+          image: 1,
+          department: 1,
+        }
+      )
+      .populate("department");
+
+    return doctors;
   }
 }

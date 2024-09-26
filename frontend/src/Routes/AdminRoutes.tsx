@@ -18,8 +18,11 @@ function AdminRoutes() {
         <Route path="users" element={<AdminUsers />}></Route>
         <Route path="doctors" element={<AdminDoctors />}></Route>
         <Route path="departments" element={<AdminDocSpecialization />} />
-        <Route path="applications" element={<DoctorApplications/>}></Route>
-        <Route path="viewApplication" element={<DoctorApplicationDetails/>}></Route>
+        <Route path="applications" element={<DoctorApplications />}></Route>
+        <Route
+          path="viewApplication"
+          element={<DoctorApplicationDetails />}
+        ></Route>
         {/*<Route path="viewApplication" element={<ApplicationDetailspage />} /> */}
       </Route>
     </Routes>

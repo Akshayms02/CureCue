@@ -137,17 +137,16 @@ export class doctorServices {
         { expiresIn: "7d" }
       );
 
-      const files = [];
-      if (user) {
-        files.push(user.image);
+      let imageUrl = "";
+
+      if (user?.image) {
+        const folderPath = this.getFolderPathByFileType(user?.image?.type);
+        const signedUrl = await this.S3Service.getFile(
+          user.image.url,
+          folderPath
+        );
+        imageUrl = signedUrl;
       }
-      const signedFiles = await Promise.all(
-        files.map(async (file: { type: string; url: string }) => {
-          const folderPath = this.getFolderPathByFileType(file.type);
-          const signedUrl = await this.S3Service.getFile(file.url, folderPath);
-          return { ...file, signedUrl };
-        })
-      );
 
       const doctorInfo = {
         name: user.name,
@@ -160,7 +159,7 @@ export class doctorServices {
         fees: user.fees,
         gender: user.gender,
         department: user.department,
-        image: signedFiles,
+        image: imageUrl,
       };
 
       return { doctorInfo, docaccessToken, refreshToken };

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { defaultImg } from "../../assets/profile";
 
 // Define the types for the data
 interface Department {
@@ -21,7 +22,7 @@ interface DoctorInfo {
   fees: number;
   gender: string;
   department: Department;
-  image:any
+  image: any
 }
 
 const ProfileCard: React.FC = () => {
@@ -46,18 +47,18 @@ const ProfileCard: React.FC = () => {
           <div className="flex items-center space-x-4">
             {/* Profile image */}
             <img
-              src={doctorData.image[0].signedUrl}
+              src={doctorData.image || defaultImg}
               alt={doctorData.name}
               className="w-24 h-24 rounded-full object-cover border-2 border-blue-500"
             />
             {/* User name and details */}
             <div>
-              <h2 className="text-2xl font-bold">{doctorData.name}</h2>
+              <h2 className="text-2xl font-bold">{doctorData?.name}</h2>
               <p className="text-gray-600">
-                Department: {doctorData.department.name}
+                Department: {doctorData.department?.name}
               </p>
               <span className="text-sm text-green-500 flex items-center">
-                <span className="mr-1">&#x2022;</span> {doctorData.docStatus}
+                
               </span>
             </div>
           </div>
@@ -73,15 +74,15 @@ const ProfileCard: React.FC = () => {
           {/* Experience */}
           <div>
             <h3 className="text-lg font-bold">Experience</h3>
-            <p>Specialist in {doctorData.department.description}</p>
+            <p>Specialist in {doctorData.department?.description}</p>
           </div>
           {/* About Me */}
           <div>
             <h3 className="text-lg font-bold">About me</h3>
             <p>
-              Hi, I am Dr. {doctorData.name}, a specialist in{" "}
-              {doctorData.department.name} with a focus on{" "}
-              {doctorData.department.description}.
+              Hi, I am Dr. {doctorData?.name}, a specialist in{" "}
+              {doctorData?.department?.name} with a focus on{" "}
+              {doctorData?.department?.description}.
             </p>
             <p className="mt-2">
               My contact information is available for inquiries and
@@ -109,10 +110,10 @@ const ProfileCard: React.FC = () => {
           {/* Contact Info */}
           <div>
             <h3 className="text-lg font-bold">Contact Info</h3>
-            <p>Email: {doctorData.email}</p>
-            <p>Phone: {doctorData.phone}</p>
-            <p>Fees: ${doctorData.fees}</p>
-            <p>Gender: {doctorData.gender}</p>
+            <p>Email: {doctorData?.email}</p>
+            <p>Phone: {doctorData?.phone}</p>
+            <p>Fees: ${doctorData?.fees}</p>
+            <p>Gender: {doctorData?.gender}</p>
           </div>
         </div>
       </div>
