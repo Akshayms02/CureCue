@@ -38,7 +38,18 @@ route.post(
   uploadDoctorDataFiles,
   doctorController.uploadDoctorDetails.bind(doctorController)
 );
-route.get("/check-status/:email",doctorController.checkStatus.bind(doctorController));
+route.get(
+  "/check-status/:email",
+  doctorController.checkStatus.bind(doctorController)
+);
+route.post("/slots", doctorController.scheduleSlots.bind(doctorController));
+
+route.get(
+  "/checkslots",
+  doctorController.checkAvialableSlots.bind(doctorController)
+);
+
+route.post("/deleteSlot", doctorController.deleteSlot.bind(doctorController));
 
 route.post("/refresh-token", refreshTokenHandler);
 

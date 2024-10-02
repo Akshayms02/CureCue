@@ -50,18 +50,19 @@ function UserHome() {
         }}
       >
         <div className="container mx-auto">
-          <h1 className="text-4xl font-bold mb-4 text-blue-700">
+          <h1 className="text-4xl font-bold mb-4 text-black">
             Welcome to CureCue
           </h1>
-          <p className="text-lg mb-8 text-blue-700 font-semibold">
+          <p className="text-lg mb-8 text-black font-semibold">
             Your trusted platform for booking doctor appointments seamlessly.
           </p>
           <NavLink
             to="/signup"
-            className="bg-black text-white font-semibold py-2 px-6 rounded-lg shadow-lg hover:bg-gray-100"
+            className="bg-black text-white font-semibold py-2 px-6 rounded-lg shadow-lg hover:bg-gray-800"
           >
             Get Started
           </NavLink>
+          <NavLink to="/doctor/dashboard" className="block mt-10 text-3xl text-black hover:text-blue-700 text-pretty">Are you a Doctor?</NavLink>
         </div>
       </section>
 
@@ -114,11 +115,10 @@ function UserHome() {
             <button
               onClick={handlePrevPage}
               disabled={currentPage === 0}
-              className={`px-4 py-2 rounded-lg shadow-lg ${
-                currentPage === 0
-                  ? "bg-gray-300"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
+              className={`px-4 py-2 rounded-lg shadow-lg ${currentPage === 0
+                ? "bg-gray-300"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+                }`}
             >
               <FaArrowLeft />
             </button>
@@ -126,11 +126,10 @@ function UserHome() {
             <button
               onClick={handleNextPage}
               disabled={indexOfLastDoctor >= doctors.length}
-              className={`px-4 py-2  rounded-lg shadow-lg ${
-                indexOfLastDoctor >= doctors.length
-                  ? "bg-gray-300"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
-              }`}
+              className={`px-4 py-2  rounded-lg shadow-lg ${indexOfLastDoctor >= doctors.length
+                ? "bg-gray-300"
+                : "bg-blue-600 text-white hover:bg-blue-700"
+                }`}
             >
               <FaArrowRight />
             </button>

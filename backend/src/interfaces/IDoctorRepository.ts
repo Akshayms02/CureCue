@@ -6,4 +6,11 @@ export interface IDoctorRepository {
   createUser(userData: IDoctor): Promise<IDoctor>;
   userLoginValidate(email: string, password: string): Promise<IDoctor>;
   uploadDoctorData(data: DoctorData, docDetails: docDetails): Promise<any>;
+  createSlot(
+    parsedDate: any,
+    formattedTimeSlots: any,
+    doctorId: string
+  ): Promise<any>;
+  checkSlots(doctorId: string, date: string): Promise<any>;
+  deleteSlot(start: string, doctorId: string, date: string): Promise<any>;
 }

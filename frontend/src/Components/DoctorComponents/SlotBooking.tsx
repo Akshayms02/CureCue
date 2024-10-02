@@ -44,11 +44,7 @@ export function SlotBooking() {
   };
 
 
-  useEffect(() => {
-    if (date) {
-      fetchAvailableSlots(date);
-    }
-  }, [date]);
+
 
   // Dynamically generate time slots based on the selected date
   const generateTimeSlots = (selectedDate: Date | undefined) => {
@@ -141,6 +137,12 @@ export function SlotBooking() {
         toast.error(error.response?.data?.message)
       });
   };
+
+  useEffect(() => {
+    if (date) {
+      fetchAvailableSlots(date);
+    }
+  }, [date,handleAddSlot]);
 
   const handleDeleteSlot = async (slotStart, date) => {
     try {
