@@ -13,6 +13,7 @@ import axiosUrl from "../../Utils/axios";
 import { toast } from "sonner";
 import { clearUser } from "../../Redux/Slice/doctorSlice";
 import { useDispatch } from "react-redux";
+import { FaCheckToSlot } from "react-icons/fa6";
 
 export function DoctorSideBar() {
   const navigate = useNavigate();
@@ -73,6 +74,19 @@ export function DoctorSideBar() {
               Profile
             </NavLink>
             <NavLink
+              to="/doctor/slots"
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
+                  isActive
+                    ? "text-primary bg-gray-300"
+                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
+                }`
+              }
+            >
+              <FaCheckToSlot className="h-6 w-6" />
+              Slots
+            </NavLink>
+            <NavLink
               to="/doctor/appointments"
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
@@ -98,6 +112,7 @@ export function DoctorSideBar() {
               <UserIcon className="h-6 w-6" />
               Patients
             </NavLink>
+
             <NavLink
               to="/doctor/reports"
               className={({ isActive }) =>

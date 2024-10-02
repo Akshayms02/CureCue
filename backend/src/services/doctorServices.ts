@@ -14,6 +14,10 @@ import {
 } from "../interfaces/doctorInterfaces";
 import { AwsConfig } from "../config/awsConfig";
 
+interface ITimeSlot {
+  start: string;
+  end: string;
+}
 export class doctorServices {
   constructor(
     private doctorRepository: IDoctorRepository,
@@ -286,6 +290,70 @@ export class doctorServices {
         throw new Error("User not found");
       }
       return { isBlocked: user.isBlocked, kycStatus: user.kycStatus };
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  async scheduleSlot(date: string, timeSlots: ITimeSlot[], doctorId: string) {
+    try {
+      const parsedDate = new Date(date);
+      console.log(timeSlots);
+
+      // Format the timeSlots array to match the schema
+      const formattedTimeSlots = timeSlots.map((slot: any) => ({
+        start: new Date(slot.start),
+        end: new Date(slot.end),
+        isBooked: false,
+        isOnHold: false,
+        holdExpiresAt: null,
+      }));
+
+      const response = await this.doctorRepository.createSlot(
+        parsedDate,
+        formattedTimeSlots,
+        doctorId
+      );
+      if (response.status) {
+        return { status: true };
+      } else {
+        throw new Error("Some of the slots here are already scheduled");
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  async checkSlots(doctorId: string, date: string) {
+    try {
+      const response = await this.doctorRepository.checkSlots(
+        doctorId as string,
+        date as string
+      );
+
+      if (response) {
+        return response;
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+  async deleteSlot(start: string, doctorId: string, date: string) {
+    try {
+      const reponse = await this.doctorRepository.deleteSlot(
+        start as string,
+        doctorId as string,
+        date as string
+      );
+      if (reponse.status) {
+        return { status: true };
+      }
     } catch (error: any) {
       if (error instanceof Error) {
         throw new Error(error.message);

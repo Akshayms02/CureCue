@@ -7,6 +7,7 @@ import DoctorLayout from "../Components/Common/DoctorLayout";
 import { DoctorDashboard } from "../Components/DoctorComponents/DoctorDashBoardComponent";
 import DoctorProtectedRoute from "./ProtectedRoutes/DoctorProtectedRoute";
 import ProfileCard from "../Pages/Doctor/Profile";
+import SlotManagement from "../Pages/Doctor/SlotManagement";
 
 function DoctorRoutes() {
   return (
@@ -29,6 +30,14 @@ function DoctorRoutes() {
           element={
             <DoctorProtectedRoute>
               <ProfileCard />
+            </DoctorProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="slots"
+          element={
+            <DoctorProtectedRoute>
+              <SlotManagement />
             </DoctorProtectedRoute>
           }
         ></Route>
