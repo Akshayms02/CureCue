@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import axiosUrl from "../../Utils/axios";
 import { useNavigate } from "react-router-dom";
 import { MoreHorizontal } from "lucide-react";
 import { Badge } from "../../../components/ui/badge";
@@ -29,6 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
+import { getDoctors, listUnlistDoctor } from "../../services/adminServices";
 
 interface DoctorDetails {
   _id: string;
@@ -47,8 +47,8 @@ function DoctorManagement() {
 
   const fetchDoctors = async () => {
     try {
-      const response = await axiosUrl.get("/api/admin/getDoctors");
-      setDoctors(response.data.response);
+      const response = await getDoctors()
+      setDoctors(response);
     } catch (error: any) {
       toast.error(`Failed to fetch doctors${error}`);
     }
@@ -65,7 +65,7 @@ function DoctorManagement() {
   }, []);
 
   const toggleListState = async (id: string) => {
-    const response = await axiosUrl.put(`/api/admin/listUnlistDoctor/${id}`);
+    const response = await listUnlistDoctor(id as string)
     if (response) {
       toast.success("The Action was successful");
     } else {
@@ -138,7 +138,7 @@ function DoctorManagement() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() =>
-                              navigate(`/api/admin/viewDoctor/${doctor._id}`)
+                              navigate(`/admin/${doctor._id}`)
                             }
                           >
                             View Details

@@ -1,8 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import axiosUrl from "../../Utils/axios";
 import { toast } from "sonner";
 import { useState } from "react";
 import Swal from "sweetalert2";
+import { acceptDoctorApplication, rejectDoctor } from "../../services/adminServices";
 
 const formatDate = (dateString: string) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -35,7 +35,7 @@ const DoctorApplicationDetails = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axiosUrl.post(`/api/admin/accept-doctor/${doctor.doctorId}`);
+          await acceptDoctorApplication(doctor.doctorId)
           Swal.fire(
             "Accepted!",
             "Doctor's application has been accepted.",
@@ -52,7 +52,7 @@ const DoctorApplicationDetails = () => {
 
   const handleReject = async () => {
     try {
-      await axiosUrl.post(`/api/admin/reject-doctor/${doctor.doctorId}`);
+      await rejectDoctor(doctor.doctorId)
       toast.success("Doctor application rejected");
       navigate("/admin/doctors");
     } catch (error) {
@@ -61,13 +61,13 @@ const DoctorApplicationDetails = () => {
     }
   };
 
-  // Function to close the modal and clear the selected file
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedFile(null);
   };
 
-  // Function to open the modal and set the file to be displayed in iframe
+
   const openModal = (fileUrl: string) => {
     setSelectedFile(fileUrl);
     setIsModalOpen(true);

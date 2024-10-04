@@ -3,19 +3,15 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { clearUser } from "../../Redux/Slice/userSlice";
-import axiosUrl from "../../Utils/axios";
 import { toast } from "sonner";
+import { userLogout } from "../../services/userServices";
 
 const ProfileLayout: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleLogout = async () => {
     try {
-      const response = await axiosUrl.post("/api/user/logout", {
-        headers: {
-          "Token-Type": "user",
-        },
-      });
+      const response = await userLogout()
       localStorage.removeItem("accessToken");
       localStorage.removeItem("userInfo");
       dispatch(clearUser());

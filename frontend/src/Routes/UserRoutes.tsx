@@ -9,6 +9,7 @@ import UserProtectedRoute from "./ProtectedRoutes/UserProtectedRoute";
 import UserLayout from "../Components/Common/userLayout";
 import UserHome from "../Components/UserComponents/UserHome";
 import UserBookingPage from "../Components/UserComponents/UserBookingPage";
+import DoctorListDepartmentWise from "../Components/UserComponents/DoctorListDepartmentWise";
 
 function UserRoutes() {
   return (
@@ -20,6 +21,7 @@ function UserRoutes() {
       <Route path="/" element={<UserLayout />}>
         <Route path="/" element={<UserHome />}></Route>
         <Route path="/booking" element={<UserBookingPage />}></Route>
+        <Route path="/:departmentId" element={<DoctorListDepartmentWise />}></Route>
       </Route>
 
       <Route path="/" element={<ProfileLayout />}>

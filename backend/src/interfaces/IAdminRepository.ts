@@ -17,4 +17,5 @@ export interface IAdminRepository {
   getAllApplications(): Promise<any>;
   getSingleDoctorApplication(id: string): Promise<any>;
   approveDoctor(doctorId: string): Promise<any>;
+  getDoctorData(doctorId: string): Promise<any>;
 }

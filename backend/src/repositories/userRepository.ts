@@ -2,6 +2,8 @@ import { IUserRepository } from "../interfaces/IUserRepository";
 import userModel, { IUser } from "../models/userModel";
 import bcrypt from "bcrypt";
 import doctorModel from "../models/doctorModel";
+import specializationModel from "../models/specializationModel";
+import mongoose from "mongoose";
 
 export class UserRepository implements IUserRepository {
   async existUser(email: string): Promise<IUser | null> {
@@ -74,5 +76,43 @@ export class UserRepository implements IUserRepository {
       .populate("department");
 
     return doctors;
+  }
+  async getSpecializations() {
+    try {
+      const specializations = await specializationModel.find({
+        isListed: true,
+      });
+
+      if (specializations) {
+        return specializations;
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  async getDepDoctors(departmentId: string) {
+    try {
+      const doctors = await doctorModel
+        .find(
+          { department: new mongoose.Types.ObjectId(departmentId), kycStatus: "approved" },
+          {
+            doctorId: 1,
+            name: 1,
+            email: 1,
+            image: 1,
+            department: 1,
+          }
+        )
+        .populate("department");
+
+      return doctors;
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
   }
 }

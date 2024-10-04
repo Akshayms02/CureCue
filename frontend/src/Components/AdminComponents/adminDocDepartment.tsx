@@ -12,7 +12,7 @@ import {
   updateSpecialization,
 } from "../../Redux/Actions/adminActions";
 
-import axiosUrl from "../../Utils/axios";
+
 import { Button } from "../../../components/ui/button";
 import {
   Card,
@@ -48,6 +48,7 @@ import {
   FormMessage,
 } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/input";
+import { getSpecializations } from "../../services/adminServices";
 
 // Define the schema for validation
 const schema = z.object({
@@ -83,8 +84,8 @@ const AdminDocDepartment: React.FC = () => {
 
   const fetchSpecializations = async () => {
     try {
-      const response = await axiosUrl.get("/api/admin/getSpecializations");
-      setCategories(response.data.response);
+      const response = await getSpecializations()
+      setCategories(response);
     } catch (error: any) {
       toast.error(`Failed to fetch specializations: ${error}`);
     }

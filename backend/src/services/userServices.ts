@@ -198,4 +198,48 @@ export class userServices {
       throw new Error(error);
     }
   }
+  async getSpecialization() {
+    try {
+      const response = await this.userRepositary.getSpecializations();
+      if (response) {
+        return response;
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  async getDepDoctors(departmentId: string) {
+    try {
+      const response = await this.userRepositary.getDepDoctors(departmentId);
+      console.log(departmentId) 
+      const docs = await Promise.all(
+        response.map(async (doctor: any) => {
+          let profileUrl = "";
+          if (doctor?.image?.url) {
+            const filePath = this.getFolderPathByFileType(doctor?.image?.type);
+            profileUrl = await this.S3Service.getFile(
+              doctor?.image?.url,
+              filePath
+            );
+          }
+          return {
+            name: doctor?.name,
+            email: doctor?.email,
+            profileUrl: profileUrl,
+            doctorId: doctor?.doctorId,
+            department: doctor?.department.name,
+          };
+        })
+      );
+
+      return docs;
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
 }

@@ -291,4 +291,19 @@ export default class AdminController {
       res.status(400).json(error);
     }
   }
+
+  async getDoctorData(req: Request, res: Response): Promise<void> {
+    try {
+      const { doctorId } = req.query;
+      console.log(req.query)
+      console.log(doctorId)
+      const response = await this.adminService.getDoctorData(
+        doctorId as string
+      );
+      res.status(200).json(response);
+    } catch (error: any) {
+      console.log(error);
+      res.status(500).json(error.message);
+    }
+  }
 }

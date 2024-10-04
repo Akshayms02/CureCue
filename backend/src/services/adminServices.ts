@@ -284,4 +284,43 @@ export class adminServices {
       throw new Error(error);
     }
   }
+
+  async getDoctorData(doctorId: string) {
+    try {
+      const response = await this.adminRepository.getDoctorData(
+        doctorId as string
+      );
+      let imageUrl = "";
+
+      if (response?.image) {
+        const folderPath = this.getFolderPathByFileType(response?.image?.type);
+        const signedUrl = await this.S3Service.getFile(
+          response.image.url,
+          folderPath
+        );
+        imageUrl = signedUrl;
+      }
+
+      const doctorInfo = {
+        name: response.name,
+        email: response.email,
+        doctorId: response.doctorId,
+        phone: response.phone,
+        isBlocked: response.isBlocked,
+        docStatus: response.kycStatus,
+        DOB: response.DOB,
+        fees: response.fees,
+        gender: response.gender,
+        department: response.department,
+        image: imageUrl,
+      };
+      if (response) {
+        return doctorInfo;
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
 }

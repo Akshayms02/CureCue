@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import axiosUrl from "../../Utils/axios";
+
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -20,6 +20,8 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
+import { getApplications, viewApplications } from "../../services/adminServices";
+
 
 interface DoctorApplication {
   _id: string;
@@ -46,9 +48,9 @@ function DoctorApplications() {
 
   const fetchApplications = async () => {
     try {
-      const response = await axiosUrl.get("/api/admin/getApplications");
+      const response = await getApplications()
       console.log(response);
-      setApplications(response.data.response);
+      setApplications(response);
     } catch (error: any) {
       toast.error(`Failed to fetch doctors${error}`);
     }
@@ -66,10 +68,9 @@ function DoctorApplications() {
 
   const viewApplication = async (id: string) => {
     try {
-      const response = await axiosUrl.get(`/api/admin/doctorApplication/${id}`);
-      console.log(response.data);
+      const response =await viewApplications(id)
       navigate("/admin/viewApplication", {
-        state: { response: response.data.data },
+        state: { response: response },
       });
     } catch (error: any) {
       toast.error(`Failed to fetch the details:${error}`);

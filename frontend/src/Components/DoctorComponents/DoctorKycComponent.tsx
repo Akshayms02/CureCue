@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { toast } from "sonner";
-import axiosUrl from "../../Utils/axios";
 import * as z from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +10,7 @@ import { useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../Redux/store";
 import { uploadDoctorData } from "../../Redux/Actions/doctorActions";
 import { useDispatch } from "react-redux";
+import { getSpecializations } from "../../services/doctorServices";
 
 export interface Specializations {
   _id: number;
@@ -105,8 +105,8 @@ export function DoctorKycComponent() {
   React.useEffect(() => {
     const fetchSpecializations = async () => {
       try {
-        const response = await axiosUrl.get("/api/admin/getSpecializations");
-        setSpecializations(response.data.response);
+        const response = await getSpecializations()
+        setSpecializations(response);
       } catch (error) {
         console.error("Failed to fetch specializations:", error);
       }
@@ -227,9 +227,8 @@ export function DoctorKycComponent() {
                       type="text"
                       placeholder="Enter your full name"
                       {...field}
-                      className={`border p-2 rounded ${
-                        errors.name ? "border-red-500" : ""
-                      }`}
+                      className={`border p-2 rounded ${errors.name ? "border-red-500" : ""
+                        }`}
                     />
                     {errors.name && (
                       <p className="text-red-500 text-sm mt-1">
@@ -240,259 +239,259 @@ export function DoctorKycComponent() {
                 )}
               />
 
-<Controller
-  name="gender"
-  control={control}
-  render={({ field }) => (
-    <div>
-      <label htmlFor="gender" className="block mb-1">
-        Gender
-      </label>
-      <select
-        id="gender"
-        {...field}
-        className={`border p-2 rounded w-full ${errors.gender ? "border-red-500" : ""}`}
-      >
-        <option value="">Select Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-      </select>
-      {errors.gender && (
-        <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>
-      )}
-    </div>
-  )}
-/>
+              <Controller
+                name="gender"
+                control={control}
+                render={({ field }) => (
+                  <div>
+                    <label htmlFor="gender" className="block mb-1">
+                      Gender
+                    </label>
+                    <select
+                      id="gender"
+                      {...field}
+                      className={`border p-2 rounded w-full ${errors.gender ? "border-red-500" : ""}`}
+                    >
+                      <option value="">Select Gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                    {errors.gender && (
+                      <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>
+                    )}
+                  </div>
+                )}
+              />
 
-<Controller
-  name="dob"
-  control={control}
-  render={({ field }) => (
-    <div>
-      <label htmlFor="dob" className="block mb-1">
-        Date of Birth
-      </label>
-      <Input
-        id="dob"
-        type="date"
-        {...field}
-        className={`border p-2 rounded ${errors.dob ? "border-red-500" : ""}`}
-      />
-      {errors.dob && (
-        <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>
-      )}
-    </div>
-  )}
-/>
+              <Controller
+                name="dob"
+                control={control}
+                render={({ field }) => (
+                  <div>
+                    <label htmlFor="dob" className="block mb-1">
+                      Date of Birth
+                    </label>
+                    <Input
+                      id="dob"
+                      type="date"
+                      {...field}
+                      className={`border p-2 rounded ${errors.dob ? "border-red-500" : ""}`}
+                    />
+                    {errors.dob && (
+                      <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>
+                    )}
+                  </div>
+                )}
+              />
 
-<Controller
-  name="department"
-  control={control}
-  render={({ field }) => (
-    <div>
-      <label htmlFor="department" className="block mb-1">
-        Department
-      </label>
-      <select
-        id="department"
-        {...field}
-        className={`border p-2 rounded w-full ${errors.department ? "border-red-500" : ""}`}
-      >
-        <option value="">Select Department</option>
-        {specializations
-          .filter((specialization) => specialization.isListed)
-          .map((specialization) => (
-            <option key={specialization._id} value={specialization._id}>
-              {specialization.name}
-            </option>
-          ))}
-      </select>
-      {errors.department && (
-        <p className="text-red-500 text-sm mt-1">{errors.department.message}</p>
-      )}
-    </div>
-  )}
-/>
+              <Controller
+                name="department"
+                control={control}
+                render={({ field }) => (
+                  <div>
+                    <label htmlFor="department" className="block mb-1">
+                      Department
+                    </label>
+                    <select
+                      id="department"
+                      {...field}
+                      className={`border p-2 rounded w-full ${errors.department ? "border-red-500" : ""}`}
+                    >
+                      <option value="">Select Department</option>
+                      {specializations
+                        .filter((specialization) => specialization.isListed)
+                        .map((specialization) => (
+                          <option key={specialization._id} value={specialization._id}>
+                            {specialization.name}
+                          </option>
+                        ))}
+                    </select>
+                    {errors.department && (
+                      <p className="text-red-500 text-sm mt-1">{errors.department.message}</p>
+                    )}
+                  </div>
+                )}
+              />
 
-<Controller
-  name="fees"
-  control={control}
-  render={({ field }) => (
-    <div>
-      <label htmlFor="fees" className="block mb-1">
-        Consultation Fees
-      </label>
-      <Input
-        id="fees"
-        type="number"
-        placeholder="Enter consultation fees"
-        {...field}
-        className={`border p-2 rounded ${errors.fees ? "border-red-500" : ""}`}
-      />
-      {errors.fees && (
-        <p className="text-red-500 text-sm mt-1">{errors.fees.message}</p>
-      )}
-    </div>
-  )}
-/>
+              <Controller
+                name="fees"
+                control={control}
+                render={({ field }) => (
+                  <div>
+                    <label htmlFor="fees" className="block mb-1">
+                      Consultation Fees
+                    </label>
+                    <Input
+                      id="fees"
+                      type="number"
+                      placeholder="Enter consultation fees"
+                      {...field}
+                      className={`border p-2 rounded ${errors.fees ? "border-red-500" : ""}`}
+                    />
+                    {errors.fees && (
+                      <p className="text-red-500 text-sm mt-1">{errors.fees.message}</p>
+                    )}
+                  </div>
+                )}
+              />
 
-<Controller
-  name="aadhaarNumber"
-  control={control}
-  render={({ field }) => (
-    <div>
-      <label htmlFor="aadhaarNumber" className="block mb-1">
-        Aadhaar Number
-      </label>
-      <Input
-        id="aadhaarNumber"
-        type="text"
-        placeholder="Enter 12-digit Aadhaar Number"
-        {...field}
-        className={`border p-2 rounded ${errors.aadhaarNumber ? "border-red-500" : ""}`}
-      />
-      {errors.aadhaarNumber && (
-        <p className="text-red-500 text-sm mt-1">{errors.aadhaarNumber.message}</p>
-      )}
-    </div>
-  )}
-/>
+              <Controller
+                name="aadhaarNumber"
+                control={control}
+                render={({ field }) => (
+                  <div>
+                    <label htmlFor="aadhaarNumber" className="block mb-1">
+                      Aadhaar Number
+                    </label>
+                    <Input
+                      id="aadhaarNumber"
+                      type="text"
+                      placeholder="Enter 12-digit Aadhaar Number"
+                      {...field}
+                      className={`border p-2 rounded ${errors.aadhaarNumber ? "border-red-500" : ""}`}
+                    />
+                    {errors.aadhaarNumber && (
+                      <p className="text-red-500 text-sm mt-1">{errors.aadhaarNumber.message}</p>
+                    )}
+                  </div>
+                )}
+              />
 
-<Controller
-  name="image"
-  control={control}
-  render={({ field }) => (
-    <div>
-      <label htmlFor="image" className="block mb-1">
-        Profile Image
-      </label>
-      <Input
-        id="image"
-        type="file"
-        onChange={(e) => handleImageChange(e, "image")}
-        className="border p-2 rounded"
-      />
-      {imagePreviews.image && (
-        <img src={imagePreviews.image} alt="Image preview" className="mt-2 max-w-xs" />
-      )}
-      {errors.image && (
-        <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>
-      )}
-    </div>
-  )}
-/>
+              <Controller
+                name="image"
+                control={control}
+                render={({ field }) => (
+                  <div>
+                    <label htmlFor="image" className="block mb-1">
+                      Profile Image
+                    </label>
+                    <Input
+                      id="image"
+                      type="file"
+                      onChange={(e) => handleImageChange(e, "image")}
+                      className="border p-2 rounded"
+                    />
+                    {imagePreviews.image && (
+                      <img src={imagePreviews.image} alt="Image preview" className="mt-2 max-w-xs" />
+                    )}
+                    {errors.image && (
+                      <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>
+                    )}
+                  </div>
+                )}
+              />
 
-<Controller
-  name="aadhaarFrontImage"
-  control={control}
-  render={({ field }) => (
-    <div>
-      <label htmlFor="aadhaarFrontImage" className="block mb-1">
-        Aadhaar Front Image
-      </label>
-      <Input
-        id="aadhaarFrontImage"
-        type="file"
-        onChange={(e) => handleImageChange(e, "aadhaarFrontImage")}
-        className="border p-2 rounded"
-      />
-      {imagePreviews.aadhaarFrontImage && (
-        <img
-          src={imagePreviews.aadhaarFrontImage}
-          alt="Aadhaar Front Image preview"
-          className="mt-2 max-w-xs"
-        />
-      )}
-      {errors.aadhaarFrontImage && (
-        <p className="text-red-500 text-sm mt-1">{errors.aadhaarFrontImage.message}</p>
-      )}
-    </div>
-  )}
-/>
+              <Controller
+                name="aadhaarFrontImage"
+                control={control}
+                render={({ field }) => (
+                  <div>
+                    <label htmlFor="aadhaarFrontImage" className="block mb-1">
+                      Aadhaar Front Image
+                    </label>
+                    <Input
+                      id="aadhaarFrontImage"
+                      type="file"
+                      onChange={(e) => handleImageChange(e, "aadhaarFrontImage")}
+                      className="border p-2 rounded"
+                    />
+                    {imagePreviews.aadhaarFrontImage && (
+                      <img
+                        src={imagePreviews.aadhaarFrontImage}
+                        alt="Aadhaar Front Image preview"
+                        className="mt-2 max-w-xs"
+                      />
+                    )}
+                    {errors.aadhaarFrontImage && (
+                      <p className="text-red-500 text-sm mt-1">{errors.aadhaarFrontImage.message}</p>
+                    )}
+                  </div>
+                )}
+              />
 
-<Controller
-  name="aadhaarBackImage"
-  control={control}
-  render={({ field }) => (
-    <div>
-      <label htmlFor="aadhaarBackImage" className="block mb-1">
-        Aadhaar Back Image
-      </label>
-      <Input
-        id="aadhaarBackImage"
-        type="file"
-        onChange={(e) => handleImageChange(e, "aadhaarBackImage")}
-        className="border p-2 rounded"
-      />
-      {imagePreviews.aadhaarBackImage && (
-        <img
-          src={imagePreviews.aadhaarBackImage}
-          alt="Aadhaar Back Image preview"
-          className="mt-2 max-w-xs"
-        />
-      )}
-      {errors.aadhaarBackImage && (
-        <p className="text-red-500 text-sm mt-1">{errors.aadhaarBackImage.message}</p>
-      )}
-    </div>
-  )}
-/>
+              <Controller
+                name="aadhaarBackImage"
+                control={control}
+                render={({ field }) => (
+                  <div>
+                    <label htmlFor="aadhaarBackImage" className="block mb-1">
+                      Aadhaar Back Image
+                    </label>
+                    <Input
+                      id="aadhaarBackImage"
+                      type="file"
+                      onChange={(e) => handleImageChange(e, "aadhaarBackImage")}
+                      className="border p-2 rounded"
+                    />
+                    {imagePreviews.aadhaarBackImage && (
+                      <img
+                        src={imagePreviews.aadhaarBackImage}
+                        alt="Aadhaar Back Image preview"
+                        className="mt-2 max-w-xs"
+                      />
+                    )}
+                    {errors.aadhaarBackImage && (
+                      <p className="text-red-500 text-sm mt-1">{errors.aadhaarBackImage.message}</p>
+                    )}
+                  </div>
+                )}
+              />
 
-<Controller
-  name="certificateImage"
-  control={control}
-  render={({ field }) => (
-    <div>
-      <label htmlFor="certificateImage" className="block mb-1">
-        Certificate Image
-      </label>
-      <Input
-        id="certificateImage"
-        type="file"
-        onChange={(e) => handleImageChange(e, "certificateImage")}
-        className="border p-2 rounded"
-      />
-      {imagePreviews.certificateImage && (
-        <img
-          src={imagePreviews.certificateImage}
-          alt="Certificate Image preview"
-          className="mt-2 max-w-xs"
-        />
-      )}
-      {errors.certificateImage && (
-        <p className="text-red-500 text-sm mt-1">{errors.certificateImage.message}</p>
-      )}
-    </div>
-  )}
-/>
+              <Controller
+                name="certificateImage"
+                control={control}
+                render={({ field }) => (
+                  <div>
+                    <label htmlFor="certificateImage" className="block mb-1">
+                      Certificate Image
+                    </label>
+                    <Input
+                      id="certificateImage"
+                      type="file"
+                      onChange={(e) => handleImageChange(e, "certificateImage")}
+                      className="border p-2 rounded"
+                    />
+                    {imagePreviews.certificateImage && (
+                      <img
+                        src={imagePreviews.certificateImage}
+                        alt="Certificate Image preview"
+                        className="mt-2 max-w-xs"
+                      />
+                    )}
+                    {errors.certificateImage && (
+                      <p className="text-red-500 text-sm mt-1">{errors.certificateImage.message}</p>
+                    )}
+                  </div>
+                )}
+              />
 
-<Controller
-  name="qualificationImage"
-  control={control}
-  render={({ field }) => (
-    <div>
-      <label htmlFor="qualificationImage" className="block mb-1">
-        Qualification Image
-      </label>
-      <Input
-        id="qualificationImage"
-        type="file"
-        onChange={(e) => handleImageChange(e, "qualificationImage")}
-        className="border p-2 rounded"
-      />
-      {imagePreviews.qualificationImage && (
-        <img
-          src={imagePreviews.qualificationImage}
-          alt="Qualification Image preview"
-          className="mt-2 max-w-xs"
-        />
-      )}
-      {errors.qualificationImage && (
-        <p className="text-red-500 text-sm mt-1">{errors.qualificationImage.message}</p>
-      )}
-    </div>
-  )}
-/>
+              <Controller
+                name="qualificationImage"
+                control={control}
+                render={({ field }) => (
+                  <div>
+                    <label htmlFor="qualificationImage" className="block mb-1">
+                      Qualification Image
+                    </label>
+                    <Input
+                      id="qualificationImage"
+                      type="file"
+                      onChange={(e) => handleImageChange(e, "qualificationImage")}
+                      className="border p-2 rounded"
+                    />
+                    {imagePreviews.qualificationImage && (
+                      <img
+                        src={imagePreviews.qualificationImage}
+                        alt="Qualification Image preview"
+                        className="mt-2 max-w-xs"
+                      />
+                    )}
+                    {errors.qualificationImage && (
+                      <p className="text-red-500 text-sm mt-1">{errors.qualificationImage.message}</p>
+                    )}
+                  </div>
+                )}
+              />
 
               <Button type="submit">Submit</Button>
             </form>

@@ -11,14 +11,13 @@ import {
 } from "lucide-react";
 import myImage from "../../assets/Screenshot_2024-08-15_191834-removebg-preview.png";
 import { toast } from "sonner";
+import { adminLogout } from "../../services/adminServices";
 
 export function AdminSideBar() {
   const navigate = useNavigate();
   const handleLogout = async () => {
     try {
-      const response = await axiosUrl.post(`/api/admin/logout`, {
-        headers: { "Token-Type": "admin" },
-      });
+      const response = await adminLogout()
       console.log(response);
 
       localStorage.removeItem("adminAccessToken");

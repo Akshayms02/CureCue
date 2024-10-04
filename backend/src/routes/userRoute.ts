@@ -24,6 +24,8 @@ route.get(
 );
 route.post("/logout", userController.logoutUser.bind(userController));
 route.get("/getDoctors",userController.getDoctors.bind(userController))
+route.get("/specializations",userController.getSpecializations.bind(userController))
+route.get("/getDepDoctors",userController.getDepDoctors.bind(userController))
 route.post("/refresh-token", refreshTokenHandler);
 
 export default route;

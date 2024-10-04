@@ -123,4 +123,30 @@ export default class UserController {
       res.status(400).json({ message: `Internal Server Error:${error}` });
     }
   }
+  async getSpecializations(req: Request, res: Response): Promise<void> {
+    try {
+      const response = await this.userService.getSpecialization();
+
+      res.status(200).json(response);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to fetch specializations" });
+    }
+  }
+
+  async getDepDoctors(req: Request, res: Response): Promise<void> {
+    try {
+      const { departmentId } = req.query;
+      const response = await this.userService.getDepDoctors(
+        departmentId as string
+      );
+      console.log(response);
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+    }
+  }
 }

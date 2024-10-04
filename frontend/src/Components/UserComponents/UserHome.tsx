@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 import DoctorCard from "../../Components/UserComponents/DoctorCard";
-import axiosUrl from "../../Utils/axios";
+
 
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import { getDoctors } from "../../services/userServices";
 
 function UserHome() {
   const [doctors, setDoctors] = useState<any[]>([]);
@@ -14,7 +15,7 @@ function UserHome() {
 
   useEffect(() => {
     const fetchDoctors = async () => {
-      const { data } = await axiosUrl.get("/api/user/getDoctors");
+      const data = await getDoctors()
       setDoctors(data);
     };
     fetchDoctors();

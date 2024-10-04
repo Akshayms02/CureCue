@@ -4,6 +4,7 @@ import doctorModel from "../models/doctorModel";
 import { IAdminRepository } from "../interfaces/IAdminRepository";
 import userModel from "../models/userModel";
 import doctorApplicationModel from "../models/doctorApplicationModel";
+import mongoose from "mongoose";
 
 export class AdminRepository implements IAdminRepository {
   async adminCheck(email: string) {
@@ -177,6 +178,37 @@ export class AdminRepository implements IAdminRepository {
       return { status: true };
     } catch (error: any) {
       throw new Error(error);
+    }
+  }
+
+  async getDoctorData(doctorId: string) {
+    try {
+      console.log(doctorId)
+      const response = await doctorModel
+        .findOne(
+          { _id: new mongoose.Types.ObjectId(doctorId) },
+          {
+            _id: 0,
+            doctorId: 1,
+            name: 1,
+            email: 1,
+            phone: 1,
+            password: 1,
+            isBlocked: 1,
+            kycStatus: 1,
+            DOB: 1,
+            department: 1,
+            fees: 1,
+            gender: 1,
+            image: 1,
+          }
+        )
+        .populate("department");
+      return response;
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
     }
   }
 }

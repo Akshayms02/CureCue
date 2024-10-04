@@ -9,22 +9,18 @@ import {
 } from "lucide-react";
 import myImage from "../../assets/Screenshot_2024-08-15_191834-removebg-preview.png";
 import { useNavigate } from "react-router-dom";
-import axiosUrl from "../../Utils/axios";
 import { toast } from "sonner";
 import { clearUser } from "../../Redux/Slice/doctorSlice";
 import { useDispatch } from "react-redux";
 import { FaCheckToSlot } from "react-icons/fa6";
+import { logoutDoctor } from "../../services/doctorServices";
 
 export function DoctorSideBar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = async () => {
     try {
-      const response = await axiosUrl.post("/api/doctor/logout", {
-        headers: {
-          "Token-Type": "doctor",
-        },
-      });
+      const response = await logoutDoctor()
       localStorage.removeItem("docaccessToken");
       localStorage.removeItem("doctorInfo");
       dispatch(clearUser());
@@ -50,10 +46,9 @@ export function DoctorSideBar() {
             <NavLink
               to="/doctor/dashboard"
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
+                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
+                  ? "text-primary bg-gray-300"
+                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
                 }`
               }
             >
@@ -63,10 +58,9 @@ export function DoctorSideBar() {
             <NavLink
               to="/doctor/profile"
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
+                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
+                  ? "text-primary bg-gray-300"
+                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
                 }`
               }
             >
@@ -76,10 +70,9 @@ export function DoctorSideBar() {
             <NavLink
               to="/doctor/slots"
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
+                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
+                  ? "text-primary bg-gray-300"
+                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
                 }`
               }
             >
@@ -89,10 +82,9 @@ export function DoctorSideBar() {
             <NavLink
               to="/doctor/appointments"
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
+                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
+                  ? "text-primary bg-gray-300"
+                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
                 }`
               }
             >
@@ -102,10 +94,9 @@ export function DoctorSideBar() {
             <NavLink
               to="/doctor/patients"
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
+                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
+                  ? "text-primary bg-gray-300"
+                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
                 }`
               }
             >
@@ -116,10 +107,9 @@ export function DoctorSideBar() {
             <NavLink
               to="/doctor/reports"
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
+                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
+                  ? "text-primary bg-gray-300"
+                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
                 }`
               }
             >

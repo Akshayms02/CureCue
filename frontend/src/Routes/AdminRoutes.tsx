@@ -8,6 +8,7 @@ import AdminDoctors from "../Pages/Admin/adminDoctors";
 import AdminDocSpecialization from "../Pages/Admin/adminDocSpecialization";
 import DoctorApplications from "../Components/AdminComponents/doctorApplications";
 import DoctorApplicationDetails from "../Components/AdminComponents/doctorApplicationDetails";
+import DoctorViewdetails from "../Components/AdminComponents/doctorViewdetails";
 
 function AdminRoutes() {
   return (
@@ -19,11 +20,12 @@ function AdminRoutes() {
         <Route path="doctors" element={<AdminDoctors />}></Route>
         <Route path="departments" element={<AdminDocSpecialization />} />
         <Route path="applications" element={<DoctorApplications />}></Route>
+        <Route path="/:doctorId" element={<DoctorViewdetails />}></Route>
         <Route
           path="viewApplication"
           element={<DoctorApplicationDetails />}
         ></Route>
-        {/*<Route path="viewApplication" element={<ApplicationDetailspage />} /> */}
+
       </Route>
     </Routes>
   );

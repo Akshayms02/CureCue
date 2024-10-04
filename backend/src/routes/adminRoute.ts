@@ -54,4 +54,6 @@ route.post(
   adminController.acceptApplication.bind(adminController)
 );
 
+route.get("/getDoctor",adminController.getDoctorData.bind(adminController))
+
 export default route;

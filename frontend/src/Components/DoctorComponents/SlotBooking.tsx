@@ -2,41 +2,49 @@ import { Calendar } from "../../../components/ui/calendar";
 import { useState, useEffect } from "react";
 import DatePicker from "react-datepicker"; // Importing DatePicker from react-datepicker
 import "react-datepicker/dist/react-datepicker.css"; // Importing DatePicker styles
-import axiosUrl from "../../Utils/axios";
+
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { toast } from "sonner";
 import { FiTrash } from 'react-icons/fi';
+import { addSlot, checkSlots, deleteSlot } from "../../services/doctorServices";
 
 export function SlotBooking() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<{ start: Date; end: Date }[]>([]);
-  const [availableSlots, setAvailableSlots] = useState<{ start: Date; end: Date, isBooked: boolean, isOnHold: boolean }[]>([]); // Store fetched slots
+  const [availableSlots, setAvailableSlots] = useState<{ start: Date; end: Date, isBooked: boolean, isOnHold: boolean }[]>([]);
 
   const DoctorData = useSelector((state: RootState) => state.doctor);
 
-  // Function to fetch available slots for the selected date
+
   const fetchAvailableSlots = async (selectedDate: Date | undefined) => {
     if (!selectedDate) return;
 
     try {
       const localDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-      const response = await axiosUrl.get(`/api/doctor/checkslots`, {
-        params: {
-          doctorId: DoctorData?.doctorInfo?.doctorId,
-          date: localDate.toISOString(),
-        },
-      });
+
+
+      const doctorId = DoctorData?.doctorInfo?.doctorId;
+      const date = localDate.toISOString()
+
+
+      const response = await checkSlots(doctorId, date);
+
+
       console.log(response)
-      const fetchedSlots = response.data.map((slot: any) => ({
+      const fetchedSlots = response.map((slot: any) => ({
         start: new Date(slot.start),
         end: new Date(slot.end),
         isBooked: slot.isBooked,
         isOnHold: slot.isOnHold
       }));
+
+
       setAvailableSlots(fetchedSlots);
+
+
     } catch (error: any) {
       setAvailableSlots([]);
       console.log(error)
@@ -121,13 +129,9 @@ export function SlotBooking() {
     console.log(requestBody);
 
     // API call to save slots
-    axiosUrl.post("/api/doctor/slots", requestBody, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    addSlot(requestBody)
       .then((response) => {
-        console.log("Slot added successfully:", response.data);
+        console.log("Slot added successfully:", response);
         toast.success("Slot Added successfully")
         setIsModalOpen(false);
         setSelectedDate(undefined);
@@ -142,17 +146,14 @@ export function SlotBooking() {
     if (date) {
       fetchAvailableSlots(date);
     }
-  }, [date,handleAddSlot]);
+  }, [date, handleAddSlot]);
 
-  const handleDeleteSlot = async (slotStart, date) => {
+  const handleDeleteSlot = async (slotStart: any, date: any) => {
     try {
-      const response = await axiosUrl.post('/api/doctor/deleteSlot', {
-        start: slotStart,
-        doctorId: DoctorData?.doctorInfo?.doctorId,
-        date: date
-      });
+      const doctorId = DoctorData?.doctorInfo?.doctorId
+      const response = await deleteSlot(slotStart, doctorId, date);
 
-      if (response.status === 200) {
+      if (response?.status === 200) {
         setAvailableSlots((prevSlots) =>
           prevSlots.filter((slot) => slot.start !== slotStart)
         );
