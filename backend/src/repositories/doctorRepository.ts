@@ -188,6 +188,7 @@ export class DoctorRepository implements IDoctorRepository {
       }
 
       const availableSlots = slot?.timeSlots?.map((element) => element);
+      console.log("slot:", availableSlots);
 
       return availableSlots;
     } catch (error: any) {
@@ -222,5 +223,29 @@ export class DoctorRepository implements IDoctorRepository {
         throw new Error(error.message);
       }
     }
+  }
+
+  async checkAvialability(
+    doctorId: string,
+    parsedDate: Date,
+    parsedStart: Date,
+    parsedEnd: Date
+  ) {
+    const slot = await Slot.findOne({
+      doctorId,
+      date: parsedDate,
+    });
+
+    if (!slot) {
+      return { available: true };
+    }
+
+    const isAvailable = !slot.timeSlots.some((s) => {
+      const startTime = new Date(s.start);
+      const endTime = new Date(s.end);
+      return parsedStart < endTime && parsedEnd > startTime; // Check for overlap
+    });
+
+    return { available: isAvailable };
   }
 }

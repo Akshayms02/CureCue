@@ -51,6 +51,8 @@ route.get(
 
 route.post("/deleteSlot", doctorController.deleteSlot.bind(doctorController));
 
+route.post("/checkAvialability",doctorController.checkAvialability.bind(doctorController))
+
 route.post("/refresh-token", refreshTokenHandler);
 
 export default route;

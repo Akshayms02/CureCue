@@ -13,4 +13,10 @@ export interface IDoctorRepository {
   ): Promise<any>;
   checkSlots(doctorId: string, date: string): Promise<any>;
   deleteSlot(start: string, doctorId: string, date: string): Promise<any>;
+  checkAvialability(
+    doctorId: string,
+    parsedDate: Date,
+    parsedStart: Date,
+    parsedEnd: Date
+  ): Promise<any>;
 }

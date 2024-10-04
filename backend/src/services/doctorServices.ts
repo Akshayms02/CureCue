@@ -360,4 +360,43 @@ export class doctorServices {
       }
     }
   }
+
+  async checkAvialability(
+    doctorId: string,
+    date: string,
+    start: string,
+    end: string
+  ) {
+    try {
+      const parsedDate = new Date(date);
+      if (isNaN(parsedDate.getTime())) {
+        throw new Error("Invalid date format");
+      }
+
+      const parsedStart = new Date(start);
+      const parsedEnd = new Date(end);
+      if (
+        isNaN(parsedStart.getTime()) ||
+        isNaN(parsedEnd.getTime()) ||
+        parsedEnd <= parsedStart
+      ) {
+        throw new Error("Invalid start or end time");
+      }
+
+      const response = this.doctorRepository.checkAvialability(
+        doctorId as string,
+        parsedDate as Date,
+        parsedStart as Date,
+        parsedEnd as Date
+      );
+
+      if (response) {
+        return response;
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
 }

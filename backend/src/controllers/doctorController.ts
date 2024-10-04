@@ -255,4 +255,28 @@ export default class DoctorController {
       }
     }
   }
+
+  async checkAvialability(req: Request, res: Response): Promise<void> {
+    const { doctorId, date, start, end } = req.body;
+    if (!doctorId || !date || !start || !end) {
+      res.status(400).json({ error: "Missing required fields" });
+    }
+
+    try {
+      const response = await this.doctorService.checkAvialability(
+        doctorId as string,
+        date as string,
+        start as string,
+        end as string
+      );
+      if (response) {
+        res.status(200).json(response);
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server Error" });
+      }
+    }
+  }
 }

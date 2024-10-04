@@ -37,6 +37,8 @@ export const checkSlots = async (
       },
     });
 
+    console.log(response)
+
     if (response?.data) {
       return response.data;
     }
@@ -47,7 +49,7 @@ export const checkSlots = async (
   }
 };
 
-export const addSlot = async (requestBody: any) => {
+export const addSlots = async (requestBody: any) => {
   try {
     const response = await doctorAxiosUrl.post(
       "/api/doctor/slots",
@@ -70,7 +72,7 @@ export const addSlot = async (requestBody: any) => {
 
 export const deleteSlot = async (
   slotStart: string,
-  doctorId: string|undefined,
+  doctorId: string | undefined,
   date: Date
 ) => {
   try {
@@ -79,6 +81,27 @@ export const deleteSlot = async (
       doctorId: doctorId,
       date: date,
     });
+    if (response) {
+      return response;
+    }
+  } catch (error: any) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+  }
+};
+
+export const checkAvialability = async (requestBody: {
+  doctorId: string | undefined;
+  date: string;
+  start: string;
+  end: string;
+}) => {
+  try {
+    const response = await doctorAxiosUrl.post(
+      "/api/doctor/checkAvialability",
+      requestBody
+    );
     if (response) {
       return response;
     }

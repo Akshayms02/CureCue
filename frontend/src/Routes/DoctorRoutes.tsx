@@ -8,6 +8,7 @@ import { DoctorDashboard } from "../Components/DoctorComponents/DoctorDashBoardC
 import DoctorProtectedRoute from "./ProtectedRoutes/DoctorProtectedRoute";
 import ProfileCard from "../Pages/Doctor/Profile";
 import SlotManagement from "../Pages/Doctor/SlotManagement";
+// import DoctorScheduler from "../Pages/Doctor/slot";
 
 function DoctorRoutes() {
   return (
