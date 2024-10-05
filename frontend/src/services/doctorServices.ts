@@ -37,7 +37,7 @@ export const checkSlots = async (
       },
     });
 
-    console.log(response)
+    console.log(response);
 
     if (response?.data) {
       return response.data;
@@ -73,7 +73,7 @@ export const addSlots = async (requestBody: any) => {
 export const deleteSlot = async (
   slotStart: string,
   doctorId: string | undefined,
-  date: Date
+  date: string
 ) => {
   try {
     const response = await doctorAxiosUrl.post("/api/doctor/deleteSlot", {

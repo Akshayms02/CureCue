@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { format } from 'date-fns';
 
 
-import "react-datepicker/dist/react-datepicker.css"; // Importing DatePicker styles
+import "react-datepicker/dist/react-datepicker.css";
 
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
@@ -43,7 +43,7 @@ export function SlotBooking() {
           isOnHold: slot.isOnHold
         }));
         setAvailableSlots(fetchedSlots);
-      }else{
+      } else {
         setAvailableSlots([])
       }
 
@@ -63,7 +63,10 @@ export function SlotBooking() {
   const handleDeleteSlot = async (slotStart: any, date: any) => {
     try {
       const doctorId = DoctorData?.doctorInfo?.doctorId
-      const response = await deleteSlot(slotStart, doctorId, date);
+      const localDate = format(date, 'yyyy-MM-dd',)
+      console.log(slotStart, doctorId, localDate)
+
+      const response = await deleteSlot(slotStart, doctorId, localDate);
 
       if (response?.status === 200) {
         setAvailableSlots((prevSlots) =>
@@ -154,7 +157,7 @@ export function SlotBooking() {
         </div>
       </section>
 
-      {isModalOpen && (<AddSlotModal setIsModalOpen={setIsModalOpen} />
+      {isModalOpen && (<AddSlotModal setIsModalOpen={setIsModalOpen} setAvailableSlots={setAvailableSlots} Pdate={date} />
       )}
     </main>
   );

@@ -17,7 +17,7 @@ function App() {
             <Route path="/admin/*" element={<AdminRoutes/>}></Route>
           </Routes>
         </Router>
-        <Toaster position="top-right" />
+        <Toaster position="top-right" richColors />
       </ThemeProvider>
     </>
   );

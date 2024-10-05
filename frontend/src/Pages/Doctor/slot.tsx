@@ -15,14 +15,14 @@ interface TimeSlot {
     end: Date;
 }
 
-const AddSlotModal: React.FC<{ setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>> }> = ({ setIsModalOpen }) => {
+const AddSlotModal: React.FC<{ setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>, setAvailableSlots: React.Dispatch<React.SetStateAction<any>>, Pdate: any }> = ({ setIsModalOpen, setAvailableSlots, Pdate }) => {
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
     const [startTime, setStartTime] = useState<Date | null>(null);
     const [endTime, setEndTime] = useState<Date | null>(null);
     const [isLoading, setIsLoading] = useState(false); //Loading state
     const DoctorData = useSelector((state: RootState) => state.doctor);
-
+console.log("parent date",Pdate)
 
     const handleDateChange = (date: Date | null) => {
         setSelectedDate(date);
@@ -132,6 +132,17 @@ const AddSlotModal: React.FC<{ setIsModalOpen: React.Dispatch<React.SetStateActi
             const response = await addSlots(requestBody)
             console.log(response)
             if (response.message === "Successful") {
+                const newAvailableSlots = timeSlots.map((slot) => ({
+                    start: slot.start,
+                    end: slot.end,
+                    isBooked: false,  // Assuming new slots are not booked
+                    isOnHold: false   // Assuming new slots are not on hold
+                }));
+                console.log(Pdate,selectedDate)
+                if (selectedDate?.toISOString() === Pdate.toISOString()) {
+                    setAvailableSlots((prevSlots) => [...prevSlots, ...newAvailableSlots]);
+                }
+
                 toast.success('Slots saved successfully!');
                 setTimeSlots([]);
                 setIsModalOpen(false);
