@@ -3,7 +3,7 @@ import {
   Home,
   LucideLogOut,
   CalendarIcon,
-  ClipboardListIcon,
+  DollarSign,
   UserIcon,
   User,
 } from "lucide-react";
@@ -92,6 +92,18 @@ export function DoctorSideBar() {
               Appointments
             </NavLink>
             <NavLink
+              to="/doctor/wallet"
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
+                  ? "text-primary bg-gray-300"
+                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
+                }`
+              }
+            >
+              <DollarSign className="h-6 w-6" />
+              Wallet
+            </NavLink>
+            <NavLink
               to="/doctor/patients"
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
@@ -104,18 +116,7 @@ export function DoctorSideBar() {
               Patients
             </NavLink>
 
-            <NavLink
-              to="/doctor/reports"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
-                  ? "text-primary bg-gray-300"
-                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <ClipboardListIcon className="h-6 w-6" />
-              Reports
-            </NavLink>
+
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold text-muted-foreground hover:text-primary hover:bg-accent/50"

@@ -5,6 +5,7 @@ import { IAdminRepository } from "../interfaces/IAdminRepository";
 import userModel from "../models/userModel";
 import doctorApplicationModel from "../models/doctorApplicationModel";
 import mongoose from "mongoose";
+import walletModel from "../models/walletModel";
 
 export class AdminRepository implements IAdminRepository {
   async adminCheck(email: string) {
@@ -174,6 +175,13 @@ export class AdminRepository implements IAdminRepository {
       if (!updatedDoctor) {
         throw new Error("Doctor not found");
       }
+      const createWallet = new walletModel({
+        doctorId:doctorId,
+        balance: 0,
+        history: [],
+      });
+
+      await createWallet.save();
 
       return { status: true };
     } catch (error: any) {
@@ -183,7 +191,7 @@ export class AdminRepository implements IAdminRepository {
 
   async getDoctorData(doctorId: string) {
     try {
-      console.log(doctorId)
+      console.log(doctorId);
       const response = await doctorModel
         .findOne(
           { _id: new mongoose.Types.ObjectId(doctorId) },
