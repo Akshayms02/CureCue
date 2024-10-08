@@ -149,4 +149,31 @@ export default class UserController {
       }
     }
   }
+
+  async getDoctorData(req: Request, res: Response): Promise<void> {
+    try {
+      const { doctorId } = req.params;
+      const response = await this.userService.getDoctorData(doctorId as string);
+      if (response) {
+        res.status(200).json(response);
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+    }
+  }
+  async getSlots(req: Request, res: Response): Promise<void> {
+    try {
+      const { doctorId,date } = req.params;
+      const response = await this.userService.getSlots(doctorId as string,date as string);
+      if (response) {
+        res.status(200).json(response);
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+    }
+  }
 }

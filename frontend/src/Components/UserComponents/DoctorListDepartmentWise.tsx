@@ -1,12 +1,13 @@
 
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { LuBadgeCheck } from "react-icons/lu";
 import { getDepDoctors } from "../../services/userServices";
 
 interface Doctor {
+    doctorId: string;
     _id: string;
     name: string;
     department: string;
@@ -18,6 +19,7 @@ const DoctorListDepartmentWise = () => {
     const [doctors, setDoctors] = useState<Doctor[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchDoctors = async () => {
@@ -52,8 +54,8 @@ const DoctorListDepartmentWise = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
                         {doctors.map((doctor) => (
-                            <div key={doctor._id} className="w-64 h-80 text-white shadow-lg rounded-md relative overflow-hidden cursor-pointer font-sans">
-                                {/* Certified badge */}
+                            <div key={doctor.doctorId} className="w-64 h-80 text-white shadow-lg rounded-md relative overflow-hidden cursor-pointer font-sans" onClick={() => navigate(`/doctordetails/${doctor.doctorId}`)}>
+
                                 <div className="absolute top-2 left-2 flex items-center space-x-1">
                                     <LuBadgeCheck className="text-3xl fill-blue-600" size={40} />
                                 </div>

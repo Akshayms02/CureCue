@@ -7,4 +7,6 @@ export interface IUserRepository {
   getDoctors(): Promise<any>;
   getSpecializations(): Promise<any>;
   getDepDoctors(departmentId: string): Promise<any>;
+  getDoctorData(doctorId: string): Promise<any>;
+  getSlots(doctorId: string,date:Date): Promise<any>;
 }

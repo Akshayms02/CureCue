@@ -10,6 +10,7 @@ import UserLayout from "../Components/Common/userLayout";
 import UserHome from "../Components/UserComponents/UserHome";
 import UserBookingPage from "../Components/UserComponents/UserBookingPage";
 import DoctorListDepartmentWise from "../Components/UserComponents/DoctorListDepartmentWise";
+import Doctordetails from "../Components/UserComponents/Doctordetails";
 
 function UserRoutes() {
   return (
@@ -22,6 +23,7 @@ function UserRoutes() {
         <Route path="/" element={<UserHome />}></Route>
         <Route path="/booking" element={<UserBookingPage />}></Route>
         <Route path="/:departmentId" element={<DoctorListDepartmentWise />}></Route>
+        <Route path="/doctordetails/:doctorId" element={<Doctordetails />}></Route>
       </Route>
 
       <Route path="/" element={<ProfileLayout />}>

@@ -96,8 +96,8 @@ const ProfileCard: React.FC = () => {
           {/* Skills */}
           <div>
             <h3 className="text-lg font-bold">Skills</h3>
-            <ul className="flex space-x-3">
-              <li className="px-3 py-1 bg-gray-100 rounded-lg">
+            <ul className="flex space-x-3 ">
+              <li className="px-3 py-1 bg-blue-200 rounded-lg">
                 Nuerology Expertise
               </li>
               <li className="px-3 py-1 bg-gray-100 rounded-lg">Patient Care</li>

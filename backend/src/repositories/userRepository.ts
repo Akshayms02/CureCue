@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import doctorModel from "../models/doctorModel";
 import specializationModel from "../models/specializationModel";
 import mongoose from "mongoose";
+import Slot from "../models/doctorSlotsModel";
 
 export class UserRepository implements IUserRepository {
   async existUser(email: string): Promise<IUser | null> {
@@ -97,7 +98,10 @@ export class UserRepository implements IUserRepository {
     try {
       const doctors = await doctorModel
         .find(
-          { department: new mongoose.Types.ObjectId(departmentId), kycStatus: "approved" },
+          {
+            department: new mongoose.Types.ObjectId(departmentId),
+            kycStatus: "approved",
+          },
           {
             doctorId: 1,
             name: 1,
@@ -109,6 +113,54 @@ export class UserRepository implements IUserRepository {
         .populate("department");
 
       return doctors;
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  async getDoctorData(doctorId: string) {
+    try {
+      const response = await doctorModel
+        .findOne(
+          { doctorId: doctorId },
+          {
+            doctorId: 1,
+            name: 1,
+            email: 1,
+            image: 1,
+            department: 1,
+            fees: 1,
+            phone: 1,
+            gender: 1,
+          }
+        )
+        .populate("department")
+        .lean();
+
+      if (response) {
+        return response;
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  async getSlots(doctorId: string, date: Date) {
+    try {
+      console.log(date);
+      const response = await Slot.findOne({
+        doctorId: doctorId,
+        date: date,
+      }).lean();
+      if (response) {
+        return response.timeSlots;
+      } else {
+        return [];
+      }
     } catch (error: any) {
       if (error instanceof Error) {
         throw new Error(error.message);

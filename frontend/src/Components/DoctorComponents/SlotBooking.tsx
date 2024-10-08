@@ -10,10 +10,12 @@ import { RootState } from "../../Redux/store";
 import { toast } from "sonner";
 import { FiTrash } from 'react-icons/fi';
 import { checkSlots, deleteSlot } from "../../services/doctorServices";
-import AddSlotModal from "../../Pages/Doctor/slot";
+import AddSlotModal from "./slot";
 
 export function SlotBooking() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const localDate = new Date();
+  localDate.setHours(0, 0, 0, 0)
+  const [date, setDate] = useState<Date | undefined>(localDate);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<{ start: Date; end: Date, isBooked: boolean, isOnHold: boolean }[]>([]);
 

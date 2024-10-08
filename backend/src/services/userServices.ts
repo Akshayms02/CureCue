@@ -214,7 +214,7 @@ export class userServices {
   async getDepDoctors(departmentId: string) {
     try {
       const response = await this.userRepositary.getDepDoctors(departmentId);
-      console.log(departmentId) 
+      console.log(departmentId);
       const docs = await Promise.all(
         response.map(async (doctor: any) => {
           let profileUrl = "";
@@ -236,6 +236,50 @@ export class userServices {
       );
 
       return docs;
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  async getDoctorData(doctorId: string) {
+    try {
+      const response = await this.userRepositary.getDoctorData(
+        doctorId as string
+      );
+      if (response) {
+        let profileUrl = "";
+        if (response?.image?.url) {
+          const filePath = this.getFolderPathByFileType(response?.image?.type);
+          profileUrl = await this.S3Service.getFile(
+            response?.image?.url,
+            filePath
+          );
+          if (profileUrl) {
+            response.profileUrl = profileUrl;
+          }
+        }
+        console.log(response);
+
+        return response;
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  async getSlots(doctorId: string, date: string) {
+    try {
+      const parsedDate = new Date(date);
+      const response = await this.userRepositary.getSlots(
+        doctorId as string,
+        parsedDate as Date
+      );
+
+      return response;
     } catch (error: any) {
       if (error instanceof Error) {
         throw new Error(error.message);
