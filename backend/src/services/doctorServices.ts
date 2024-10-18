@@ -399,4 +399,30 @@ export class doctorServices {
       }
     }
   }
+
+  async getDoctorData(doctorId: string) {
+    try {
+      const response = await this.doctorRepository.getDoctorData(doctorId);
+      let imageUrl = "";
+      console.log(response)
+
+      if (response?.image) {
+        const folderPath = this.getFolderPathByFileType(response?.image?.type);
+        const signedUrl = await this.S3Service.getFile(
+          response.image.url,
+          folderPath
+        );
+        imageUrl = signedUrl;
+      }
+      response.imageUrl = imageUrl;
+      console.log(response);
+      if (response) {
+        return response;
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
 }

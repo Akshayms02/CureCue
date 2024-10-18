@@ -55,4 +55,6 @@ route.post("/checkAvialability",doctorController.checkAvialability.bind(doctorCo
 
 route.post("/refresh-token", refreshTokenHandler);
 
+route.get("/getDoctorData/:doctorId",doctorController.getDoctorData.bind(doctorController))
+
 export default route;

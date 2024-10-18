@@ -19,4 +19,5 @@ export interface IDoctorRepository {
     parsedStart: Date,
     parsedEnd: Date
   ): Promise<any>;
+  getDoctorData(doctorId: string): Promise<any>;
 }

@@ -279,4 +279,22 @@ export default class DoctorController {
       }
     }
   }
+
+  async getDoctorData(req: Request, res: Response): Promise<void> {
+    try {
+      const { doctorId } = req.params;
+      const response = await this.doctorService.getDoctorData(
+        doctorId as string
+      );
+      console.log(response)
+      if (response) {
+        res.status(200).json(response);
+      }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        console.log(error)
+        res.status(500).json({ message: "Internal server Error" });
+      }
+    }
+  }
 }

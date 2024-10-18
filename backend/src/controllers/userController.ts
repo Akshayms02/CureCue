@@ -165,11 +165,24 @@ export default class UserController {
   }
   async getSlots(req: Request, res: Response): Promise<void> {
     try {
-      const { doctorId,date } = req.params;
-      const response = await this.userService.getSlots(doctorId as string,date as string);
+      const { doctorId, date } = req.params;
+      const response = await this.userService.getSlots(
+        doctorId as string,
+        date as string
+      );
       if (response) {
         res.status(200).json(response);
       }
+    } catch (error: any) {
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Internal Server Error" });
+      }
+    }
+  }
+
+  async createAppointment(req: Request, res: Response): Promise<void> {
+    try {
+      res.status(200).json({ message: "Not implemented" });
     } catch (error: any) {
       if (error instanceof Error) {
         res.status(500).json({ message: "Internal Server Error" });

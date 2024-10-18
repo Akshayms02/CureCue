@@ -111,3 +111,18 @@ export const checkAvialability = async (requestBody: {
     }
   }
 };
+
+export const getDoctorData = async (doctorId: string) => {
+  try {
+    const response = await doctorAxiosUrl.get(
+      `/api/doctor/getDoctorData/${doctorId}`
+    );
+    if (response) {
+      return response;
+    }
+  } catch (error: any) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+  }
+};

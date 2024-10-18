@@ -248,4 +248,36 @@ export class DoctorRepository implements IDoctorRepository {
 
     return { available: isAvailable };
   }
+
+  async getDoctorData(doctorId: string) {
+    try {
+      console.log(doctorId)
+      const user = await doctorModel
+        .findOne(
+          { doctorId },
+          {
+            _id: 0,
+            doctorId: 1,
+            name: 1,
+            email: 1,
+            phone: 1,
+            password: 1,
+            isBlocked: 1,
+            kycStatus: 1,
+            DOB: 1,
+            department: 1,
+            fees: 1,
+            gender: 1,
+            image: 1,
+          }
+        )
+        .populate("department").lean();
+
+      return user;
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
 }

@@ -34,6 +34,7 @@ route.get(
   userController.getDoctorData.bind(userController)
 );
 route.get("/getSlots/:doctorId/:date", userController.getSlots.bind(userController));
+route.post("/createAppointment",userController.createAppointment.bind(userController))
 route.post("/refresh-token", refreshTokenHandler);
 
 export default route;

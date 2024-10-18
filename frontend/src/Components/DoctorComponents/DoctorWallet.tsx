@@ -7,12 +7,12 @@ interface WalletHistoryItem {
 
 const DoctorWallet: React.FC = () => {
     const walletHistory: WalletHistoryItem[] = [
-        { description: "Received $100.00", amount: "+ $100.00" },
-        { description: "Sent $50.00", amount: "- $50.00" },
-        { description: "Received $200.00", amount: "+ $200.00" },
-        { description: "Sent $30.00", amount: "- $30.00" },
-        { description: "Received $150.00", amount: "+ $150.00" },
-        { description: "Sent $20.00", amount: "- $20.00" },
+        { description: "Received Rs. 100.00", amount: "+ Rs. 100.00" },
+        { description: "Sent Rs. 50.00", amount: "- Rs. 50.00" },
+        { description: "Received Rs. 200.00", amount: "+ Rs. 200.00" },
+        { description: "Sent Rs. 30.00", amount: "- Rs. 30.00" },
+        { description: "Received Rs. 150.00", amount: "+ Rs. 150.00" },
+        { description: "Sent Rs. 20.00", amount: "- Rs. 20.00" },
     ];
 
     const [newTransaction, setNewTransaction] = useState({ amount: '' });
@@ -27,7 +27,7 @@ const DoctorWallet: React.FC = () => {
         <div className="flex flex-row items-center justify-center h-screen bg-gray-100 gap-10 px-20 ">
             <div className="bg-white p-6 rounded-xl shadow-2xl mb-4 w-1/2 h-64">
                 <h1 className="text-3xl font-bold text-center mb-4">Wallet Balance</h1>
-                <p className="text-3xl font-semibold text-green-600"> $500.00 </p>
+                <p className="text-3xl font-semibold text-green-600"> Rs. 500.00 </p>
                 <div className="flex mt-10 gap-5 justify-center">
                     <input
                         type="text"

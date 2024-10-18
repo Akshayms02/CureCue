@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { fetchAvialableTimeslots, getDoctorData } from '../../services/userServices';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
+import axiosUrl from '../../Utils/axios';
+
 
 interface Department {
     name: string
@@ -17,6 +20,7 @@ interface DoctorInfo {
     profileUrl: string,
     gender: string
     email: string
+    doctorId: string
 }
 
 interface TimeSlots {
@@ -27,16 +31,38 @@ interface TimeSlots {
     holdExpiresAt: string
     _id: string
 }
+interface UserInfo {
+    name: string;
+    email: string;
+    userId: string;
+    phone: string;
+    gender: string;
+    DOB: string;
+    profileImage: any;
+    bio: string;
+}
 
 const Doctordetails: React.FC = () => {
     const { doctorId } = useParams<{ doctorId: string }>();
+    const [userData, setUserData] = useState<UserInfo | null>(null);
+
+    useEffect(() => {
+        const storedData = localStorage.getItem("userInfo");
+        if (storedData) {
+            setUserData(JSON.parse(storedData) as UserInfo);
+        }
+    }, []);
+    const navigate = useNavigate()
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
     const [timeslots, setTimeslots] = useState<TimeSlots[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [doctorData, setDoctorData] = useState<DoctorInfo | null>(null)
-    const [selectedTimeslot, setSelectedTimeslot] = useState<string | null>(null);
+    const [selectedTimeslot, setSelectedTimeslot] = useState<Date | null>(null);
+
+
+
 
     const doctor = {
         name: 'Dr. Bernadette Carr',
@@ -73,7 +99,7 @@ const Doctordetails: React.FC = () => {
             try {
                 if (selectedDate) {
                     const date = format(selectedDate, 'yyyy-MM-dd',)
-                    const response = await fetchAvialableTimeslots(doctorId as string, date as string)
+                    const response: any = await fetchAvialableTimeslots(doctorId as string, date as string)
                     if (response?.length < 0) {
                         setTimeslots([])
                     } else {
@@ -98,6 +124,56 @@ const Doctordetails: React.FC = () => {
 
         fetchTimeslots();
     }, [selectedDate, doctorId]);
+
+    const handlePayment = async () => {
+        console.log("clicked")
+
+        try {
+            const options = {
+                key: "rzp_test_7PE24PnF4GNlR0",
+                amount: parseInt(doctorData?.fees as string) * 100,
+                currency: "INR",
+                name: "CureCue",
+                description: "Appointment Payment",
+                handler: async function (response: {
+                    razorpay_payment_id: any;
+                    razorpay_order_id: any;
+                }) {
+                    try {
+                        await axiosUrl.post(`api/user/createAppointment`, {
+                            amount: parseInt(doctorData?.fees as string),
+                            currency: "INR",
+                            email: doctorData?.email,
+                            doctorId: doctorData?.doctorId,
+                            userId: userData?.userId,
+                            paymentId: response.razorpay_payment_id,
+                            orderId: response.razorpay_order_id,
+                        });
+
+                        toast.success("Payment successful and order created.");
+                        setTimeout(() => {
+                            navigate("/");
+                        }, 1500);
+                    } catch (error) {
+                        console.error("Error saving payment:", error);
+                        toast.error("Failed to save order.");
+                    }
+                },
+                prefill: {
+                    name: "Your Name",
+                    email: "your-email@example.com",
+                    contact: "9876543210",
+                },
+            };
+
+            const paymentObject = new (window as any).Razorpay(options);
+            paymentObject.open();
+        } catch (error) {
+            console.error("Error during payment process:", error);
+            toast.error("Error during payment.");
+        }
+
+    };
 
     return (
         <div className='h-screen pb-64 '>
@@ -173,8 +249,13 @@ const Doctordetails: React.FC = () => {
                                     <div className="mt-4">
                                         <h4 className="text-lg font-semibold text-gray-800 mb-2">Available Timeslots:</h4>
                                         <div className="grid grid-cols-2 gap-2">
-                                            {timeslots.map((slot,index) => (
-                                                <div className='border px-3 py-2 rounded-lg bg-blue-200 flex justify-between items-center' key={index}>
+                                            {timeslots.map((slot) => (
+                                                <div
+                                                    key={slot.start.toISOString()}
+                                                    className={`border px-3 py-2 rounded-lg flex justify-between items-center cursor-pointer ${selectedTimeslot?.getTime() === slot.start.getTime() ? 'bg-blue-500 text-white' : 'bg-blue-200'
+                                                        }`}
+                                                    onClick={() => setSelectedTimeslot(slot.start)}
+                                                >
                                                     <span>
                                                         {slot.start.toLocaleTimeString([], {
                                                             hour: '2-digit',
@@ -201,20 +282,19 @@ const Doctordetails: React.FC = () => {
                                 <div className="flex justify-end mt-4">
                                     <button
                                         onClick={() => {
-                                            setIsModalOpen(false); // Close the modal
-                                            setSelectedDate(null); // Clear selected date
-                                            setSelectedTimeslot(null); // Clear selected timeslot
+                                            setIsModalOpen(false);
+                                            setSelectedTimeslot(null);
                                         }}
                                         className="w-1/4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded mr-2"
                                     >
                                         Cancel
                                     </button>
                                     <button
-                                        onClick={() => {
-                                            // Handle booking logic here
-                                            console.log("Booking for:", selectedDate, selectedTimeslot);
-                                        }}
+                                        onClick={
+                                            handlePayment
+                                        }
                                         className="w-1/4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded"
+                                        disabled={!selectedTimeslot}
                                     >
                                         Book Now
                                     </button>
@@ -224,7 +304,7 @@ const Doctordetails: React.FC = () => {
                         </div>
                     </div>
                 )}
-            </div></div>
+            </div></div >
 
     );
 };
