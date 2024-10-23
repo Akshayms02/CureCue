@@ -4,6 +4,7 @@ import UserController from "../controllers/userController";
 import { userServices } from "../services/userServices";
 import { refreshTokenHandler } from "../config/refreshTokenConfig";
 import { AwsConfig } from "../config/awsConfig";
+import { verifyToken } from "../config/jwtConfig";
 
 const route = Router();
 
@@ -35,6 +36,7 @@ route.get(
 );
 route.get("/getSlots/:doctorId/:date", userController.getSlots.bind(userController));
 route.post("/createAppointment",userController.createAppointment.bind(userController))
+route.post("/holdTimeslot",verifyToken,userController.holdSlot.bind(userController))
 route.post("/refresh-token", refreshTokenHandler);
 
 export default route;

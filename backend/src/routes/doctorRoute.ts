@@ -57,4 +57,6 @@ route.post("/refresh-token", refreshTokenHandler);
 
 route.get("/getDoctorData/:doctorId",doctorController.getDoctorData.bind(doctorController))
 
+route.get("/appointments/:doctorId",doctorController.getAppointments.bind(doctorController))
+
 export default route;

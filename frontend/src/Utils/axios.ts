@@ -34,11 +34,12 @@ axiosUrl.interceptors.response.use(
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
-
+      const userInfo = localStorage.getItem("userInfo");
+      const parsedUserInfo=JSON.parse(userInfo as string)
       try {
         const response = await axios.post(
           `${URL}/api/user/refresh-token`,
-          {},
+          {userId:parsedUserInfo?.userId},
           {
             withCredentials: true,
           }

@@ -3,8 +3,8 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import redisClient from "../utils/redisCaching";
 import sendEmailOtp from "../config/nodemailer";
-import { createToken } from "../config/jwtConfig";
-import jwt from "jsonwebtoken";
+import { createRefreshToken, createToken } from "../config/jwtConfig";
+
 import { IDoctorRepository } from "../interfaces/IDoctorRepository";
 import {
   docDetails,
@@ -133,12 +133,10 @@ export class doctorServices {
       if (!user) {
         throw new Error("Invalid Login Credentails");
       }
-      const docaccessToken = createToken(user.doctorId as string);
-
-      const refreshToken = jwt.sign(
-        { id: user.doctorId, email: user.email },
-        process.env.JWT_SECRET!,
-        { expiresIn: "7d" }
+      const docaccessToken = createToken(user.doctorId as string, "doctor");
+      const refreshToken = createRefreshToken(
+        user.doctorId as string,
+        "doctor"
       );
 
       let imageUrl = "";
@@ -404,7 +402,7 @@ export class doctorServices {
     try {
       const response = await this.doctorRepository.getDoctorData(doctorId);
       let imageUrl = "";
-      console.log(response)
+      console.log(response);
 
       if (response?.image) {
         const folderPath = this.getFolderPathByFileType(response?.image?.type);
@@ -423,6 +421,19 @@ export class doctorServices {
       if (error instanceof Error) {
         throw new Error(error.message);
       }
+    }
+  }
+
+  async getAppointments(doctorId: string) {
+    try {
+      const appointments = await this.doctorRepository.findAppointmentsByDoctor(
+        doctorId
+      );
+
+      return appointments;
+    } catch (error: any) {
+      console.log(error);
+      throw new Error("Error fetching appointments from service");
     }
   }
 }

@@ -8,6 +8,7 @@ dotenv.config();
 const secret_key = process.env.SECRET_KEY as string;
 
 const refreshTokenHandler = (req: Request, res: Response) => {
+  console.log(req.body)
   const { userId } = req.body;
 
   if (!userId) {
@@ -15,20 +16,19 @@ const refreshTokenHandler = (req: Request, res: Response) => {
   }
 
   const refreshToken = req.cookies.refreshToken;
-
+console.log(refreshToken)
   if (!refreshToken) {
     return res.status(401).json({ message: "Refresh token is missing." });
   }
 
   jwt.verify(refreshToken, secret_key, (err: jwt.VerifyErrors | null) => {
     if (err) {
-      
       return res
         .status(401)
         .json({ message: "Invalid or expired refresh token." });
     }
 
-    const newAccessToken = createToken(userId);
+    const newAccessToken = createToken(userId, "user");
 
     res.json({ accessToken: newAccessToken });
   });

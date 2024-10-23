@@ -9,6 +9,7 @@ import userRoute from "../src/routes/userRoute";
 import doctorRoute from "../src/routes/doctorRoute";
 import adminRoute from "../src/routes/adminRoute"
 import connectDB from "./config/dataBase";
+import "./config/cronjob"
 connectDB();
 
 app.use(cookieParser());

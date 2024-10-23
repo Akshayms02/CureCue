@@ -9,6 +9,7 @@ import DoctorProtectedRoute from "./ProtectedRoutes/DoctorProtectedRoute";
 import ProfileCard from "../Pages/Doctor/Profile";
 import SlotManagement from "../Pages/Doctor/SlotManagement";
 import DoctorWallet from "../Components/DoctorComponents/DoctorWallet";
+import AppointmentList from "../Components/DoctorComponents/AppointmentList";
 // import DoctorScheduler from "../Pages/Doctor/slot";
 
 function DoctorRoutes() {
@@ -40,6 +41,14 @@ function DoctorRoutes() {
           element={
             <DoctorProtectedRoute>
               <SlotManagement />
+            </DoctorProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="appointments"
+          element={
+            <DoctorProtectedRoute>
+              <AppointmentList />
             </DoctorProtectedRoute>
           }
         ></Route>

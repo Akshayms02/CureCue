@@ -1,58 +1,109 @@
 import React, { useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
+import { Input } from "../../../components/ui/input"
+import { Button } from "../../../components/ui/button"
+import { ScrollArea } from "../../../components/ui/scroll-area"
+import { Separator } from "../../../components/ui/separator"
+import { PlusCircle, MinusCircle } from "lucide-react"
 
 interface WalletHistoryItem {
-    description: string;
-    amount: string;
+  description: string
+  amount: string
 }
 
 const DoctorWallet: React.FC = () => {
-    const walletHistory: WalletHistoryItem[] = [
-        { description: "Received Rs. 100.00", amount: "+ Rs. 100.00" },
-        { description: "Sent Rs. 50.00", amount: "- Rs. 50.00" },
-        { description: "Received Rs. 200.00", amount: "+ Rs. 200.00" },
-        { description: "Sent Rs. 30.00", amount: "- Rs. 30.00" },
-        { description: "Received Rs. 150.00", amount: "+ Rs. 150.00" },
-        { description: "Sent Rs. 20.00", amount: "- Rs. 20.00" },
-    ];
+  const [walletHistory, setWalletHistory] = useState<WalletHistoryItem[]>([
+    { description: "Received Rs. 100.00", amount: "+ Rs. 100.00" },
+    { description: "Sent Rs. 50.00", amount: "- Rs. 50.00" },
+    { description: "Received Rs. 200.00", amount: "+ Rs. 200.00" },
+    { description: "Sent Rs. 30.00", amount: "- Rs. 30.00" },
+    { description: "Received Rs. 150.00", amount: "+ Rs. 150.00" },
+    { description: "Sent Rs. 20.00", amount: "- Rs. 20.00" },
+  ])
 
-    const [newTransaction, setNewTransaction] = useState({ amount: '' });
-    // const [walletHistory, setWalletHistory] = useState<WalletHistory[]>([]);
+  const [newTransaction, setNewTransaction] = useState({ amount: '' })
 
-    const handleAddTransaction = () => {
-        alert("Not implemented")
+  const handleAddTransaction = () => {
+    if (newTransaction.amount) {
+      const amount = parseFloat(newTransaction.amount)
+      if (!isNaN(amount)) {
+        const newItem: WalletHistoryItem = {
+          description: `${amount >= 0 ? 'Received' : 'Sent'} Rs. ${Math.abs(amount).toFixed(2)}`,
+          amount: `${amount >= 0 ? '+' : '-'} Rs. ${Math.abs(amount).toFixed(2)}`,
+        }
+        setWalletHistory([newItem, ...walletHistory])
+        setNewTransaction({ amount: '' })
+      }
+    }
+  }
 
-    };
+  const calculateBalance = () => {
+    return walletHistory.reduce((total, item) => {
+      const amount = parseFloat(item.amount.replace(/[^\d.-]/g, ''))
+      return total + amount
+    }, 0)
+  }
 
-    return (
-        <div className="flex flex-row items-center justify-center h-screen bg-gray-100 gap-10 px-20 ">
-            <div className="bg-white p-6 rounded-xl shadow-2xl mb-4 w-1/2 h-64">
-                <h1 className="text-3xl font-bold text-center mb-4">Wallet Balance</h1>
-                <p className="text-3xl font-semibold text-green-600"> Rs. 500.00 </p>
-                <div className="flex mt-10 gap-5 justify-center">
-                    <input
-                        type="text"
-                        placeholder="Enter the amount"
-                        value={newTransaction.amount}
-                        onChange={(e) => setNewTransaction({ ...newTransaction, amount: e.target.value })}
-                        className='h-10 rounded-lg px-3 border border-gray-700'
-                    />
-
-                    <button className='bg-black text-white rounded-md w-24 font-medium' onClick={handleAddTransaction}>Add</button>
-                </div>
+  return (
+    <div className="container mx-auto my-auto p-4 space-y-4">
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Wallet Balance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-4xl font-bold text-primary">
+              Rs. {calculateBalance().toFixed(2)}
+            </p>
+            <div className="mt-6 space-y-2">
+              <Input
+                type="number"
+                placeholder="Enter the amount"
+                value={newTransaction.amount}
+                onChange={(e) => setNewTransaction({ amount: e.target.value })}
+              />
+              <Button onClick={handleAddTransaction} className="w-full">
+                Withdraw
+              </Button>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-xl w-1/2 h-3/4 overflow-y-auto ">
-                <h2 className="text-xl font-bold mb-4">Wallet History</h2>
-                <div className="flex flex-col space-y-4">
-                    {walletHistory.map((item, index) => (
-                        <div key={index} className="flex justify-between">
-                            <p className="text-gray-800">{item.description}</p>
-                            <p className={item.amount.startsWith('-') ? "text-red-600" : "text-green-600"}>{item.amount}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
-    )
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Wallet History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[300px] pr-4">
+              {walletHistory.map((item, index) => (
+                <React.Fragment key={index}>
+                  <div className="flex justify-between items-center py-2">
+                    <div className="flex items-center space-x-2">
+                      {item.amount.startsWith('+') ? (
+                        <PlusCircle className="text-green-500" />
+                      ) : (
+                        <MinusCircle className="text-red-500" />
+                      )}
+                      <p>{item.description}</p>
+                    </div>
+                    <p
+                      className={
+                        item.amount.startsWith('-')
+                          ? "text-red-500 font-semibold"
+                          : "text-green-500 font-semibold"
+                      }
+                    >
+                      {item.amount}
+                    </p>
+                  </div>
+                  {index < walletHistory.length - 1 && <Separator />}
+                </React.Fragment>
+              ))}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
 }
 
 export default DoctorWallet
