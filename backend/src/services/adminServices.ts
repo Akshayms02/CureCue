@@ -1,7 +1,7 @@
-import jwt from "jsonwebtoken";
 // import { IAdmin } from "../models/adminModel";
 import { IAdminRepository } from "../interfaces/IAdminRepository";
 import { AwsConfig } from "../config/awsConfig";
+import { createAdminToken, createRefreshToken } from "../config/jwtConfig";
 
 export class adminServices {
   constructor(
@@ -36,21 +36,15 @@ export class adminServices {
           throw new Error("Password is wrong");
         }
 
-        const adminAccessToken = jwt.sign(
-          { email: adminData.email },
-          process.env.JWT_SECRET as string,
-          {
-            expiresIn: "1hr",
-          }
-        );
-        const adminRefreshToken = jwt.sign(
-          { email: adminData.email },
-          process.env.JWT_SECRET as string,
-          {
-            expiresIn: "7d",
-          }
+        const adminAccessToken = createAdminToken(
+          adminData.email as string,
+          "admin"
         );
 
+        const adminRefreshToken = createRefreshToken(
+          adminData.email as string,
+          "admin"
+        );
         const adminInfo = {
           email: adminData.email,
         };

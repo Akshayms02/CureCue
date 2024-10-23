@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import { DoctorData } from "../interfaces/doctorInterfaces";
 import { docDetails } from "../controllers/doctorController";
 import Slot from "../models/doctorSlotsModel";
+import appointmentModel from "../models/appointmentModel";
 
 export class DoctorRepository implements IDoctorRepository {
   async existUser(email: string): Promise<IDoctor | null> {
@@ -251,7 +252,7 @@ export class DoctorRepository implements IDoctorRepository {
 
   async getDoctorData(doctorId: string) {
     try {
-      console.log(doctorId)
+      console.log(doctorId);
       const user = await doctorModel
         .findOne(
           { doctorId },
@@ -271,9 +272,20 @@ export class DoctorRepository implements IDoctorRepository {
             image: 1,
           }
         )
-        .populate("department").lean();
+        .populate("department")
+        .lean();
 
       return user;
+    } catch (error: any) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+  async findAppointmentsByDoctor(doctorId: string) {
+    try {
+      const appointments = await appointmentModel.find({ doctorId });
+      return appointments;
     } catch (error: any) {
       if (error instanceof Error) {
         throw new Error(error.message);

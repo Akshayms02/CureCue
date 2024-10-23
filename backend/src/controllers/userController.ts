@@ -180,12 +180,103 @@ export default class UserController {
     }
   }
 
-  async createAppointment(req: Request, res: Response): Promise<void> {
+  async createAppointment(req: Request, res: Response) {
     try {
-      res.status(200).json({ message: "Not implemented" });
+      const {
+        amount,
+        currency,
+        email,
+        doctorId,
+        userId,
+        paymentId,
+        orderId,
+        date,
+        patientName,
+        timeslotId,
+      } = req.body;
+      const appointment = await this.userService.createAppointment({
+        amount,
+        currency,
+        email,
+        doctorId,
+        userId,
+        paymentId,
+        orderId,
+        date,
+        patientName,
+        timeslotId,
+      });
+
+      return res.status(201).json({
+        message: "Appointment created successfully",
+        appointment,
+      });
     } catch (error: any) {
-      if (error instanceof Error) {
-        res.status(500).json({ message: "Internal Server Error" });
+      return res.status(500).json({
+        message: "Failed to create appointment",
+        error: error.message,
+      });
+    }
+  }
+
+  async holdSlot(req: Request, res: Response) {
+    const { doctorId, date, startTime, userId } = req.body;
+    console.log(req.body);
+
+    try {
+      const checkHold = await this.userService.checkHold(
+        doctorId,
+        new Date(date),
+        new Date(startTime)
+      );
+      if (checkHold) {
+        if (checkHold.length > 0) {
+          const timeslot = checkHold[0].timeSlots.filter((element: any) => {
+            return element.start.toISOString() == startTime;
+          });
+
+          if (timeslot[0].isOnHold == true) {
+            return res
+              .status(400)
+              .json({ success: false, message: "Failed to hold timeslot." });
+          }
+        }
+      }
+      if (!userId) {
+        throw new Error("Invalid User");
+      }
+      const result = await this.userService.holdSlot(
+        doctorId,
+        new Date(date),
+        new Date(startTime),
+        userId
+      );
+      console.log(result);
+
+      if (result) {
+        return res.status(200).json({
+          success: true,
+          message: "Timeslot held successfully.",
+          result,
+        });
+      } else {
+        console.log("hello");
+        return res
+          .status(400)
+          .json({ success: false, message: "Failed to hold timeslot." });
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (error.message == "Invalid User") {
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid User" });
+      } else {
+        return res.status(500).json({
+          success: false,
+          message: "Error holding timeslot.",
+          error: error.message,
+        });
       }
     }
   }

@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import axiosUrl from '../../Utils/axios';
 
 
+
 interface Department {
     name: string
 }
@@ -109,8 +110,9 @@ const Doctordetails: React.FC = () => {
                             isBooked: slot.isBooked,
                             isOnHold: slot.isOnHold
                         }));
+                        const filterSlots = slots.filter((elem) => elem.isBooked == false)
                         console.log(response)
-                        setTimeslots(slots);
+                        setTimeslots(filterSlots);
                     }
 
                 }
@@ -126,53 +128,83 @@ const Doctordetails: React.FC = () => {
     }, [selectedDate, doctorId]);
 
     const handlePayment = async () => {
-        console.log("clicked")
-
-        try {
-            const options = {
-                key: "rzp_test_7PE24PnF4GNlR0",
-                amount: parseInt(doctorData?.fees as string) * 100,
-                currency: "INR",
-                name: "CureCue",
-                description: "Appointment Payment",
-                handler: async function (response: {
-                    razorpay_payment_id: any;
-                    razorpay_order_id: any;
-                }) {
-                    try {
-                        await axiosUrl.post(`api/user/createAppointment`, {
-                            amount: parseInt(doctorData?.fees as string),
-                            currency: "INR",
-                            email: doctorData?.email,
-                            doctorId: doctorData?.doctorId,
-                            userId: userData?.userId,
-                            paymentId: response.razorpay_payment_id,
-                            orderId: response.razorpay_order_id,
-                        });
-
-                        toast.success("Payment successful and order created.");
-                        setTimeout(() => {
-                            navigate("/");
-                        }, 1500);
-                    } catch (error) {
-                        console.error("Error saving payment:", error);
-                        toast.error("Failed to save order.");
-                    }
-                },
-                prefill: {
-                    name: "Your Name",
-                    email: "your-email@example.com",
-                    contact: "9876543210",
-                },
-            };
-
-            const paymentObject = new (window as any).Razorpay(options);
-            paymentObject.open();
-        } catch (error) {
-            console.error("Error during payment process:", error);
-            toast.error("Error during payment.");
+        if (!selectedTimeslot) {
+            toast.error("Please select a timeslot.");
+            return;
         }
 
+        try {
+            // Step 1: Hold the selected timeslot
+            const holdSlotResponse = await axiosUrl.post(`api/user/holdTimeslot`, {
+                doctorId: doctorData?.doctorId,
+                startTime: selectedTimeslot,  // Send the selected timeslot info here
+                userId: userData?.userId,
+                date: selectedDate
+            });
+
+            if (holdSlotResponse.data.success) {
+                console.log("Slot held successfully");
+
+                // Step 2: Proceed to Payment
+                const options = {
+                    key: "rzp_test_7PE24PnF4GNlR0",
+                    amount: parseInt(doctorData?.fees as string) * 100,
+                    currency: "INR",
+                    name: "CureCue",
+                    description: "Appointment Payment",
+                    handler: async function (response: {
+                        razorpay_payment_id: any;
+                        razorpay_order_id: any;
+                    }) {
+                        try {
+                            // Step 3: Finalize appointment on payment success
+                            await axiosUrl.post(`api/user/createAppointment`, {
+                                amount: parseInt(doctorData?.fees as string),
+                                currency: "INR",
+                                email: doctorData?.email,
+                                doctorId: doctorData?.doctorId,
+                                userId: userData?.userId,
+                                paymentId: response.razorpay_payment_id,
+                                orderId: response.razorpay_order_id,
+                                timeslotId: selectedTimeslot,  // Include timeslot here too
+                                patientName: userData?.name,
+                                date: selectedDate
+                            });
+
+                            toast.success("Payment successful and appointment booked.");
+                            setTimeout(() => {
+                                navigate("/");
+                            }, 1500);
+                        } catch (error) {
+                            console.error("Error saving appointment:", error);
+                            toast.error("Failed to save appointment.");
+                        }
+                    },
+                    prefill: {
+                        name: userData?.name,
+                        email: userData?.email,
+                        contact: userData?.phone,
+                    },
+                };
+
+                const paymentObject = new (window as any).Razorpay(options);
+                paymentObject.open();
+            } else {
+                toast.error("Failed to hold the slot. Please try again.");
+            }
+        } catch (error: any) {
+            if (error.status == 400) {
+                toast.error("Slot is On hold Please Select another Slot")
+            } else if (error.status == 401) {
+                toast.error("Please Login first")
+            }
+            else {
+                console.log(error.message)
+                console.error("Error during holding slot or payment process:", error);
+                toast.error("Error during the process.");
+            }
+
+        }
     };
 
     return (
@@ -242,7 +274,10 @@ const Doctordetails: React.FC = () => {
                                     dateFormat="yyyy-MM-dd"
                                     disabled={isLoading}
                                     className='border border-gray-300 rounded-md h-11 px-3 mb-4'
+                                    minDate={new Date()} // Restricts to today
+                                    maxDate={new Date(new Date().setDate(new Date().getDate() + 10))} // Restricts to 10 days from now
                                 />
+
                                 {isLoading && <p className="text-gray-500">Loading timeslots...</p>}
                                 {error && <p className="text-red-500">{error}</p>}
                                 {timeslots.length > 0 ? (

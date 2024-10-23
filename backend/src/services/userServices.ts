@@ -5,8 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import redisClient from "../utils/redisCaching";
 import sendEmailOtp from "../config/nodemailer";
 import { AwsConfig } from "../config/awsConfig";
-import { createToken } from "../config/jwtConfig";
-import jwt from "jsonwebtoken";
+import { createToken, createRefreshToken } from "../config/jwtConfig";
+import mongoose from "mongoose";
 
 export class userServices {
   constructor(
@@ -115,13 +115,9 @@ export class userServices {
       if (!user) {
         throw new Error("Invalid Login Credentails");
       }
-      const accessToken = createToken(user.userId as string);
+      const accessToken = createToken(user.userId as string, "user");
 
-      const refreshToken = jwt.sign(
-        { id: user.userId, email: user.email },
-        process.env.JWT_SECRET!,
-        { expiresIn: "7d" }
-      );
+      const refreshToken = createRefreshToken(user.userId as string, "user");
 
       const userInfo = {
         name: user.name,
@@ -285,5 +281,89 @@ export class userServices {
         throw new Error(error.message);
       }
     }
+  }
+
+  async createAppointment(data: any) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      const {
+        doctorId,
+        userId,
+        paymentId,
+        amount,
+        date,
+        patientName,
+        timeslotId,
+      } = data;
+      const parseDate = new Date(date);
+      console.log(data);
+
+      // Call the repository to find a valid slot
+      const slot = await this.userRepositary.findAvailableSlot(
+        doctorId,
+        userId,
+        timeslotId,
+        new Date(date),
+        session
+      );
+      console.log(slot);
+      if (!slot) {
+        throw new Error("No valid time slot found");
+      }
+      const timeSlot=slot.timeSlots.filter((element:any)=>element.start.toISOString()==timeslotId)
+
+      // Call the repository to book the slot
+      await this.userRepositary.bookSlot(slot, userId, session);
+
+      // Call the repository to create an appointment
+      const newAppointment = await this.userRepositary.createAppointment(
+        {
+          doctorId,
+          userId,
+          paymentId,
+          fees: amount,
+          start: timeSlot[0].start,
+          end: timeSlot[0].end,
+          date: parseDate,
+          patientName: patientName,
+        },
+        session
+      );
+
+      // Commit the transaction
+      await session.commitTransaction();
+      session.endSession();
+
+      return newAppointment;
+    } catch (error: any) {
+      // Rollback transaction on error
+      console.log(error);
+      await session.abortTransaction();
+      session.endSession();
+      throw new Error("Failed to book appointment");
+    }
+  }
+
+  async holdSlot(
+    doctorId: string,
+    date: Date,
+    startTime: Date,
+    userId: string,
+    holdDurationMinutes: number = 5
+  ) {
+    console.log(startTime);
+    return await this.userRepositary.holdSlot(
+      doctorId,
+      date,
+      startTime,
+      userId,
+      holdDurationMinutes
+    );
+  }
+
+  async checkHold(doctorId: string, date: Date, startTime: Date) {
+    return await this.userRepositary.checkHold(doctorId, date, startTime);
   }
 }

@@ -8,5 +8,16 @@ export interface IUserRepository {
   getSpecializations(): Promise<any>;
   getDepDoctors(departmentId: string): Promise<any>;
   getDoctorData(doctorId: string): Promise<any>;
-  getSlots(doctorId: string,date:Date): Promise<any>;
+  getSlots(doctorId: string, date: Date): Promise<any>;
+  findAvailableSlot(doctorId: any, userId: any,start:any,date:any, session: any): Promise<any>;
+  bookSlot(slot: any, userId: any, session: any): Promise<any>;
+  createAppointment(data: any, session: any): Promise<any>;
+  holdSlot(
+    doctorId: any,
+    date: any,
+    startTime: any,
+    userId: any,
+    holdDurationMinutes: any
+  ): Promise<any>;
+  checkHold(doctorId: any, date: any, startTime: any): Promise<any>;
 }

@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema, model } from "mongoose";
 
 interface IAppointment extends Document {
-  userId: mongoose.Types.ObjectId;
-  docId: mongoose.Types.ObjectId;
+  userId: string;
+  doctorId: string;
   patientName: string;
   date: Date;
   start: Date;
@@ -10,7 +10,7 @@ interface IAppointment extends Document {
   locked: mongoose.Types.ObjectId | null;
   status: "pending" | "completed" | "cancelled";
   fees: number;
-  paymentMethod: "razoray" | "wallet";
+  paymentMethod: "razorpay" | "wallet";
   paymentStatus:
     | "payment pending"
     | "payment completed"
@@ -28,13 +28,13 @@ interface IAppointment extends Document {
 const AppointmentSchema = new Schema<IAppointment>(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: "User",
       required: true,
     },
 
-    docId: {
-      type: mongoose.Schema.Types.ObjectId,
+    doctorId: {
+      type: String,
       ref: "Doctor",
       required: true,
     },
@@ -72,7 +72,7 @@ const AppointmentSchema = new Schema<IAppointment>(
     paymentMethod: {
       type: String,
       enum: ["razorpay", "wallet"],
-      required: true,
+      default: "razorpay",
     },
     paymentStatus: {
       type: String,

@@ -1,5 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { defaultImg } from "../../assets/profile";
+import React, { useState, useEffect } from "react"
+import { Camera, Mail, Phone, User, Calendar } from "lucide-react"
+import { Button } from "../../../components/ui/button"
+import { Input } from "../../../components/ui/input"
+import { Label } from "../../../components/ui/label"
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../../components/ui/dialog"
+import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
+import { defaultImg } from "../../assets/profile"
+
 
 interface UserInfo {
   name: string;
@@ -8,86 +22,204 @@ interface UserInfo {
   phone: string;
   gender: string;
   DOB: string;
-  profileImage: any;
+  profileImage: string;
   bio: string;
 }
 
-const ProfileOverview: React.FC = () => {
-  const [userData, setUserData] = useState<UserInfo | null>(null);
+export default function ProfileOverview() {
+  const [userData, setUserData] = useState<UserInfo | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [newImage, setNewImage] = useState<File | null>(null)
+  const [editData, setEditData] = useState<UserInfo>({
+    name: "",
+    email: "",
+    userId: "",
+    phone: "",
+    gender: "",
+    DOB: "",
+    profileImage: "",
+    bio: "",
+  })
 
   useEffect(() => {
-    const storedData = localStorage.getItem("userInfo");
+    const storedData = localStorage.getItem("userInfo")
     if (storedData) {
-      setUserData(JSON.parse(storedData) as UserInfo);
+      const parsedData = JSON.parse(storedData) as UserInfo
+      setUserData(parsedData)
+      setEditData(parsedData)
     }
-  }, []);
+  }, [])
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setNewImage(e.target.files[0])
+    }
+  }
+
+  const handleImageSave = () => {
+    console.log("Image uploaded:", newImage)
+    // Implement actual image upload logic here
+  }
+
+  const toggleEditMode = () => setIsEditing((prev) => !prev)
+
+  const handleSave = async () => {
+    if (userData) {
+      const updatedUserData = { ...userData, ...editData }
+      try {
+        // Implement API call to update user data
+        console.log("Saving updated user data:", updatedUserData)
+        setUserData(updatedUserData)
+        localStorage.setItem("userInfo", JSON.stringify(updatedUserData))
+        setIsEditing(false)
+      } catch (error) {
+        console.error("Error updating user data:", error)
+      }
+    }
+  }
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    field: keyof UserInfo
+  ) => {
+    setEditData({ ...editData, [field]: e.target.value })
+  }
 
   if (!userData) {
-    return <p>Loading...</p>;
+    return <p>Loading...</p>
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="w-full h-full bg-white p-8 rounded-xl shadow-lg space-y-6">
-        {/* Profile header */}
-        <div className="flex justify-between items-start">
-          <div className="flex items-center space-x-4">
-            {/* Profile image */}
-            <img
-              src={defaultImg}
-              alt="Profile"
-              className="w-24 h-24 rounded-full object-cover border-2 border-blue-500"
-            />
-            {/* User name and details */}
-            <div>
-              <h2 className="text-2xl font-bold">{userData.name}</h2>
-              <span className="text-sm text-green-500 flex items-center">
-                <span className="mr-1">&#x2022;</span> Active
-              </span>
+    <div className="container mx-auto p-20 w-full">
+      <Card className="w-full max-w-4xl mx-auto">
+        <CardHeader className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 pb-6">
+          <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <div className="relative">
+              <Avatar className="h-28 w-28">
+                <AvatarImage src={userData.profileImage||defaultImg} alt={defaultImg} />
+                <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    size="icon"
+                    className="absolute bottom-0 right-0 h-8 w-8 rounded-full"
+                  >
+                    <Camera className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Update Profile Picture</DialogTitle>
+                  </DialogHeader>
+                  <Input type="file" onChange={handleImageUpload} />
+                  <Button onClick={handleImageSave}>Save Image</Button>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div className="text-center sm:text-left">
+              <CardTitle className="text-2xl">{userData.name}</CardTitle>
+              {/* <p className="text-sm text-muted-foreground">
+                User ID: {userData.userId}
+              </p> */}
             </div>
           </div>
-          <div className="flex space-x-3">
-            <button className="px-4 py-2 bg-gradient-to-r from-stone-500 to-stone-700 text-white rounded-lg">
-              Edit Profile
-            </button>
-          </div>
-        </div>
+          <Button onClick={isEditing ? handleSave : toggleEditMode}>
+            {isEditing ? "Save Changes" : "Edit Profile"}
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-6">
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>About Me</CardTitle>
+                </CardHeader>
+                <CardContent>
 
-        {/* About Me */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* About Section */}
-          <div>
-            <h3 className="text-lg font-bold">About me</h3>
-            <p>{userData?.bio || `Hi, I am ${userData.name}.`}</p>
-            <p className="mt-2">
-              Feel free to reach out to me for inquiries and connections.
-            </p>
+                  <p className="text-sm">{userData.bio || `Hi, I am ${userData.name}.`}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Additional Info</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">
+                    Feel free to reach out to me for inquiries and connections.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Contact Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="flex items-center gap-2">
+                      <Mail className="h-4 w-4" /> Email
+                    </Label>
+                    {isEditing ? (
+                      <Input
+                        id="email"
+                        value={editData.email}
+                        onChange={(e) => handleInputChange(e, "email")}
+                      />
+                    ) : (
+                      <p className="text-sm">{userData.email}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="flex items-center gap-2">
+                      <Phone className="h-4 w-4" /> Phone
+                    </Label>
+                    {isEditing ? (
+                      <Input
+                        id="phone"
+                        value={editData.phone}
+                        onChange={(e) => handleInputChange(e, "phone")}
+                      />
+                    ) : (
+                      <p className="text-sm">{userData.phone}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="gender" className="flex items-center gap-2">
+                      <User className="h-4 w-4" /> Gender
+                    </Label>
+                    {isEditing ? (
+                      <Input
+                        id="gender"
+                        value={editData.gender}
+                        onChange={(e) => handleInputChange(e, "gender")}
+                      />
+                    ) : (
+                      <p className="text-sm">{userData.gender || "Not Provided"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="dob" className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" /> Date of Birth
+                    </Label>
+                    {isEditing ? (
+                      <Input
+                        id="dob"
+                        type="date"
+                        value={editData.DOB}
+                        onChange={(e) => handleInputChange(e, "DOB")}
+                      />
+                    ) : (
+                      <p className="text-sm">{userData.DOB || "Not Provided"}</p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-
-        {/* Contact Info */}
-        <div className="flex flex-col md:flex-row justify-between space-y-4 md:space-y-0">
-          <div>
-            <h3 className="text-lg font-bold">Contact Info</h3>
-            <p>Email: {userData?.email}</p>
-            <p>Phone: {userData?.phone}</p>
-            <p>
-              Gender:{" "}
-              {userData?.gender || (
-                <span className="text-red-700">Not Provided</span>
-              )}
-            </p>
-            <p>
-              Date of Birth:{" "}
-              {userData?.DOB || (
-                <span className="text-red-700">Not Provided</span>
-              )}
-            </p>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
-  );
-};
-
-export default ProfileOverview;
+  )
+}

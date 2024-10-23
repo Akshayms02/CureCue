@@ -286,15 +286,28 @@ export default class DoctorController {
       const response = await this.doctorService.getDoctorData(
         doctorId as string
       );
-      console.log(response)
+      console.log(response);
       if (response) {
         res.status(200).json(response);
       }
     } catch (error: any) {
       if (error instanceof Error) {
-        console.log(error)
+        console.log(error);
         res.status(500).json({ message: "Internal server Error" });
       }
+    }
+  }
+
+  async getAppointments(req: Request, res: Response): Promise<any> {
+    const doctorId = req.params.doctorId;
+
+    try {
+      const appointments = await this.doctorService.getAppointments(doctorId);
+      res.status(200).json(appointments);
+    } catch (error:any) {
+      res
+        .status(500)
+        .json({ message: "Error fetching appointments", error: error.message });
     }
   }
 }
