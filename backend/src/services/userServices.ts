@@ -125,7 +125,11 @@ export class userServices {
         userId: user.userId,
         phone: user.phone,
         isBlocked: user.isBlocked,
+        DOB: user.DOB,
+        gender: user.gender,
       };
+
+      console.log(userInfo)
 
       return { userInfo, accessToken, refreshToken };
     } catch (error: unknown) {
@@ -312,7 +316,9 @@ export class userServices {
       if (!slot) {
         throw new Error("No valid time slot found");
       }
-      const timeSlot=slot.timeSlots.filter((element:any)=>element.start.toISOString()==timeslotId)
+      const timeSlot = slot.timeSlots.filter(
+        (element: any) => element.start.toISOString() == timeslotId
+      );
 
       // Call the repository to book the slot
       await this.userRepositary.bookSlot(slot, userId, session);
@@ -365,5 +371,41 @@ export class userServices {
 
   async checkHold(doctorId: string, date: Date, startTime: Date) {
     return await this.userRepositary.checkHold(doctorId, date, startTime);
+  }
+
+  async updateProfile(updateData: {
+    userId: string;
+    name: string;
+    DOB: string;
+    gender: string;
+    phone: string;
+    email: string;
+  }): Promise<any> {
+    try {
+      const updatedUser = await this.userRepositary.updateProfile(updateData);
+
+      if (updatedUser.image != null) {
+        const folderPath = this.getFolderPathByFileType(updatedUser.image.type);
+        const signedUrl = await this.S3Service.getFile(
+          updatedUser.image.url,
+          folderPath
+        );
+
+        updatedUser.image.url = signedUrl;
+      }
+
+      const userInfo = {
+        name: updatedUser.name,
+        email: updatedUser.email,
+        userId: updatedUser.userId,
+        phone: updatedUser.phone,
+        isBlocked: updatedUser.isBlocked,
+      };
+
+      return { userInfo };
+    } catch (error: any) {
+      console.error("Error in updateProfile:", error.message);
+      throw new Error(`Failed to update profile: ${error.message}`);
+    }
   }
 }

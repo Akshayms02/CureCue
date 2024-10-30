@@ -10,6 +10,7 @@ import ProfileCard from "../Pages/Doctor/Profile";
 import SlotManagement from "../Pages/Doctor/SlotManagement";
 import DoctorWallet from "../Components/DoctorComponents/DoctorWallet";
 import AppointmentList from "../Components/DoctorComponents/AppointmentList";
+import AppointmentDetails from "../Components/DoctorComponents/AppointmentDetail";
 // import DoctorScheduler from "../Pages/Doctor/slot";
 
 function DoctorRoutes() {
@@ -49,6 +50,14 @@ function DoctorRoutes() {
           element={
             <DoctorProtectedRoute>
               <AppointmentList />
+            </DoctorProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="appointmentDetails"
+          element={
+            <DoctorProtectedRoute>
+              <AppointmentDetails />
             </DoctorProtectedRoute>
           }
         ></Route>

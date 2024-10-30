@@ -292,4 +292,28 @@ export class DoctorRepository implements IDoctorRepository {
       }
     }
   }
+  async updateProfile(updateData: {
+    doctorId: string;
+    fees: number;
+    gender: string;
+    phone: string;
+  }) {
+    try {
+      // Find the doctor by ID
+      console.log(updateData)
+      const doctor = await doctorModel.findOne({ doctorId: updateData.doctorId });
+      if (!doctor) {
+        throw new Error("doctor not found");
+      }
+
+      Object.assign(doctor, updateData);
+
+      const updatedDoctor = await doctor.save();
+
+      return updatedDoctor;
+    } catch (error: any) {
+      console.error("Error updating profile:", error.message);
+      throw new Error(`Failed to update profile: ${error.message}`);
+    }
+  }
 }

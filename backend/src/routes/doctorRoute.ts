@@ -59,4 +59,6 @@ route.get("/getDoctorData/:doctorId",doctorController.getDoctorData.bind(doctorC
 
 route.get("/appointments/:doctorId",doctorController.getAppointments.bind(doctorController))
 
+route.put("/updateDoctor",doctorController.updateDoctorProfile.bind(doctorController))
+
 export default route;

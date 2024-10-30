@@ -65,8 +65,8 @@ export const resendOtp = createAsyncThunk<boolean>(
       return response.status === 200;
     } catch (error: unknown) {
       if (error instanceof Error) {
-        if(error.message=="No email found in localStorage"){
-          throw new Error("Invalid Entry")
+        if (error.message == "No email found in localStorage") {
+          throw new Error("Invalid Entry");
         }
         throw new Error(`${error.message}`);
       } else {
@@ -92,6 +92,34 @@ export const login = createAsyncThunk(
     } catch (error: any) {
       console.log(error);
       return rejectWithValue(error.response.data.message || "Login failed");
+    }
+  }
+);
+export const updateUserProfile = createAsyncThunk(
+  "doctor/updatUserProfile",
+  async ({ userId, gender, DOB, phone,email,name }: any, { rejectWithValue }) => {
+    try {
+      const response = await axiosUrl.put("/api/user/updateUser", {
+        userId: userId,
+        gender,
+        DOB,
+        phone,
+        email,
+        name
+      });
+
+      console.log("Thunkkkk response:", response.data.response);
+      return response.data.response;
+    } catch (error: any) {
+      if (error.response) {
+        const errorMessage = error.response.data.message || "Update failed";
+        console.log("Error response:", errorMessage);
+        return rejectWithValue(errorMessage);
+      } else if (error.request) {
+        return rejectWithValue("No response from server.");
+      } else {
+        return rejectWithValue(error.message || "Update failed");
+      }
     }
   }
 );

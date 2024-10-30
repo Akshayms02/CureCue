@@ -436,4 +436,49 @@ export class doctorServices {
       throw new Error("Error fetching appointments from service");
     }
   }
+
+  async updateProfile(updateData: {
+    doctorId: string;
+    fees: number;
+    gender: string;
+    phone: string;
+  }): Promise<any> {
+    try {
+      console.log(updateData);
+      const updatedDoctor = await this.doctorRepository.updateProfile(
+        updateData
+      );
+      let imageUrl = "";
+
+      if (updatedDoctor?.image) {
+        const folderPath = this.getFolderPathByFileType(
+          updatedDoctor?.image?.type
+        );
+        const signedUrl = await this.S3Service.getFile(
+          updatedDoctor.image.url,
+          folderPath
+        );
+        imageUrl = signedUrl;
+      }
+
+      const doctorInfo = {
+        name: updatedDoctor.name,
+        email: updatedDoctor.email,
+        doctorId: updatedDoctor.doctorId,
+        phone: updatedDoctor.phone,
+        isBlocked: updatedDoctor.isBlocked,
+        docStatus: updatedDoctor.kycStatus,
+        DOB: updatedDoctor.DOB,
+        fees: updatedDoctor.fees,
+        gender: updatedDoctor.gender,
+        department: updatedDoctor.department,
+        image: imageUrl,
+      };
+
+      return { doctorInfo };
+    } catch (error: any) {
+      console.error("Error in updateProfile:", error.message);
+      throw new Error(`Failed to update profile: ${error.message}`);
+    }
+  }
 }

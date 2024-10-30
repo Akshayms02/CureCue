@@ -304,10 +304,41 @@ export default class DoctorController {
     try {
       const appointments = await this.doctorService.getAppointments(doctorId);
       res.status(200).json(appointments);
-    } catch (error:any) {
+    } catch (error: any) {
       res
         .status(500)
         .json({ message: "Error fetching appointments", error: error.message });
+    }
+  }
+
+  async updateDoctorProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const { doctorId, fees, gender, phone } = req.body;
+      console.log(req.body)
+
+      const response = await this.doctorService.updateProfile({
+        doctorId,
+        fees,
+        gender,
+        phone,
+      });
+
+      res
+        .status(200)
+        .json({ message: "Profile updated successfully", response });
+    } catch (error: any) {
+      console.error("Error updating profile:", error.message);
+
+      if (error.message.includes("something went wrong")) {
+        res.status(400).json({ message: "Error updating profile." });
+      } else {
+        res
+          .status(500)
+          .json({
+            message: "An unexpected error occurred",
+            error: error.message,
+          });
+      }
     }
   }
 }

@@ -21,4 +21,10 @@ export interface IDoctorRepository {
   ): Promise<any>;
   getDoctorData(doctorId: string): Promise<any>;
   findAppointmentsByDoctor(doctorId: string): Promise<any>;
+  updateProfile(updateData: {
+    doctorId: string;
+    fees: number;
+    gender: string;
+    phone: string;
+  }): Promise<any>;
 }

@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosUrl from "../../Utils/axios";
+import doctorAxiosUrl from "../../Utils/doctorAxios";
 
 const API = "/api/doctor";
 
@@ -107,10 +108,37 @@ export const uploadDoctorData = createAsyncThunk(
       );
       const { kycStatus } = response.data;
 
-      return{kycStatus};
+      return { kycStatus };
     } catch (error: any) {
       console.log(error);
       return rejectWithValue(error.response || "Upload Failed");
+    }
+  }
+);
+
+export const updateDoctorProfile = createAsyncThunk(
+  "doctor/updateDoctorProfile",
+  async ({ doctorId, gender, fees, phone }: any, { rejectWithValue }) => {
+    try {
+      const response = await doctorAxiosUrl.put("/api/doctor/updateDoctor", {
+        doctorId: doctorId,
+        gender,
+        fees,
+        phone,
+      });
+
+      console.log("Thunkkkk response:", response.data.response);
+      return response.data.response; // Adjust according to your API response structure
+    } catch (error: any) {
+      if (error.response) {
+        const errorMessage = error.response.data.message || "Update failed";
+        console.log("Error response:", errorMessage);
+        return rejectWithValue(errorMessage);
+      } else if (error.request) {
+        return rejectWithValue("No response from server.");
+      } else {
+        return rejectWithValue(error.message || "Update failed");
+      }
     }
   }
 );
