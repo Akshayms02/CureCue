@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { login, uploadDoctorData } from "../Actions/doctorActions";
+import {
+  login,
+  updateDoctorProfile,
+  uploadDoctorData,
+} from "../Actions/doctorActions";
 
 interface Doctor {
   name: string;
@@ -8,10 +12,10 @@ interface Doctor {
   email: string;
   isBlocked: boolean;
   docStatus: string;
-  DOB:string;
-  department:any;
-  fees:any;
-  gender:any
+  DOB: string;
+  department: any;
+  fees: any;
+  gender: any;
 }
 
 interface DocState {
@@ -58,7 +62,7 @@ const doctorSlice = createSlice({
           action: PayloadAction<{ docaccessToken: string; doctorInfo: Doctor }>
         ) => {
           const { docaccessToken, doctorInfo } = action.payload;
-          console.log(doctorInfo)
+          console.log(doctorInfo);
           state.doctorInfo = doctorInfo;
           state.docStatus = doctorInfo.docStatus;
           localStorage.setItem("docaccessToken", docaccessToken);
@@ -76,9 +80,24 @@ const doctorSlice = createSlice({
           const { kycStatus } = action.payload;
           state.docStatus = kycStatus;
         }
-      );
+      )
+      .addCase(
+        updateDoctorProfile.fulfilled,
+        (state, action: PayloadAction<{ doctorInfo: Doctor }>) => {
+          const { doctorInfo } = action.payload;
+          state.doctorInfo = doctorInfo;
+          state.loading = false;
+
+          localStorage.setItem("doctorInfo", JSON.stringify(doctorInfo));
+        }
+      )
+      .addCase(updateDoctorProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = (action.payload as string) || "Login failed";
+      });
   },
 });
 
-export const { clearUser, setLoading, setError ,setDocStatus} = doctorSlice.actions;
+export const { clearUser, setLoading, setError, setDocStatus } =
+  doctorSlice.actions;
 export default doctorSlice.reducer;

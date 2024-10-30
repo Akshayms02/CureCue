@@ -21,7 +21,8 @@ import {
 import { Badge } from "../../../components/ui/badge"
 import { toast } from 'sonner'
 import doctorAxiosUrl from '../../Utils/doctorAxios'
-import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+
 
 interface Appointment {
     _id: string
@@ -38,6 +39,7 @@ export default function AppointmentList() {
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const DoctorData = localStorage.getItem("doctorInfo")
     const parsedDocData = JSON.parse(DoctorData as string)
+    const navigate=useNavigate()
 
     useEffect(() => {
         const fetchAppointments = async () => {
@@ -69,6 +71,12 @@ export default function AppointmentList() {
             default:
                 return <Badge variant="secondary">Pending</Badge>
         }
+    }
+
+    const viewDetails=(appointment:any)=>{
+        console.log(appointment)
+        navigate('/doctor/appointmentDetails', { state: { appointment: appointment } })
+
     }
 
     if (loading) return <div className="flex justify-center items-center h-screen">Loading appointments...</div>
@@ -114,7 +122,7 @@ export default function AppointmentList() {
                                 </TableCell>
                                 <TableCell>{getStatusBadge(appointment.status)}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="outline" size="sm">
+                                    <Button variant="outline" size="sm" onClick={()=>viewDetails(appointment)}>
                                         View Details
                                         <ChevronRightIcon className="ml-2 h-4 w-4" />
                                     </Button>

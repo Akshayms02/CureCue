@@ -13,6 +13,8 @@ import {
 } from "../../../components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
 import { defaultImg } from "../../assets/profile"
+import { updateUserProfile } from "../../Redux/Actions/userActions"
+import { useDispatch } from "react-redux"
 
 
 interface UserInfo {
@@ -28,6 +30,7 @@ interface UserInfo {
 
 export default function ProfileOverview() {
   const [userData, setUserData] = useState<UserInfo | null>(null)
+  const dispatch: any = useDispatch()
   const [isEditing, setIsEditing] = useState(false)
   const [newImage, setNewImage] = useState<File | null>(null)
   const [editData, setEditData] = useState<UserInfo>({
@@ -67,7 +70,17 @@ export default function ProfileOverview() {
     if (userData) {
       const updatedUserData = { ...userData, ...editData }
       try {
-        // Implement API call to update user data
+        const updatedValues = {
+          userId: userData.userId,
+          gender: updatedUserData.gender,
+          DOB: updatedUserData.DOB,
+          email: updatedUserData.email,
+          phone: updatedUserData.phone,
+          name: userData.name
+        }
+
+        await dispatch(updateUserProfile(updatedValues))
+
         console.log("Saving updated user data:", updatedUserData)
         setUserData(updatedUserData)
         localStorage.setItem("userInfo", JSON.stringify(updatedUserData))
@@ -90,13 +103,13 @@ export default function ProfileOverview() {
   }
 
   return (
-    <div className="container mx-auto p-20 w-full">
-      <Card className="w-full max-w-4xl mx-auto">
+    <div className="container mx-auto p-20 w-full ">
+      <Card className="w-full max-w-4xl mx-auto shadow-2xl">
         <CardHeader className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 pb-6">
           <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="relative">
               <Avatar className="h-28 w-28">
-                <AvatarImage src={userData.profileImage||defaultImg} alt={defaultImg} />
+                <AvatarImage src={userData.profileImage || defaultImg} alt={defaultImg} />
                 <AvatarFallback>{userData.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <Dialog>
@@ -207,11 +220,17 @@ export default function ProfileOverview() {
                       <Input
                         id="dob"
                         type="date"
-                        value={editData.DOB}
+                        value={editData.DOB ? new Date(editData.DOB).toISOString().split('T')[0] : ''}
                         onChange={(e) => handleInputChange(e, "DOB")}
                       />
                     ) : (
-                      <p className="text-sm">{userData.DOB || "Not Provided"}</p>
+                      <p className="text-sm">{userData.DOB
+                        ? new Date(userData.DOB).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })
+                        : "Not Provided"}</p>
                     )}
                   </div>
                 </div>

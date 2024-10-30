@@ -280,4 +280,34 @@ export default class UserController {
       }
     }
   }
+
+  async updateUserProfile(req: Request, res: Response) {
+    try {
+      const { userId, name, DOB, gender, phone, email } = req.body;
+
+      const response = await this.userService.updateProfile({
+        userId,
+        name,
+        DOB,
+        gender,
+        phone,
+        email,
+      });
+
+      res
+        .status(200)
+        .json({ message: "Profile updated successfully", response });
+    } catch (error: any) {
+      console.error("Error updating profile:", error.message);
+
+      if (error.message.includes("something went wrong")) {
+        res.status(400).json({ message: "Error updating profile." });
+      } else {
+        res.status(500).json({
+          message: "An unexpected error occurred",
+          error: error.message,
+        });
+      }
+    }
+  }
 }

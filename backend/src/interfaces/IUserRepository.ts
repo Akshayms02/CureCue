@@ -9,7 +9,13 @@ export interface IUserRepository {
   getDepDoctors(departmentId: string): Promise<any>;
   getDoctorData(doctorId: string): Promise<any>;
   getSlots(doctorId: string, date: Date): Promise<any>;
-  findAvailableSlot(doctorId: any, userId: any,start:any,date:any, session: any): Promise<any>;
+  findAvailableSlot(
+    doctorId: any,
+    userId: any,
+    start: any,
+    date: any,
+    session: any
+  ): Promise<any>;
   bookSlot(slot: any, userId: any, session: any): Promise<any>;
   createAppointment(data: any, session: any): Promise<any>;
   holdSlot(
@@ -20,4 +26,12 @@ export interface IUserRepository {
     holdDurationMinutes: any
   ): Promise<any>;
   checkHold(doctorId: any, date: any, startTime: any): Promise<any>;
+  updateProfile(updateData: {
+    userId: string;
+    name: string;
+    DOB: string;
+    gender: string;
+    phone: string;
+    email: string;
+  }): Promise<any>;
 }

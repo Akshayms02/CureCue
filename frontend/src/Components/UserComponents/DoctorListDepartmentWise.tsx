@@ -1,88 +1,124 @@
-
-
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
-import { LuBadgeCheck } from "react-icons/lu";
-import { getDepDoctors } from "../../services/userServices";
+import { useEffect, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import { toast } from "sonner"
+import { BadgeCheck } from "lucide-react"
+import { getDepDoctors } from "../../services/userServices"
+import { Card, CardFooter } from "../../../components/ui/card"
+import { Button } from "../../../components/ui/button"
+import { Skeleton } from "../../../components/ui/skeleton"
+import { Alert, AlertDescription, AlertTitle } from "../../../components/ui/alert"
 
 interface Doctor {
-    doctorId: string;
-    _id: string;
-    name: string;
-    department: string;
-    profileUrl: string;
+  doctorId: string
+  _id: string
+  name: string
+  department: string
+  profileUrl: string
 }
 
 const DoctorListDepartmentWise = () => {
-    const { departmentId } = useParams<{ departmentId: string }>();
-    const [doctors, setDoctors] = useState<Doctor[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-    const navigate = useNavigate()
+  const { departmentId } = useParams<{ departmentId: string }>()
+  const [doctors, setDoctors] = useState<Doctor[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate()
 
-    useEffect(() => {
-        const fetchDoctors = async () => {
-            try {
-                const response = await getDepDoctors(departmentId as string)
-                console.log(response)
-                setDoctors(response);
-                setLoading(false);
-            } catch (err: any) {
-                setError("Failed to load doctors");
-                setLoading(false);
-                toast.error(err.message);
-            }
-        };
-
-        fetchDoctors();
-    }, [departmentId]);
-
-    if (loading) {
-        return <p className="text-center my-auto mx-auto">Loading...</p>;
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await getDepDoctors(departmentId as string)
+        console.log(response)
+        setDoctors(response)
+        setLoading(false)
+      } catch (err: any) {
+        setError("Failed to load doctors")
+        setLoading(false)
+        toast.error(err.message)
+      }
     }
 
-    if (error) {
-        return <p className="text-center text-red-500 my-auto mx-auto">{error}</p>;
-    }
+    fetchDoctors()
+  }, [departmentId])
 
+  if (loading) {
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            {doctors.length > 0 ? (
-                <>
-                    <h1 className="text-4xl font-bold text-center mb-16 mt-20">Doctors in Department  {doctors[0]?.department}</h1>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                        {doctors.map((doctor) => (
-                            <div key={doctor.doctorId} className="w-64 h-80 text-white shadow-lg rounded-md relative overflow-hidden cursor-pointer font-sans" onClick={() => navigate(`/doctordetails/${doctor.doctorId}`)}>
-
-                                <div className="absolute top-2 left-2 flex items-center space-x-1">
-                                    <LuBadgeCheck className="text-3xl fill-blue-600" size={40} />
-                                </div>
-
-                                {/* Doctor Image */}
-                                <img
-                                    src={doctor.profileUrl}
-                                    className="rounded-md object-cover w-full h-full"
-                                    alt={doctor.name}
-                                />
-
-                                {/* Doctor Details */}
-                                <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black to-transparent p-4">
-                                    <p className="font-bold text-3xl pr-36">{doctor.name}</p>
-                                    <p className="text-md pr-36">{doctor.department}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </>
-            ) : (
-                <div className="text-center text-blue-900 text-5xl font-semibold mt-36 mx-auto my-auto">
-                    No doctors available for this department right now.
-                </div>
-            )}
+      <div className="container mx-auto p-6 space-y-4">
+        <Skeleton className="h-12 w-[250px] mx-auto" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, index) => (
+            <Card key={index} className="overflow-hidden">
+              <Skeleton className="h-80 w-full" />
+              <CardFooter className="p-4">
+                <Skeleton className="h-4 w-full" />
+              </CardFooter>
+            </Card>
+          ))}
         </div>
-    );
-};
+      </div>
+    )
+  }
 
-export default DoctorListDepartmentWise;
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <Alert variant="destructive">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
+  return (
+    <div className="container mx-auto p-6">
+      {doctors.length > 0 ? (
+        <>
+          <h1 className="text-4xl font-bold text-center mb-12">
+            Doctors in {doctors[0]?.department} Department
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {doctors.map((doctor) => (
+              <Card
+                key={doctor.doctorId}
+                className="overflow-hidden cursor-pointer transition-shadow hover:shadow-lg"
+                onClick={() => navigate(`/doctordetails/${doctor.doctorId}`)}
+              >
+                <div className="relative h-80 w-full aspect-[4/3] overflow-hidden bg-white">
+                  <img
+                    src={doctor.profileUrl || "/placeholder.svg?height=320&width=256"}
+                    className="object-contain w-full h-full object-center"
+                    alt={doctor.name}
+                  />
+                  <div className="absolute top-2 left-2 bg-white rounded-full p-1">
+                    <BadgeCheck className="text-primary h-6 w-6" />
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 text-white">
+                    <h2 className="font-bold text-xl truncate">{doctor.name}</h2>
+                    <p className="text-sm opacity-90 truncate">{doctor.department}</p>
+                  </div>
+                </div>
+                <CardFooter className="p-4">
+                  <Button className="w-full hover:bg-gray-300" variant="outline">
+                    View Profile
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="text-center">
+          <h2 className="text-3xl font-semibold text-gray-800 mb-4">No Doctors Available</h2>
+          <p className="text-xl text-gray-600">
+            There are currently no doctors available for this department.
+          </p>
+          <Button className="mt-8" onClick={() => navigate(-1)}>
+            Go Back
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default DoctorListDepartmentWise

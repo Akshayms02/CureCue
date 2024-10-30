@@ -11,8 +11,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../../components/ui/dialog"
-import { getDoctorData } from "../../services/doctorServices" 
-import { defaultImg } from "../../assets/profile" 
+import { getDoctorData } from "../../services/doctorServices"
+import { defaultImg } from "../../assets/profile"
+import { useDispatch } from "react-redux"
+import { updateDoctorProfile } from "../../Redux/Actions/doctorActions"
 
 interface Department {
   _id: string
@@ -40,6 +42,7 @@ interface DoctorInfo {
 
 export default function DoctorProfileCard() {
   const [doctorData, setDoctorData] = useState<DoctorInfo | null>(null)
+  const dispatch: any = useDispatch()
   const [isEditing, setIsEditing] = useState(false)
   const [newImage, setNewImage] = useState<File | null>(null)
   const [editData, setEditData] = useState({
@@ -88,7 +91,16 @@ export default function DoctorProfileCard() {
     if (doctorData) {
       const updatedDoctorData = { ...doctorData, ...editData }
       try {
-        // Implement API call to update doctor data
+
+        const updatedValues = {
+          doctorId: doctorData.doctorId, // Assuming you have doctorId in the data
+          gender: editData.gender,
+          fees: Number(editData.fees), // Convert fees to a number before sending
+          phone: editData.phone,
+        };
+        console.log(updatedValues)
+        await dispatch(updateDoctorProfile(updatedValues))
+
         console.log("Saving updated doctor data:", updatedDoctorData)
         setDoctorData(updatedDoctorData)
         setIsEditing(false)

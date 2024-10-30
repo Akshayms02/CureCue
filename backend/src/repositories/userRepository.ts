@@ -37,6 +37,8 @@ export class UserRepository implements IUserRepository {
           phone: 1,
           password: 1,
           isBlocked: 1,
+          DOB: 1,
+          gender: 1,
         }
       );
 
@@ -274,5 +276,31 @@ export class UserRepository implements IUserRepository {
       date: convertedDate,
       "timeSlots.start": convertedDateString,
     }).lean();
+  }
+
+  async updateProfile(updateData: {
+    userId: string;
+    name: string;
+    DOB: string;
+    gender: string;
+    phone: string;
+    email: string;
+  }) {
+    try {
+      // Find the user by ID
+      const user = await userModel.findOne({ userId: updateData.userId });
+      if (!user) {
+        throw new Error("User not found");
+      }
+      console.log(updateData);
+      Object.assign(user, updateData);
+
+      const updatedUser = await user.save();
+
+      return updatedUser;
+    } catch (error: any) {
+      console.error("Error updating profile:", error.message);
+      throw new Error(`Failed to update profile: ${error.message}`);
+    }
   }
 }
