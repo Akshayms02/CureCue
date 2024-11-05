@@ -56,7 +56,7 @@ export function DoctorSidebar() {
 
   return (
     <SidebarProvider>
-      <Sidebar className="border-r">
+      <Sidebar className="border-r shadow-2xl">
         <SidebarHeader className="border-b p-4">
           <img src={myImage} alt="Logo" className="object-cover" />
         </SidebarHeader>

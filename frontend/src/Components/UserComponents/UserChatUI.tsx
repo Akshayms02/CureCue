@@ -87,7 +87,7 @@ function UserChatUI() {
     };
 
     return (
-        <Card className="w-[75%] mt-3 mx-auto h-[650px] flex flex-col">
+        <Card className="w-[75%] mt-0 mx-auto h-[650px] flex flex-col shadow-2xl">
             <CardHeader className="border-b">
                 <CardTitle className="flex justify-between items-center">
                     <div className="flex items-center space-x-4">

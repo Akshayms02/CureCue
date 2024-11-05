@@ -84,7 +84,7 @@ const DoctorChatUI = () => {
     };
 
     return (
-        <Card className="w-full max-w-4xl mx-auto h-[calc(100vh-4rem)] flex flex-col mt-6">
+        <Card className="w-full max-w-4xl mx-auto h-[calc(100vh-4rem)] flex flex-col mt-6 shadow-2xl">
             <CardHeader className="border-b">
                 <CardTitle className="flex justify-between items-center">
                     <div className="flex items-center space-x-4" ref={scrollAreaRef}>
