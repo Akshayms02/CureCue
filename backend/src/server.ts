@@ -7,10 +7,16 @@ const port = process.env.PORT || 5000;
 import cookieParser from "cookie-parser";
 import userRoute from "../src/routes/userRoute";
 import doctorRoute from "../src/routes/doctorRoute";
-import adminRoute from "../src/routes/adminRoute"
+import adminRoute from "../src/routes/adminRoute";
 import connectDB from "./config/dataBase";
-import "./config/cronjob"
+import "./config/cronjob";
+import { createServer } from "http";
+import { configSocketIO } from "./config/socketConfig";
+import chatRoute from "../src/routes/chatRoutes";
+
 connectDB();
+const server = createServer(app);
+configSocketIO(server);
 
 app.use(cookieParser());
 const corsOptions = {
@@ -32,10 +38,18 @@ app.get("/", async (req, res) => {
   }
 });
 
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  next();
+});
+
+
 app.use("/api/user", userRoute);
 app.use("/api/doctor", doctorRoute);
-app.use("/api/admin",adminRoute)
+app.use("/api/admin", adminRoute);
+app.use("/api/chat", chatRoute);
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running on port http://localhost:${port}/`);
 });

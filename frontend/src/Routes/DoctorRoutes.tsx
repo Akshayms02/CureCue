@@ -11,6 +11,7 @@ import SlotManagement from "../Pages/Doctor/SlotManagement";
 import DoctorWallet from "../Components/DoctorComponents/DoctorWallet";
 import AppointmentList from "../Components/DoctorComponents/AppointmentList";
 import AppointmentDetails from "../Components/DoctorComponents/AppointmentDetail";
+import DoctorChatUI from "../Components/DoctorComponents/DoctorChatUI";
 // import DoctorScheduler from "../Pages/Doctor/slot";
 
 function DoctorRoutes() {
@@ -66,6 +67,14 @@ function DoctorRoutes() {
           element={
             <DoctorProtectedRoute>
               <DoctorWallet/>
+            </DoctorProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="chat"
+          element={
+            <DoctorProtectedRoute>
+              <DoctorChatUI/>
             </DoctorProtectedRoute>
           }
         ></Route>

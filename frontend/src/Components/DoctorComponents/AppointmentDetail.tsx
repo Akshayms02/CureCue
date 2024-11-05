@@ -3,7 +3,7 @@ import { format } from 'date-fns'
 import { Button } from "../../../components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Badge } from "../../../components/ui/badge"
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 // interface AppointmentProps {
 //     appointment: {
@@ -27,8 +27,9 @@ import { useLocation } from 'react-router-dom'
 
 export default function AppointmentDetails() {
     const [isChatEnabled, setIsChatEnabled] = useState(false)
-    const location=useLocation()
-    const {appointment}=location.state||{}
+    const location = useLocation()
+    const { appointment } = location.state || {}
+    const navigate = useNavigate()
 
     useEffect(() => {
         const checkChatAvailability = () => {
@@ -63,14 +64,15 @@ export default function AppointmentDetails() {
                 return 'bg-gray-500'
         }
     }
-    const onCancel=()=>{
+    const onCancel = () => {
         console.log("clicked")
     }
-    const onAddPrescription=()=>{
+    const onAddPrescription = () => {
         console.log("clicked onAddPrescription")
     }
-    const onChat=()=>{
-        console.log("clicked onChat")
+    const onChat = () => {
+        console.log("appointment :", appointment)
+        navigate("/doctor/chat", { state: { appointment } })
     }
 
     return (

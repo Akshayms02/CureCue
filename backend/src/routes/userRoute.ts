@@ -34,10 +34,25 @@ route.get(
   "/getDoctorData/:doctorId",
   userController.getDoctorData.bind(userController)
 );
-route.get("/getSlots/:doctorId/:date", userController.getSlots.bind(userController));
-route.post("/createAppointment",userController.createAppointment.bind(userController))
-route.post("/holdTimeslot",verifyToken,userController.holdSlot.bind(userController))
-route.put("/updateUser",userController.updateUserProfile.bind(userController))
+route.get(
+  "/getSlots/:doctorId/:date",
+  userController.getSlots.bind(userController)
+);
+route.post(
+  "/createAppointment",
+  userController.createAppointment.bind(userController)
+);
+route.post(
+  "/holdTimeslot",
+  verifyToken,
+  userController.holdSlot.bind(userController)
+);
+route.put("/updateUser", userController.updateUserProfile.bind(userController));
+route.get(
+  "/getAppointments/:userId",
+  userController.getAllAppointments.bind(userController)
+);
+route.get('/getAppointment/:appointmentId', userController.getAppointment.bind(userController));
 route.post("/refresh-token", refreshTokenHandler);
 
 export default route;

@@ -1,121 +1,101 @@
-import { NavLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import axiosUrl from "../../Utils/axios";
-import {
-  Home,
-  LucideLogOut,
-  Users2Icon,
-  BriefcaseMedicalIcon,
-  MedalIcon,
-  CalendarClockIcon,
-} from "lucide-react";
-import myImage from "../../assets/Screenshot_2024-08-15_191834-removebg-preview.png";
-import { toast } from "sonner";
-import { adminLogout } from "../../services/adminServices";
+
+
+import React from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { Home, LogOut, Users2, Briefcase, Medal, CalendarClock } from 'lucide-react'
+import { toast } from 'sonner'
+import myImage from '../../assets/Screenshot_2024-08-15_191834-removebg-preview.png'
+import { adminLogout } from '../../services/adminServices'
+
+import { Button } from '../../../components/ui/button'
+import { ScrollArea } from '../../../components/ui/scroll-area'
+import { Sheet, SheetContent, SheetTrigger } from '../../../components/ui/sheet'
+// import { Separator } from '@/components/ui/separator' // Removed as per update 3
 
 export function AdminSideBar() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const [open, setOpen] = React.useState(false)
+
   const handleLogout = async () => {
     try {
       const response = await adminLogout()
-      console.log(response);
+      console.log(response)
 
-      localStorage.removeItem("adminAccessToken");
-      localStorage.removeItem("adminInfo");
-      toast.success("You have been successfully Logged out");
-      navigate("/admin/login");
+      localStorage.removeItem('adminAccessToken')
+      localStorage.removeItem('adminInfo')
+      toast.success('You have been successfully logged out')
+      navigate('/admin/login')
     } catch (error) {
-      console.error("Logout failed", error);
+      console.error('Logout failed', error)
     }
-  };
+  }
 
-  return (
-    <div className="hidden border-r bg-muted/40 md:block">
-      <div className="flex h-full max-h-screen flex-col gap-2">
-        <div
-          className="flex h-12 items-center border-b px-4 lg:h-[60px] lg:px-6"
-          style={{ marginTop: "12px", marginBottom: "5px" }}
+  const NavItem = ({ to, icon: Icon, children }) => (
+    <NavLink
+      to={to}
+      onClick={() => setOpen(false)}
+      className={({ isActive }) =>
+        `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sm font-medium ${
+          isActive
+            ? 'bg-black text-white'
+            : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+        }`
+      }
+    >
+      <Icon className="h-4 w-4" />
+      {children}
+    </NavLink>
+  )
+
+  const SidebarContent = (
+    <div className="flex flex-col h-full">
+      <ScrollArea className="flex-grow">
+        <div className="flex flex-col gap-2 p-4">
+          <NavItem to="/admin/dashboard" icon={Home}>Dashboard</NavItem>
+          <NavItem to="/admin/users" icon={Users2}>Users</NavItem>
+          <NavItem to="/admin/departments" icon={Medal}>Departments</NavItem>
+          <NavItem to="/admin/doctors" icon={Briefcase}>Doctors</NavItem>
+          <NavItem to="/admin/applications" icon={CalendarClock}>Applications</NavItem>
+        </div>
+      </ScrollArea>
+      <div className="mt-auto p-4">
+        <Button
+          variant="ghost"
+          className="w-full justify-start"
+          onClick={handleLogout}
         >
-          <img src={myImage} width={300} />
-        </div>
-        <div className="flex-1 mt-10">
-          <nav className="grid items-start px-2 text-sm font-medium lg:px-4 gap-4">
-            <NavLink
-              to="/admin/dashboard"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <Home className="h-6 w-6" />
-              Dashboard
-            </NavLink>
-
-            <NavLink
-              to="/admin/users"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <Users2Icon className="h-6 w-6" />
-              Users
-            </NavLink>
-            <NavLink
-              to="/admin/departments"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <MedalIcon className="h-6 w-6" />
-              Departments{" "}
-            </NavLink>
-            <NavLink
-              to="/admin/doctors"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <BriefcaseMedicalIcon className="h-6 w-6" />
-              Doctors
-            </NavLink>
-            <NavLink
-              to="/admin/applications"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${
-                  isActive
-                    ? "text-primary bg-gray-300"
-                    : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <CalendarClockIcon className="h-6 w-6" />
-              Applications
-            </NavLink>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold text-muted-foreground hover:text-primary hover:bg-accent/50"
-            >
-              <LucideLogOut className="h-6 w-6" />
-              Logout
-            </button>
-          </nav>
-        </div>
+          <LogOut className="mr-2 h-4 w-4" />
+          Logout
+        </Button>
       </div>
     </div>
-  );
+  )
+
+  return (
+    <>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <Button variant="outline" size="icon" className="md:hidden">
+            <Home className="h-4 w-4" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-64 p-0">
+          <div className="flex h-full flex-col">
+            <div className="border-b p-4">
+              <img src={myImage} alt="Logo" className="h-8" />
+            </div>
+            {SidebarContent}
+          </div>
+        </SheetContent>
+      </Sheet>
+      <div className="hidden border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:block">
+        <div className="flex h-full max-h-screen flex-col">
+          <div className="border-b p-4">
+            <img src={myImage} alt="Logo" className="h-16 object-cover" />
+          </div>
+          {SidebarContent}
+        </div>
+      </div>
+    </>
+  )
 }

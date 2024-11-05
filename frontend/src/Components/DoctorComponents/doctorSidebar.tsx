@@ -1,23 +1,36 @@
+'use client'
+
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 import {
   Home,
-  LucideLogOut,
-  CalendarIcon,
+  LogOut,
+  Calendar,
   DollarSign,
-  UserIcon,
   User,
-} from "lucide-react";
-import myImage from "../../assets/Screenshot_2024-08-15_191834-removebg-preview.png";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { clearUser } from "../../Redux/Slice/doctorSlice";
-import { useDispatch } from "react-redux";
-import { FaCheckToSlot } from "react-icons/fa6";
-import { logoutDoctor } from "../../services/doctorServices";
+  Users,
 
-export function DoctorSideBar() {
+} from "lucide-react";
+import { FaCheckToSlot } from "react-icons/fa6";
+import myImage from "../../assets/Screenshot_2024-08-15_191834-removebg-preview.png";
+import { clearUser } from "../../Redux/Slice/doctorSlice";
+import { logoutDoctor } from "../../services/doctorServices";
+import { Button } from "../../../components/ui/button";
+import { ScrollArea } from "../../../components/ui/scroll-area";
+import {
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarFooter,
+  SidebarProvider
+} from "../../../components/ui/sidebar";
+
+export function DoctorSidebar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const handleLogout = async () => {
     try {
       const response = await logoutDoctor()
@@ -25,108 +38,60 @@ export function DoctorSideBar() {
       localStorage.removeItem("doctorInfo");
       dispatch(clearUser());
       toast.success("You have been successfully logged out");
-
       navigate("/doctor/login");
       console.log(response);
     } catch (error: any) {
       console.error("Logout failed", error);
     }
   };
+
+  const navItems = [
+    { to: "/doctor/dashboard", icon: Home, label: "Dashboard" },
+    { to: "/doctor/profile", icon: User, label: "Profile" },
+    { to: "/doctor/slots", icon: FaCheckToSlot, label: "Slots" },
+    { to: "/doctor/appointments", icon: Calendar, label: "Appointments" },
+    { to: "/doctor/wallet", icon: DollarSign, label: "Wallet" },
+    { to: "/doctor/patients", icon: Users, label: "Patients" },
+  ];
+
   return (
-    <div className="hidden border-r bg-muted/40 md:block">
-      <div className="flex h-full max-h-screen flex-col gap-2">
-        <div
-          className="flex h-12 items-center border-b px-4 lg:h-[60px] lg:px-6"
-          style={{ marginTop: "12px", marginBottom: "5px" }}
-        >
-          <img src={myImage} width={300} />
-        </div>
-        <div className="flex-1 mt-10">
-          <nav className="grid items-start px-2 text-sm font-medium lg:px-4 gap-4">
-            <NavLink
-              to="/doctor/dashboard"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
-                  ? "text-primary bg-gray-300"
-                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <Home className="h-6 w-6" />
-              Dashboard
-            </NavLink>
-            <NavLink
-              to="/doctor/profile"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
-                  ? "text-primary bg-gray-300"
-                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <User className="h-6 w-6" />
-              Profile
-            </NavLink>
-            <NavLink
-              to="/doctor/slots"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
-                  ? "text-primary bg-gray-300"
-                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <FaCheckToSlot className="h-6 w-6" />
-              Slots
-            </NavLink>
-            <NavLink
-              to="/doctor/appointments"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
-                  ? "text-primary bg-gray-300"
-                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <CalendarIcon className="h-6 w-6" />
-              Appointments
-            </NavLink>
-            <NavLink
-              to="/doctor/wallet"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
-                  ? "text-primary bg-gray-300"
-                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <DollarSign className="h-6 w-6" />
-              Wallet
-            </NavLink>
-            <NavLink
-              to="/doctor/patients"
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold ${isActive
-                  ? "text-primary bg-gray-300"
-                  : "text-muted-foreground hover:text-primary hover:bg-accent/50"
-                }`
-              }
-            >
-              <UserIcon className="h-6 w-6" />
-              Patients
-            </NavLink>
-
-
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-lg font-semibold text-muted-foreground hover:text-primary hover:bg-accent/50"
-            >
-              <LucideLogOut className="h-6 w-6" />
-              Logout
-            </button>
-          </nav>
-        </div>
-      </div>
-    </div>
+    <SidebarProvider>
+      <Sidebar className="border-r">
+        <SidebarHeader className="border-b p-4">
+          <img src={myImage} alt="Logo" className="object-cover" />
+        </SidebarHeader>
+        <SidebarContent>
+          <ScrollArea className="h-[calc(100vh-8rem)] px-2">
+            <nav className="flex flex-col gap-2 py-4">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-lg px-3 py-2 transition-all text-sm font-medium ${isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-primary"
+                    }`
+                  }
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+          </ScrollArea>
+        </SidebarContent>
+        <SidebarFooter className="border-t p-4">
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
+        </SidebarFooter>
+      </Sidebar>
+    </SidebarProvider>
   );
 }

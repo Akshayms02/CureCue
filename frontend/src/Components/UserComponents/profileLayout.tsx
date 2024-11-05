@@ -1,11 +1,12 @@
 import React from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LogOut, User, Settings, Shield } from "lucide-react";
+import { LogOut, User, Shield } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { clearUser } from "../../Redux/Slice/userSlice";
 import { toast } from "sonner";
 import { userLogout } from "../../services/userServices";
 import { Button } from "../../../components/ui/button";
+import { SlCalender } from "react-icons/sl";
 import {
   Sheet,
   SheetContent,
@@ -35,8 +36,7 @@ const ProfileLayout: React.FC = () => {
     <NavLink
       to={to}
       className={({ isActive }) =>
-        `flex items-center space-x-2 p-2 rounded-lg transition-colors ${
-          isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+        `flex items-center space-x-2 p-2 rounded-lg transition-colors ${isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
         }`
       }
     >
@@ -50,8 +50,10 @@ const ProfileLayout: React.FC = () => {
       <NavItem to="profile" icon={<User className="h-4 w-4" />}>
         Profile Overview
       </NavItem>
-      <NavItem to="settings" icon={<Settings className="h-4 w-4" />}>
-        Profile Settings
+      <NavItem to="appointments" icon={
+        <SlCalender className="h-4 w-4" />
+      }>
+        Appointments
       </NavItem>
       <NavItem to="security" icon={<Shield className="h-4 w-4" />}>
         Security

@@ -11,6 +11,9 @@ import UserHome from "../Components/UserComponents/UserHome";
 import UserBookingPage from "../Components/UserComponents/UserBookingPage";
 import DoctorListDepartmentWise from "../Components/UserComponents/DoctorListDepartmentWise";
 import Doctordetails from "../Components/UserComponents/Doctordetails";
+import UserAppointmentsList from "../Components/UserComponents/UserAppointments";
+import UserAppointmentDetails from "../Components/UserComponents/UserAppointmentDetails";
+import UserChatUI from "../Components/UserComponents/UserChatUI";
 
 function UserRoutes() {
   return (
@@ -35,9 +38,36 @@ function UserRoutes() {
             </UserProtectedRoute>
           }
         />
+
+        <Route
+          path="appointments"
+          element={
+            <UserProtectedRoute>
+              <UserAppointmentsList />
+            </UserProtectedRoute>
+          }
+        />
+        <Route
+          path="viewAppointment"
+          element={
+            <UserProtectedRoute>
+              <UserAppointmentDetails />
+            </UserProtectedRoute>
+          }
+        />
+        <Route
+          path="chat"
+          element={
+            <UserProtectedRoute>
+              <UserChatUI />
+            </UserProtectedRoute>
+          }
+        />
+
         {/* <Route path="settings" element={<ProfileSettings />} />
           <Route path="security" element={<ProfileSecurity />} /> */}
       </Route>
+
     </Routes>
   );
 }

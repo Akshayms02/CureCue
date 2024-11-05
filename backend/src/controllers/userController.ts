@@ -310,4 +310,63 @@ export default class UserController {
       }
     }
   }
+
+  async getAllAppointments(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.userId;
+      const { status } = req.query;
+
+      const response = await this.userService.getAppointments(
+        userId,
+        status as string
+      );
+
+      res
+        .status(200)
+        .json({ message: "Appointments fetched successfully", data: response });
+    } catch (error: any) {
+      console.error("Error fetching appointments:", error.message);
+
+      if (error.message.includes("Failed to get appointments")) {
+        res
+          .status(400)
+          .json({ message: `Failed to get appointments: ${error.message}` });
+      } else {
+        res.status(500).json({
+          message: "An unexpected error occurred",
+          error: error.message,
+        });
+      }
+    }
+  }
+
+  async getAppointment(req: Request, res: Response): Promise<void> {
+    try {
+      const appointmentId = req.params.appointmentId;
+
+      const response = await this.userService.getAppointment(appointmentId);
+
+      res
+        .status(200)
+        .json({ message: "Appointment fetched successfully", data: response });
+    } catch (error: any) {
+      console.error(
+        `Error fetching appointment with ID ${req.params.appointmentId}:`,
+        error.message
+      );
+
+      if (error.message.includes("Failed to get appointments")) {
+        res
+          .status(400)
+          .json({ message: `Failed to get appointments: ${error.message}` });
+      } else {
+        res
+          .status(500)
+          .json({
+            message: "An unexpected error occurred",
+            error: error.message,
+          });
+      }
+    }
+  }
 }

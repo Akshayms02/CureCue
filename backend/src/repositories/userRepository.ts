@@ -303,4 +303,51 @@ export class UserRepository implements IUserRepository {
       throw new Error(`Failed to update profile: ${error.message}`);
     }
   }
+
+  async getAllAppointments(userId: string, status: string) {
+    try {
+      let appointments = [];
+
+      if (status === "All") {
+        appointments = await appointmentModel.find({ userId: userId }).lean();
+      } else {
+        appointments = await appointmentModel
+          .find({ userId: userId, status: status })
+          .lean();
+      }
+
+      const populatedAppointments = await Promise.all(
+        appointments.map(async (appointment) => {
+          const doctor = await doctorModel
+            .findOne({ doctorId: appointment.doctorId }, { password: 0 })
+            .lean();
+          return { ...appointment, doctor };
+        })
+      );
+
+      return populatedAppointments;
+    } catch (error: any) {
+      console.error("Error getting appointments:", error.message);
+      throw new Error(error.message);
+    }
+  }
+
+  async getAppointment(appointmentId: string) {
+    try {
+      const appointment = await appointmentModel.findById(appointmentId).lean();
+
+      if (!appointment) {
+        throw new Error(`Appointment with ID ${appointmentId} not found`);
+      }
+
+      const doctor = await doctorModel
+        .findOne({ doctorId: appointment.doctorId }, { password: 0 })
+        .lean();
+
+      return { ...appointment, doctor };
+    } catch (error: any) {
+      console.error("Error getting appointment:", error.message);
+      throw new Error(error.message);
+    }
+  }
 }

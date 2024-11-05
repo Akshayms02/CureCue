@@ -129,7 +129,7 @@ export class userServices {
         gender: user.gender,
       };
 
-      console.log(userInfo)
+      console.log(userInfo);
 
       return { userInfo, accessToken, refreshToken };
     } catch (error: unknown) {
@@ -406,6 +406,63 @@ export class userServices {
     } catch (error: any) {
       console.error("Error in updateProfile:", error.message);
       throw new Error(`Failed to update profile: ${error.message}`);
+    }
+  }
+
+  async getAppointments(userId: string, status: string) {
+    try {
+      const response = await this.userRepositary.getAllAppointments(
+        userId,
+        status
+      );
+
+      if (response) {
+        console.log("appointments", response);
+
+        const updatedAppointments = response.map((appointment: any) => ({
+          ...appointment,
+          start: new Date(appointment.start),
+          end: new Date(appointment.end),
+        }));
+
+        console.log("up", updatedAppointments);
+
+        return updatedAppointments;
+      } else {
+        console.error("Failed to get appointments: Response is invalid");
+        throw new Error(
+          "Something went wrong while fetching the appointments."
+        );
+      }
+    } catch (error: any) {
+      console.error("Error in getAppointments:", error.message);
+      throw new Error(`Failed to get appointments: ${error.message}`);
+    }
+  }
+
+  async getAppointment(appointmentId: string) {
+    try {
+      const response = await this.userRepositary.getAppointment(appointmentId);
+
+      if (response) {
+        console.log("appointments", response);
+
+        const updatedAppointment = {
+          ...response,
+          start: new Date(response.start),
+          end: new Date(response.end),
+        };
+
+        console.log("updated appointment", updatedAppointment);
+
+        return updatedAppointment;
+      } else {
+        console.error("Failed to get appointment: Response is invalid");
+        throw new Error("Something went wrong while fetching the appointment.");
+      }
+    } catch (error: any) {
+      console.error("Error in getAppointment:", error.message);
+      throw new Error(`Failed to get appointment: ${error.message}`);
     }
   }
 }
