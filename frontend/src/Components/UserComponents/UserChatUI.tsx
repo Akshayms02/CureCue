@@ -6,7 +6,7 @@ import { Button } from "../../../components/ui/button"
 import { Input } from "../../../components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card"
-import { Send, Search, Heart, Bell } from 'lucide-react'
+import { Send } from 'lucide-react'
 import { useSocket } from '../../Context/SocketIO';
 
 function UserChatUI() {
@@ -110,15 +110,7 @@ function UserChatUI() {
                         </div>
                     </div>
                     <div className="flex space-x-2">
-                        <Button variant="ghost" size="icon">
-                            <Search className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                            <Heart className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                            <Bell className="h-4 w-4" />
-                        </Button>
+                     
                     </div>
                 </CardTitle>
             </CardHeader>
