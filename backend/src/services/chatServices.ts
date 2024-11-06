@@ -1,5 +1,7 @@
 import { chatRepository } from "../repositories/chatRepository";
+import { AwsConfig } from "../config/awsConfig";
 
+const S3Service = new AwsConfig();
 export class chatService {
   private chatRepository: chatRepository;
 
@@ -10,7 +12,7 @@ export class chatService {
   async createChat(messageDetails: any): Promise<any> {
     try {
       // Use this.chatRepository to call the repository method
-      console.log(messageDetails)
+      console.log(messageDetails);
       const savedChat = await this.chatRepository.createChat(messageDetails);
       return savedChat;
     } catch (error: any) {
@@ -21,11 +23,56 @@ export class chatService {
 
   async getChat(doctorID: string, userID: string): Promise<any> {
     try {
-      return await this.chatRepository.getChat(doctorID, userID);
+      const response = await this.chatRepository.getChat(doctorID, userID);
+      let signedDoctorUrl: string | undefined;
+      let signedUserUrl: string | undefined;
+      if (
+        response?.doctor.image &&
+        response.doctor.image.url &&
+        response.doctor.image.type
+      ) {
+        const folderPath = this.getFolderPathByFileType(
+          response.doctor.image.type
+        );
+        signedDoctorUrl = await S3Service.getFile(
+          response.doctor.image.url,
+          folderPath
+        );
+      }
+      if (
+        response?.user.image &&
+        response.user.image.url &&
+        response.user.image.type
+      ) {
+        const folderPath = this.getFolderPathByFileType(
+          response.user.image.type
+        );
+        signedUserUrl = await S3Service.getFile(
+          response.user.image.url,
+          folderPath
+        );
+      }
+      return {
+        ...response,
+        signedDoctorImageUrl: signedDoctorUrl,
+        signedUserImageUrl: signedUserUrl,
+      };
     } catch (error: any) {
       console.error("Error in chatService.getChat:", error);
       throw new Error("Failed to retrieve chat"); // Adding context to the error
     }
   }
-}
+  private getFolderPathByFileType(fileType: string): string {
+    switch (fileType) {
+      case "profile image":
+        return "cureCue/doctorProfileImages";
+      case "document":
+        return "cureCue/doctorDocuments";
+      case "user profile image":
+        return "cureCue/userProfileImages";
 
+      default:
+        throw new Error(`Unknown file type: ${fileType}`);
+    }
+  }
+}

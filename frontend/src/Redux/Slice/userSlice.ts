@@ -15,18 +15,43 @@ interface UserState {
   userInfo: User | null;
   loading: boolean;
   error: string | null;
+  showIncomingVideoCall: any;
+  videoCall: any;
+  showVideoCallUser: false;
+  roomIdUser: any;
 }
 
 const initialState: UserState = {
   userInfo: null,
   loading: false,
   error: null,
+  showIncomingVideoCall: null,
+  videoCall: null,
+  showVideoCallUser: false,
+  roomIdUser: null,
 };
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    setShowIncomingVideoCall: (state, action) => {
+      state.showIncomingVideoCall = action.payload;
+    },
+    setVideoCall: (state, action) => {
+      state.videoCall = action.payload;
+    },
+    setShowVideoCall: (state, action) => {
+      state.showVideoCallUser = action.payload;
+    },
+    setRoomId: (state, action) => {
+      state.roomIdUser = action.payload;
+    },
+    endCallUser: (state) => {
+      state.videoCall = null;
+      state.showIncomingVideoCall = null;
+      localStorage.removeItem("IncomingVideoCall");
+    },
     clearUser(state) {
       state.userInfo = null;
     },
@@ -81,5 +106,14 @@ const userSlice = createSlice({
   },
 });
 
-export const { clearUser, setLoading, setError } = userSlice.actions;
+export const {
+  clearUser,
+  setLoading,
+  setError,
+  setShowIncomingVideoCall,
+  setVideoCall,
+  setShowVideoCall,
+  setRoomId,
+  endCallUser,
+} = userSlice.actions;
 export default userSlice.reducer;

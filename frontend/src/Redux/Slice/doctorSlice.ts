@@ -23,6 +23,9 @@ interface DocState {
   loading: boolean;
   error: string | null;
   docStatus: string;
+  videoCall: any;
+  showVideoCallDoctor: false;
+  roomIdDoctor: null;
 }
 
 const initialState: DocState = {
@@ -30,12 +33,28 @@ const initialState: DocState = {
   loading: false,
   error: null,
   docStatus: "pending",
+  videoCall: null,
+  showVideoCallDoctor: false,
+  roomIdDoctor: null,
 };
 
 const doctorSlice = createSlice({
   name: "doctor",
   initialState,
   reducers: {
+    setVideoCall: (state, action) => {
+      state.videoCall = action.payload;
+    },
+    setShowVideoCall: (state, action) => {
+      state.showVideoCallDoctor = action.payload;
+    },
+    setRoomId: (state, action) => {
+      state.roomIdDoctor = action.payload;
+    },
+    endCallDoctor: (state) => {
+      state.videoCall = null;
+      localStorage.removeItem("IncomingVideoCall");
+    },
     clearUser(state) {
       state.doctorInfo = null;
     },
@@ -98,6 +117,6 @@ const doctorSlice = createSlice({
   },
 });
 
-export const { clearUser, setLoading, setError, setDocStatus } =
+export const { clearUser, setLoading, setError, setDocStatus,setVideoCall,setRoomId,setShowVideoCall,endCallDoctor } =
   doctorSlice.actions;
 export default doctorSlice.reducer;

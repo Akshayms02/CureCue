@@ -1,21 +1,26 @@
 import { useRef, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import io from 'socket.io-client';
+
 import { Button } from "../../../components/ui/button"
 import { Input } from "../../../components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card"
-import { Send, Search, Heart, Bell } from 'lucide-react'
+import { Send, Video } from 'lucide-react'
 import doctorAxiosUrl from '../../Utils/doctorAxios';
+import { useSocket } from '../../Context/SocketIO';
+import { setVideoCall } from '../../Redux/Slice/doctorSlice';
+import { useDispatch } from 'react-redux';
 
 const DoctorChatUI = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { appointment } = location.state || {};
     const [newMsg, setNewMsg] = useState("");
-    const [chatHistory, setChatHistory] = useState<any[]>([]);
-    const socket = io('http://localhost:5000');
+    const [newImg, setNewImg] = useState("");
+    const [chatHistory, setChatHistory] = useState<any>([]);
+    const { socket } = useSocket()
+    const dispatch: any = useDispatch()
 
     const scrollAreaRef = useRef<HTMLDivElement | null>(null);
 
@@ -30,7 +35,9 @@ const DoctorChatUI = () => {
                         sender: "doctor"
                     }
                 });
-                setChatHistory(response.data.messages);
+                setChatHistory(response.data.chatResult.messages);
+                setNewImg(response.data.signedDoctorImageUrl)
+
                 socket.emit("joinChatRoom", {
                     doctorID: appointment?.doctorId,
                     userID: appointment?.userId
@@ -54,6 +61,13 @@ const DoctorChatUI = () => {
             socket.off("receiveMessage");
         };
     }, [appointment, navigate]);
+    useEffect(() => {
+        console.log("SOCKKK", socket)
+        if (socket) {
+            socket?.emit("joinChatRoom", { doctorID: appointment?.doctorId, userID: appointment?.userId, online: "USER" });
+
+        }
+    }, [socket])
 
     useEffect(() => {
         if (scrollAreaRef.current) {
@@ -83,6 +97,19 @@ const DoctorChatUI = () => {
         }
     };
 
+    const handleVideoCall = () => {
+        dispatch(setVideoCall({
+            userID: appointment?.userId,
+            type: "out-going",
+            callType: "video",
+            roomId: Date.now(),
+            userImage: chatHistory?.signedUserImageUrl,
+            doctorImage: chatHistory?.signedDoctorImageUrl,
+            name: chatHistory?.user?.name,
+
+        }))
+    };
+
     return (
         <Card className="w-full max-w-4xl mx-auto h-[calc(100vh-4rem)] flex flex-col mt-6 shadow-2xl">
             <CardHeader className="border-b">
@@ -93,31 +120,25 @@ const DoctorChatUI = () => {
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
                         <div>
-                            <h2 className="text-xl font-bold">Anderson Vanhron</h2>
-                            <p className="text-sm text-muted-foreground">Patient</p>
+                            <h2 className="text-xl font-bold">{appointment?.patientName}</h2>
+                            <p className="text-sm text-muted-foreground">Online</p>
                         </div>
                     </div>
                     <div className="flex space-x-2">
-                        <Button variant="ghost" size="icon">
-                            <Search className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                            <Heart className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                            <Bell className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" onClick={handleVideoCall}>
+                            <Video className="h-4 w-4" />
                         </Button>
                     </div>
                 </CardTitle>
             </CardHeader>
             <CardContent className="flex-grow overflow-hidden">
-                <div className="h-full pr-4 overflow-auto"  ref={scrollAreaRef}>
-                    {chatHistory.length > 0 ? (
+                <div className="h-full pr-4 overflow-auto" ref={scrollAreaRef}>
+                    {chatHistory?.length > 0 ? (
                         chatHistory.map((chat: any, index: number) => (
                             <div key={index} className={`flex ${chat.sender === "doctor" ? "justify-end" : "justify-start"} mb-4`}>
                                 <div className={`flex ${chat.sender === "doctor" ? "flex-row-reverse" : "flex-row"} items-end`}>
                                     <Avatar className="w-8 h-8">
-                                        <AvatarImage src={chat.profileImage} alt={`${chat.sender} profile`} />
+                                        <AvatarImage src={chat.sender === "doctor" ? newImg : "P"} alt={`${chat.sender} profile`} />
                                         <AvatarFallback>{chat.sender === "doctor" ? "D" : "P"}</AvatarFallback>
                                     </Avatar>
                                     <div className={`mx-2 py-2 px-3 rounded-lg ${chat.sender === "doctor"

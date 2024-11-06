@@ -5,16 +5,26 @@ import DoctorRoutes from "./Routes/DoctorRoutes";
 import { Toaster } from "../components/ui/sonner";
 import { ThemeProvider } from "../components/ui/themeProvider";
 import AdminRoutes from "./Routes/AdminRoutes";
+import { useSelector } from "react-redux";
+import { RootState } from "./Redux/store";
+import VideoCallOut from "./Components/DoctorComponents/VideoCallOut";
+import UserVideoIn from "./Components/UserComponents/UserVideoIn";
 
 function App() {
+  const { videoCall, showVideoCallDoctor } = useSelector((state: RootState) => state.doctor)
+  const { showIncomingVideoCall, showVideoCallUser } = useSelector((state: RootState) => state.user)
   return (
     <>
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <Router>
+          {videoCall && <VideoCallOut />}
+          {showIncomingVideoCall && <UserVideoIn />}
+          {showVideoCallDoctor && <VideochatPage />}
+          {showVideoCallUser && <VideoChatPage />}
           <Routes>
             <Route path="/*" element={<UserRoutes />} />
             <Route path="/doctor/*" element={<DoctorRoutes />} />
-            <Route path="/admin/*" element={<AdminRoutes/>}></Route>
+            <Route path="/admin/*" element={<AdminRoutes />}></Route>
           </Routes>
         </Router>
         <Toaster position="top-right" richColors />

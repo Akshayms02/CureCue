@@ -1,13 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import io from 'socket.io-client';
 import axiosUrl from '../../Utils/axios';
 import { Button } from "../../../components/ui/button"
 import { Input } from "../../../components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Send, Search, Heart, Bell } from 'lucide-react'
+import { useSocket } from '../../Context/SocketIO';
 
 function UserChatUI() {
     const location = useLocation();
@@ -15,8 +15,8 @@ function UserChatUI() {
     const { appointment } = location.state || {};
     const [newMsg, setNewMsg] = useState("");
     const [chatHistory, setChatHistory] = useState<any[]>([]);
-    const socket = io('http://localhost:5000');
 
+    const { socket } = useSocket()
     const scrollAreaRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -28,7 +28,8 @@ function UserChatUI() {
                         userID: appointment?.userId
                     }
                 });
-                setChatHistory(response.data.messages);
+                console.log("response",response)
+                setChatHistory(response?.data?.chatResult.messages);
                 socket.emit("joinChatRoom", {
                     doctorID: appointment?.doctorId,
                     userID: appointment?.userId
@@ -45,7 +46,7 @@ function UserChatUI() {
         fetchChatHistory();
 
         socket.on("receiveMessage", (messageDetails: any) => {
-            console.log("message recieved")
+            console.log("hooooooo",messageDetails)
             setChatHistory(messageDetails.messages);
         });
 
@@ -58,6 +59,14 @@ function UserChatUI() {
             socket.off("connection");
         };
     }, [appointment, navigate]);
+
+    useEffect(() => {
+        console.log("SOCKKK", socket)
+        if (socket) {
+            socket?.emit("joinChatRoom", { doctorID: appointment?.doctorId, userID: appointment?.userId, online: "USER" });
+
+        }
+    }, [socket])
 
     useEffect(() => {
         if (scrollAreaRef.current) {
