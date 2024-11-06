@@ -15,7 +15,7 @@ const userSocketMap: {
 } = {};
 
 export const getReceiverSocketId = (userId: string) => {
-  console.log("reciever and his socket id are ", userId, userSocketMap[userId]);
+  console.log("receiver and his socket id are ", userId, userSocketMap[userId]);
   return userSocketMap[userId];
 };
 
@@ -64,8 +64,6 @@ const configSocketIO = (server: HttpServer) => {
 
       socket.on("sendMessage", async ({ messageDetails }) => {
         try {
-          console.log("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
-
           let savedMessage: null | any = null;
 
           const connectionDetails: any = await chatServices.createChat(
@@ -89,9 +87,6 @@ const configSocketIO = (server: HttpServer) => {
         const userSocketId = getReceiverSocketId(data.to);
         console.log(userSocketId, "OUT");
         if (userSocketId) {
-          console.log("dddddddddd", userSocketMap);
-          console.log("cccccccc", data);
-
           socket.to(userSocketId).emit("incoming-video-call", {
             from: data.from,
             roomId: data.roomId,
@@ -102,22 +97,21 @@ const configSocketIO = (server: HttpServer) => {
 
       socket.on("accept-incoming-call", (data) => {
         const friendSocketId = getReceiverSocketId(data.to);
+        console.log(data)
+        console.log("accept call", friendSocketId);
         if (friendSocketId) {
           socket.to(friendSocketId).emit("accept-call", data);
         }
       });
 
       socket.on("leave-room", (data) => {
-        // console.log('coming here')
         const friendSocketId = getReceiverSocketId(data.to);
         if (friendSocketId) {
-          // console.log('coming here')
           socket.to(friendSocketId).emit("user-left");
         }
       });
 
       socket.on("reject-call", (data) => {
-        // console.log('data coming through reject call is ',data)
         const friendSocketId = getReceiverSocketId(data.to);
         if (friendSocketId) {
           socket.to(friendSocketId).emit("call-rejected");

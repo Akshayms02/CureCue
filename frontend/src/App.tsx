@@ -9,6 +9,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "./Redux/store";
 import VideoCallOut from "./Components/DoctorComponents/VideoCallOut";
 import UserVideoIn from "./Components/UserComponents/UserVideoIn";
+import VideoChatDoctor from "./Components/DoctorComponents/VideoCallDoctor";
+import VideoChatUser from "./Components/UserComponents/VideoCallUser";
 
 function App() {
   const { videoCall, showVideoCallDoctor } = useSelector((state: RootState) => state.doctor)
@@ -19,8 +21,8 @@ function App() {
         <Router>
           {videoCall && <VideoCallOut />}
           {showIncomingVideoCall && <UserVideoIn />}
-          {showVideoCallDoctor && <VideochatPage />}
-          {showVideoCallUser && <VideoChatPage />}
+          {showVideoCallDoctor && <VideoChatDoctor />}
+          {showVideoCallUser && <VideoChatUser />}
           <Routes>
             <Route path="/*" element={<UserRoutes />} />
             <Route path="/doctor/*" element={<DoctorRoutes />} />

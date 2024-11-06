@@ -25,7 +25,7 @@ interface DocState {
   docStatus: string;
   videoCall: any;
   showVideoCallDoctor: false;
-  roomIdDoctor: null;
+  roomIdDoctor: any;
 }
 
 const initialState: DocState = {
