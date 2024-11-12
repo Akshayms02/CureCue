@@ -77,7 +77,7 @@ const configSocketIO = (server: HttpServer) => {
           console.log("sss", savedMessage);
 
           io.to(chatRoom).emit("receiveMessage", savedMessage);
-          //  io.to(`chatNotificationRoom${savedMessage?.receiverID}`).emit("newChatNotification", savedMessage?.message);
+
         } catch (error) {
           console.log(error);
         }

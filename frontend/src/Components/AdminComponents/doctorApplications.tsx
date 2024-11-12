@@ -101,25 +101,33 @@ function DoctorApplications() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {applications.map((application) => (
-                  <TableRow key={application._id}>
-                    <TableCell className="p-4 font-medium">
-                      Dr. {application.name}
-                    </TableCell>
-                    <TableCell className="p-4">
-                      {application.department.name}
-                    </TableCell>
-
-                    <TableCell className="p-4">
-                      <button
-                        className="bg-blue-600 text-white rounded-lg p-2"
-                        onClick={() => viewApplication(application._id)}
-                      >
-                        View Details
-                      </button>
+                {applications.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={3} className="p-4 text-center">
+                      <p>No applications currently.</p>
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  applications.map((application) => (
+                    <TableRow key={application._id}>
+                      <TableCell className="p-4 font-medium">
+                        Dr. {application.name}
+                      </TableCell>
+                      <TableCell className="p-4">
+                        {application.department.name}
+                      </TableCell>
+
+                      <TableCell className="p-4">
+                        <button
+                          className="bg-blue-600 text-white rounded-lg p-2"
+                          onClick={() => viewApplication(application._id)}
+                        >
+                          View Details
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </CardContent>

@@ -11,13 +11,12 @@ export class chatService {
 
   async createChat(messageDetails: any): Promise<any> {
     try {
-      // Use this.chatRepository to call the repository method
       console.log(messageDetails);
       const savedChat = await this.chatRepository.createChat(messageDetails);
       return savedChat;
     } catch (error: any) {
       console.error("Error in chatService.createChat:", error);
-      throw new Error("Failed to create chat"); // Adding context to the error
+      throw new Error("Failed to create chat");
     }
   }
 
@@ -59,7 +58,7 @@ export class chatService {
       };
     } catch (error: any) {
       console.error("Error in chatService.getChat:", error);
-      throw new Error("Failed to retrieve chat"); // Adding context to the error
+      throw new Error("Failed to retrieve chat");
     }
   }
   private getFolderPathByFileType(fileType: string): string {

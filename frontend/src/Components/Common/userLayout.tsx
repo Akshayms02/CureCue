@@ -1,5 +1,5 @@
-import React from "react"
-import { FaUserCircle, FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram } from "react-icons/fa"
+import React, { useState } from "react"
+import { FaUserCircle, FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram, FaBell } from "react-icons/fa"
 import { useSelector } from "react-redux"
 import { RootState } from "../../Redux/store"
 import myImage from "../../assets/Screenshot_2024-08-15_191834-removebg-preview.png"
@@ -21,6 +21,12 @@ const UserLayout: React.FC = () => {
 
   const handleProfileClick = () => {
     navigate("/profile")
+  }
+
+  const [notificationCount, setNotificationCount] = useState(2)
+
+  const handleNotificationsRead = () => {
+    setNotificationCount(0)
   }
 
   return (
@@ -63,6 +69,36 @@ const UserLayout: React.FC = () => {
           </nav>
           <div className="flex-1 flex justify-end items-center space-x-4">
             <nav className="flex items-center space-x-1">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-10 h-10 rounded-full relative"
+                  >
+                    <FaBell className="h-5 w-5" />
+                    {notificationCount > 0 && (
+                      <span className="absolute top-0 right-0 w-4 h-4 text-[10px] font-bold flex items-center justify-center bg-primary text-primary-foreground rounded-full transform translate-x-1/3 -translate-y-1/3">
+                        {notificationCount}
+                      </span>
+                    )}
+                    <span className="sr-only">Notifications</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px] sm:w-[400px]" onOpenAutoFocus={handleNotificationsRead}>
+                  <h2 className="text-lg font-semibold mb-4">Notifications</h2>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-secondary rounded-lg">
+                      <h3 className="font-medium">Appointment Reminder</h3>
+                      <p className="text-sm text-muted-foreground">Your appointment with Dr. Smith is tomorrow at 2 PM.</p>
+                    </div>
+                    <div className="p-4 bg-secondary rounded-lg">
+                      <h3 className="font-medium">New Message</h3>
+                      <p className="text-sm text-muted-foreground">You have a new message from your doctor.</p>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
               {isLoggedIn ? (
                 <Button
                   variant="ghost"

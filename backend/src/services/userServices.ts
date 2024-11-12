@@ -12,7 +12,7 @@ export class userServices {
   constructor(
     private userRepositary: IUserRepository,
     private S3Service: AwsConfig
-  ) {}
+  ) { }
 
   private getFolderPathByFileType(fileType: string): string {
     switch (fileType) {
@@ -320,10 +320,10 @@ export class userServices {
         (element: any) => element.start.toISOString() == timeslotId
       );
 
-      // Call the repository to book the slot
+
       await this.userRepositary.bookSlot(slot, userId, session);
 
-      // Call the repository to create an appointment
+
       const newAppointment = await this.userRepositary.createAppointment(
         {
           doctorId,

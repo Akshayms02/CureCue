@@ -28,7 +28,7 @@ function UserChatUI() {
                         userID: appointment?.userId
                     }
                 });
-                console.log("response",response)
+                console.log("response", response)
                 setChatHistory(response?.data?.chatResult.messages);
                 socket.emit("joinChatRoom", {
                     doctorID: appointment?.doctorId,
@@ -46,7 +46,7 @@ function UserChatUI() {
         fetchChatHistory();
 
         socket.on("receiveMessage", (messageDetails: any) => {
-            console.log("hooooooo",messageDetails)
+            console.log("hooooooo", messageDetails)
             setChatHistory(messageDetails.messages);
         });
 
@@ -110,7 +110,7 @@ function UserChatUI() {
                         </div>
                     </div>
                     <div className="flex space-x-2">
-                     
+
                     </div>
                 </CardTitle>
             </CardHeader>
