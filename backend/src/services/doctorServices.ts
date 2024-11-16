@@ -481,4 +481,50 @@ export class doctorServices {
       throw new Error(`Failed to update profile: ${error.message}`);
     }
   }
+
+  async getDashboardData(doctorId: string) {
+    try {
+      console.log("Entering getDashboardData method in docService");
+
+      const response = await this.doctorRepository.getAllStatistics(
+        doctorId as string
+      );
+
+      if (response) {
+        console.log("Dashboarddd data successfully retrieved:", response);
+        return response;
+      } else {
+        console.error("Failed to retrieve dashboard data: Response is invalid");
+        throw new Error(
+          "Something went wrong while retrieving dashboard data."
+        );
+      }
+    } catch (error: any) {
+      console.error("Error in getDashboardData:", error.message);
+      throw new Error(`Failed to retrieve dashboard data: ${error.message}`);
+    }
+  }
+
+  async addPrescription(
+    appointmentId: string,
+    prescription: string
+  ): Promise<any> {
+    try {
+      const response = await this.doctorRepository.completeAppointment(
+        appointmentId,
+        prescription
+      );
+
+      if (response) {
+        return response;
+      } else {
+        throw new Error(
+          "Failed to complete the appointment: Invalid response from repository"
+        );
+      }
+    } catch (error: any) {
+      console.error("Error in addPrescription:", error.message);
+      throw new Error(`Failed to add prescription: ${error.message}`);
+    }
+  }
 }

@@ -19,6 +19,10 @@ export class chatService {
       throw new Error("Failed to create chat");
     }
   }
+  async updateAppointment(appointmentId: string): Promise<any> {
+    console.log("appoinmttt", appointmentId);
+    return await this.chatRepository.updateAppointment(appointmentId);
+  }
 
   async getChat(doctorID: string, userID: string): Promise<any> {
     try {

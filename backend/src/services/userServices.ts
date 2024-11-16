@@ -12,7 +12,7 @@ export class userServices {
   constructor(
     private userRepositary: IUserRepository,
     private S3Service: AwsConfig
-  ) { }
+  ) {}
 
   private getFolderPathByFileType(fileType: string): string {
     switch (fileType) {
@@ -320,9 +320,7 @@ export class userServices {
         (element: any) => element.start.toISOString() == timeslotId
       );
 
-
       await this.userRepositary.bookSlot(slot, userId, session);
-
 
       const newAppointment = await this.userRepositary.createAppointment(
         {
@@ -463,6 +461,51 @@ export class userServices {
     } catch (error: any) {
       console.error("Error in getAppointment:", error.message);
       throw new Error(`Failed to get appointment: ${error.message}`);
+    }
+  }
+  async addReview(
+    appointmentId: string,
+    rating: number,
+    review: string
+  ): Promise<any> {
+    try {
+      const response = await this.userRepositary.addReview(
+        appointmentId,
+        rating,
+        review
+      );
+
+      if (!response) {
+        throw new Error("Appointment not found or review could not be added");
+      }
+
+      return response;
+    } catch (error: any) {
+      console.error("Error in addReview:", error.message);
+
+      throw new Error(`Failed to add review: ${error.message}`);
+    }
+  }
+
+  async getReviewData(doctorId: string) {
+    try {
+      const response = await this.userRepositary.getDoctorReview(doctorId);
+
+      if (response?.image && response.image.url && response.image.type) {
+        const folderPath = this.getFolderPathByFileType(response.image.type);
+        const signedUrl = await this.S3Service.getFile(
+          response.image.url,
+          folderPath
+        );
+
+        return {
+          ...response,
+          signedImageUrl: signedUrl,
+        };
+      }
+    } catch (error: any) {
+      console.error("Error in getDoctor:", error.message);
+      throw new Error(`Failed to get specialization: ${error.message}`);
     }
   }
 }

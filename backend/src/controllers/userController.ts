@@ -360,12 +360,62 @@ export default class UserController {
           .status(400)
           .json({ message: `Failed to get appointments: ${error.message}` });
       } else {
+        res.status(500).json({
+          message: "An unexpected error occurred",
+          error: error.message,
+        });
+      }
+    }
+  }
+  async addReview(req: Request, res: Response): Promise<void> {
+    try {
+      const { appointmentId, rating, reviewText } = req.body;
+
+      const response = await this.userService.addReview(
+        appointmentId,
+        rating,
+        reviewText
+      );
+
+      res
+        .status(200)
+        .json({ message: "Review added successfully", data: response });
+    } catch (error: any) {
+      console.error("Error adding review:", error.message);
+
+      if (error.message.includes("Failed to add review")) {
         res
-          .status(500)
-          .json({
-            message: "An unexpected error occurred",
-            error: error.message,
-          });
+          .status(400)
+          .json({ message: `Failed to add review: ${error.message}` });
+      } else {
+        res.status(500).json({
+          message: "An unexpected error occurred",
+          error: error.message,
+        });
+      }
+    }
+  }
+  async getReviews(req: Request, res: Response): Promise<void> {
+    try {
+      const doctorId = req.params.doctorId;
+
+      const response = await this.userService.getReviewData(doctorId);
+
+      res.status(200).json({ message: "successfully", response });
+    } catch (error: any) {
+      if (
+        error.message ===
+        "Something went wrong while creating the specialization."
+      ) {
+        res.status(400).json({
+          message: "Something went wrong while creating the specialization.",
+        });
+      } else {
+        console.log(error)
+        res.status(500).json({
+          message: "An unexpected error occurred",
+          error: error.message,
+        });
       }
     }
   }

@@ -8,7 +8,12 @@ interface IAppointment extends Document {
   start: Date;
   end: Date;
   locked: mongoose.Types.ObjectId | null;
-  status: "pending" | "completed" | "cancelled";
+  status:
+    | "pending"
+    | "prescription pending"
+    | "completed"
+    | "cancelled"
+    | "cancelled by Dr";
   fees: number;
   paymentMethod: "razorpay" | "wallet";
   paymentStatus:
@@ -19,9 +24,14 @@ interface IAppointment extends Document {
     | "anonymous";
   paymentId?: string | null;
   prescription?: string | null;
+  review?: {
+    rating?: number;
+    description?: string;
+  };
   reason?: string | null;
   cancelledBy?: "user" | "doctor" | null;
   createdAt?: Date;
+  medicalRecords?: string[];
   updatedAt?: Date;
 }
 
@@ -51,6 +61,16 @@ const AppointmentSchema = new Schema<IAppointment>(
       type: Date,
       required: true,
     },
+    review: {
+      rating: {
+        type: Number,
+        default: 0,
+      },
+      description: {
+        type: String,
+        default: "",
+      },
+    },
     end: {
       type: Date,
       required: true,
@@ -62,7 +82,13 @@ const AppointmentSchema = new Schema<IAppointment>(
     },
     status: {
       type: String,
-      enum: ["pending", "completed", "cancelled"],
+      enum: [
+        "pending",
+        "completed",
+        "cancelled",
+        "prescription pending",
+        "cancelled by Dr",
+      ],
       default: "pending",
     },
     fees: {

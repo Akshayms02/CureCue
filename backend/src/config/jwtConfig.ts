@@ -16,7 +16,7 @@ const createToken = (user_id: string, role: string): string => {
 };
 
 const createAdminToken = (email: string, role: string): string => {
-  return jwt.sign({ email, role }, secret_key, { expiresIn: "30m" });
+  return jwt.sign({ email, role }, secret_key, { expiresIn: "45m" });
 };
 
 const createRefreshToken = (user_id: string, role: string): string => {
@@ -69,7 +69,7 @@ const verifyDocToken = async (req: Request, res: Response, next: NextFunction) =
   if (!token) {
     return res.status(401).send("Authorization failed.");
   }
-
+console.log(token)
   if (token) {
     jwt.verify(token, secret_key, async (err, decoded) => {
       if (err) {

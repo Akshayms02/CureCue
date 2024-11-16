@@ -14,6 +14,7 @@ const chatControllerInstance = new chatController(chatServiceInstance)
 
 
 route.get('/fetchTwoMembersChat', chatControllerInstance.getChat.bind(chatControllerInstance));
+route.post('/end-call', chatControllerInstance.updateAppointment.bind(chatControllerInstance));
 
 export default route;
 

@@ -5,10 +5,10 @@ import { createToken } from "./jwtConfig";
 
 dotenv.config();
 
-const secret_key = process.env.SECRET_KEY as string;
+const secret_key = process.env.JWT_SECRET as string;
 
 const refreshTokenHandler = (req: Request, res: Response) => {
-  console.log(req.body)
+  console.log("token refreshed",req.body);
   const { userId } = req.body;
 
   if (!userId) {
@@ -16,7 +16,7 @@ const refreshTokenHandler = (req: Request, res: Response) => {
   }
 
   const refreshToken = req.cookies.refreshToken;
-console.log(refreshToken)
+
   if (!refreshToken) {
     return res.status(401).json({ message: "Refresh token is missing." });
   }

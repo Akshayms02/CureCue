@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import axiosUrl from "../../Utils/axios";
+
 import { useNavigate } from "react-router-dom";
 import { MoreHorizontal } from "lucide-react";
 import { Badge } from "../../../components/ui/badge";
@@ -28,6 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
+import adminAxiosUrl from "../../Utils/adminAxios";
 
 interface UserDetails {
   _id: string;
@@ -50,7 +51,7 @@ function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const response = await axiosUrl.get("/api/admin/getUsers");
+      const response = await adminAxiosUrl.get("/api/admin/getUsers");
       setUsers(response.data.response);
     } catch (error: any) {
       toast.error(`Failed to fetch users${error}`);
@@ -63,7 +64,7 @@ function UserManagement() {
 
   const toggleListState = async (id: string) => {
     console.log("hello toggled");
-    const response = await axiosUrl.put(`/api/admin/listUnlistUser/${id}`);
+    const response = await adminAxiosUrl.put(`/api/admin/listUnlistUser/${id}`);
     if (response) {
       toast.success("The Action was successful");
     }

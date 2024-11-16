@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { clearUser, setDocStatus } from "../../Redux/Slice/doctorSlice";
 import axiosUrl from "../../Utils/axios";
 import { VerificationPending } from "../../Components/DoctorComponents/VerficationPending";
+import doctorAxiosUrl from "../../Utils/doctorAxios";
 
 interface DoctorProtectedRouteProps {
   children: React.ReactNode;
@@ -22,12 +23,12 @@ function DoctorProtectedRoute({ children }: DoctorProtectedRouteProps) {
       try {
         if (DoctorData.doctorInfo) {
           const email = DoctorData?.doctorInfo?.email;
-          const { data } = await axiosUrl.get(
+          const { data } = await doctorAxiosUrl.get(
             `/api/doctor/check-status/${email}`
           );
 
           if (data.isBlocked === true) {
-            await axiosUrl.post("/api/doctor/logout");
+            await doctorAxiosUrl.post("/api/doctor/logout");
             dispatch(clearUser());
             localStorage.removeItem("doctorInfo");
             localStorage.removeItem("docaccessToken")

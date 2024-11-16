@@ -20,4 +20,19 @@ export class chatController {
       res.status(400).json(error);
     }
   };
+  updateAppointment = async (req: Request, res: Response) => {
+    try {
+      const { appointmentId } = req.body;
+
+      console.log("call completed:", appointmentId);
+
+
+      const response = await this.chatService.updateAppointment(appointmentId);
+
+      res.status(200).json(response);
+    } catch (error) {
+      console.log("chat:= get chat error", error);
+      res.status(400).json(error);
+    }
+  };
 }

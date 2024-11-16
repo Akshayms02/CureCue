@@ -314,7 +314,7 @@ export default class DoctorController {
   async updateDoctorProfile(req: Request, res: Response): Promise<void> {
     try {
       const { doctorId, fees, gender, phone } = req.body;
-      console.log(req.body)
+      console.log(req.body);
 
       const response = await this.doctorService.updateProfile({
         doctorId,
@@ -332,13 +332,73 @@ export default class DoctorController {
       if (error.message.includes("something went wrong")) {
         res.status(400).json({ message: "Error updating profile." });
       } else {
-        res
-          .status(500)
-          .json({
-            message: "An unexpected error occurred",
-            error: error.message,
-          });
+        res.status(500).json({
+          message: "An unexpected error occurred",
+          error: error.message,
+        });
       }
     }
   }
+
+  async getDashboardData(req: Request, res: Response): Promise<void> {
+    try {
+      const doctorId = req.query.doctorId;
+      const response = await this.doctorService.getDashboardData(
+        doctorId as string
+      );
+
+      res
+        .status(200)
+        .json({ message: "Dashboard data retrieved successfully", response });
+    } catch (error: any) {
+      console.error("Error in getDashboardData controller:", error.message);
+
+      if (
+        error.message ===
+        "Something went wrong while retrieving dashboard data."
+      ) {
+        res.status(400).json({ message: "Failed to retrieve dashboard data." });
+      } else {
+        res.status(500).json({
+          message: "An unexpected error occurred",
+          error: error.message,
+        });
+      }
+    }
+  }
+
+  async addPrescription(req: Request, res: Response): Promise<any> {
+    try {
+      const { appointmentId, prescription } = req.body;
+
+      console.log("Received appointmentId:", appointmentId);
+      console.log("Received prescription:", prescription);
+
+      const response = await this.doctorService.addPrescription(
+        appointmentId,
+        prescription
+      );
+
+      console.log("Add Prescription Response:", response);
+
+      res
+        .status(200)
+        .json({ message: "Prescription added successfully", data: response });
+    } catch (error: any) {
+      console.error("Error adding prescription:", error.message);
+
+      if (error.message.includes("Failed to add prescription")) {
+        res
+          .status(400)
+          .json({ message: `Failed to add prescription: ${error.message}` });
+      } else {
+        res.status(500).json({
+          message: "An unexpected error occurred",
+          error: error.message,
+        });
+      }
+    }
+  }
+
+  
 }

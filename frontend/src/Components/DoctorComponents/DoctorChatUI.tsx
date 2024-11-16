@@ -99,6 +99,7 @@ const DoctorChatUI = () => {
 
     const handleVideoCall = () => {
         dispatch(setVideoCall({
+            appointmentId: appointment._id,
             userID: appointment?.userId,
             type: "out-going",
             callType: "video",

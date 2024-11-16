@@ -1,162 +1,343 @@
-import React, { useState, useEffect } from 'react'
-import { format } from 'date-fns'
+import { useEffect, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { useFormik } from "formik"
+import * as Yup from "yup"
+import Swal from "sweetalert2"
+import jsPDF from "jspdf"
+import moment from "moment"
 import { Button } from "../../../components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card"
-import { Badge } from "../../../components/ui/badge"
-import { useLocation, useNavigate } from 'react-router-dom'
-
-// interface AppointmentProps {
-//     appointment: {
-//         _id: string
-//         userId: string
-//         doctorId: string
-//         patientName: string
-//         date: string
-//         start: string
-//         end: string
-//         status: string
-//         fees: number
-//         paymentMethod: string
-//         paymentStatus: string
-//         paymentId: string
-//         prescription: string | null
-//         reason: string | null
-//     }
-
-// }
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../components/ui/dialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table"
+import { Textarea } from "../../../components/ui/textarea"
+import { ScrollArea } from "../../../components/ui/scroll-area"
+import { Download, MessageCircle, X } from 'lucide-react'
+import doctorAxiosUrl from "../../Utils/doctorAxios"
 
 export default function AppointmentDetails() {
-    const [isChatEnabled, setIsChatEnabled] = useState(false)
+
     const location = useLocation()
-    const { appointment } = location.state || {}
+    console.log("hello")
     const navigate = useNavigate()
+    const { appointment } = location.state || {}
+    console.log(appointment)
+
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [appointmentStatus, setAppointmentStatus] = useState(appointment?.status)
+    const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false)
+    const [medicalRecords, setMedicalRecords] = useState<any>([])
+
+    const openModal = () => setIsModalOpen(true)
+    const closeModal = () => {
+        setIsModalOpen(false)
+        formik.resetForm()
+    }
+
+    const openPrescriptionModal = () => setIsPrescriptionModalOpen(true)
+    const closePrescriptionModal = () => {
+        setIsPrescriptionModalOpen(false)
+        prescriptionFormik.resetForm()
+    }
+
+    const formik = useFormik({
+        initialValues: { cancelReason: "" },
+        validationSchema: Yup.object({
+            cancelReason: Yup.string().min(5, "Reason must be at least 5 characters").required("Cancellation reason is required"),
+        }),
+        onSubmit: (values) => {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you really want to cancel this appointment?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, cancel it!",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    doctorAxiosUrl
+                        .put("/api/doctor/cancelAppointment", {
+                            appointmentId: appointment?._id,
+                            reason: values.cancelReason,
+                        })
+                        .then(() => {
+                            setAppointmentStatus("cancelled by Dr")
+                            Swal.fire("Cancelled!", "Your appointment has been cancelled.", "success")
+                            closeModal()
+                        })
+                        .catch(() => {
+                            Swal.fire("Error!", "There was an error cancelling your appointment.", "error")
+                        })
+                }
+            })
+        },
+    })
+
+    const prescriptionFormik = useFormik({
+        initialValues: { prescription: "" },
+        validationSchema: Yup.object({
+            prescription: Yup.string().min(5, "Prescription must be at least 5 characters").required("Prescription is required"),
+        }),
+        onSubmit: (values) => {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to submit this prescription?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, submit it!",
+            }).then((result) => {
+                if (result.isConfirmed && appointment?._id) {
+                    doctorAxiosUrl
+                        .put("/api/doctor/addPrescription", {
+                            appointmentId: appointment._id,
+                            prescription: values.prescription,
+                        })
+                        .then(() => {
+                            setAppointmentStatus("completed")
+                            Swal.fire("Submitted!", "The prescription has been added.", "success")
+                            closePrescriptionModal()
+                        })
+                        .catch(() => {
+                            Swal.fire("Error!", "There was an error adding the prescription.", "error")
+                        })
+                } else if (!appointment?._id) {
+                    Swal.fire("Error!", "Appointment data is missing.", "error")
+                }
+            })
+        },
+    })
 
     useEffect(() => {
-        const checkChatAvailability = () => {
-            const now = new Date()
-            const startTime = new Date(appointment.start)
-            setIsChatEnabled(now >= startTime)
+        const fetchMedicalRecords = async () => {
+            try {
+                const response = await doctorAxiosUrl.get(`/api/doctor/getMedical-records/${appointment?._id}`)
+                setMedicalRecords(response.data.response)
+            } catch (error) {
+                console.error("Error fetching medical records:", error)
+            }
         }
 
-        checkChatAvailability()
-        const timer = setInterval(checkChatAvailability, 60000) // Check every minute
+        fetchMedicalRecords()
+    }, [appointment?._id])
 
-        return () => clearInterval(timer)
-    }, [appointment.start])
+    const downloadPrescription = (record: any) => {
+        if (record) {
+            const doc = new jsPDF()
 
-    const formatDate = (dateString: string) => {
-        return format(new Date(dateString), 'MMMM d, yyyy')
+            doc.setFont("Helvetica", "normal")
+            doc.setFontSize(12)
+
+            const darkBlue = "rgb(0, 51, 102)"
+            const lightBlue = "rgb(0, 102, 204)"
+            const darkGrey = "rgb(50, 50, 50)"
+            const lightGrey = "rgb(150, 150, 150)"
+
+            doc.setFontSize(18)
+            doc.setTextColor(darkBlue)
+            doc.text("CureCue", 10, 15)
+
+            doc.setFontSize(22)
+            doc.setTextColor(lightBlue)
+            doc.text("Prescription", 10, 30)
+
+            doc.setDrawColor(0, 102, 204)
+            doc.setLineWidth(1)
+            doc.line(10, 35, 200, 35)
+
+            doc.setFontSize(14)
+            doc.setTextColor(darkGrey)
+            doc.text(`Patient Name: ${record.patientNAme}`, 10, 45)
+            doc.text(`Age: ${record.age.toString()}`, 10, 55)
+            doc.text(`Date: ${moment(record.date).format("MMMM Do YYYY")}`, 10, 65)
+            doc.text(`Time: ${record.start} - ${record.end}`, 10, 75)
+
+            doc.setLineWidth(0.5)
+            doc.line(10, 80, 200, 80)
+
+            doc.setFontSize(16)
+            doc.setTextColor(darkBlue)
+            doc.text("Prescription Details:", 10, 90)
+
+            const prescriptionSpacing = 10
+            let yPosition = 90 + prescriptionSpacing
+
+            const prescriptionLines = record.prescription.split("\n")
+            prescriptionLines.forEach((line: string) => {
+                doc.setTextColor(darkGrey)
+                doc.text(line, 10, yPosition)
+                yPosition += 8
+            })
+
+            doc.setFontSize(10)
+            doc.setTextColor(lightGrey)
+            doc.text("Thank you for choosing CureCue!", 10, 280)
+            doc.text("For any questions, please contact us.", 10, 285)
+            doc.text("CureCue | curecue@gmail.com", 10, 290)
+
+            doc.save(`Prescription_${record.patientNAme}.pdf`)
+        }
     }
 
-    const formatTime = (dateString: string) => {
-        return format(new Date(dateString), 'h:mm a')
-    }
-
-    const getStatusColor = (status: string) => {
-        switch (status.toLowerCase()) {
-            case 'completed':
-                return 'bg-green-500'
-            case 'pending':
-                return 'bg-yellow-500'
-            case 'cancelled':
-                return 'bg-red-500'
+    const renderButtons = () => {
+        switch (appointmentStatus) {
+            case "pending":
+                return (
+                    <>
+                        <Button onClick={() => navigate("/doctor/chat", { state: { appointment } })}>
+                            <MessageCircle className="mr-2 h-4 w-4" /> Chat
+                        </Button>
+                        <Button variant="destructive" onClick={openModal}>
+                            <X className="mr-2 h-4 w-4" /> Cancel
+                        </Button>
+                    </>
+                )
+            case "prescription pending":
+                return (
+                    <>
+                        <Button onClick={() => navigate("/doctor/chat", { state: { appointment } })}>
+                            <MessageCircle className="mr-2 h-4 w-4" /> Chat
+                        </Button>
+                        <Button variant="secondary" onClick={openPrescriptionModal}>
+                            Add Prescription
+                        </Button>
+                    </>
+                )
+            case "cancelled":
+                return <p className="text-red-600 text-lg font-medium">Cancelled By Patient</p>
+            case "cancelled by Dr":
+                return (
+                    <Button variant="outline" onClick={openModal}>
+                        Cancelled by You
+                    </Button>
+                )
+            case "completed":
+                return <p className="text-green-600 text-lg font-medium">Completed</p>
             default:
-                return 'bg-gray-500'
+                return null
         }
-    }
-    const onCancel = () => {
-        console.log("clicked")
-    }
-    const onAddPrescription = () => {
-        console.log("clicked onAddPrescription")
-    }
-    const onChat = () => {
-        console.log("appointment :", appointment)
-        navigate("/doctor/chat", { state: { appointment } })
     }
 
     return (
-        <Card className="w-[90%] mx-auto my-auto shadow-2xl">
-            <CardHeader>
-                <CardTitle className="text-2xl">Appointment Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <h3 className="font-semibold">Patient Name</h3>
-                        <p>{appointment.patientName}</p>
+        <div className="container mx-auto p-4 space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Appointment Details</CardTitle>
+                </CardHeader>
+                <CardContent className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                        <div>
+                            <h3 className="font-semibold">Patient Information</h3>
+                            <p>Name: {appointment?.patientName || "N/A"}</p>
+                            <p>Date: {appointment?.date ? new Date(appointment.date).toLocaleDateString() : "N/A"}</p>
+                            <p>Time: {appointment?.start ? new Date(appointment.start).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) : "N/A"}</p>
+                            <p>Fees: {appointment?.fees || "N/A"}</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="font-semibold">Patient ID</h3>
-                        <p>{appointment.userId}</p>
+                    <div className="space-y-4">
+                        <div>
+                            <h3 className="font-semibold">Description</h3>
+                            <ScrollArea className="h-[100px] w-full rounded-md border p-4">
+                                <p>{appointment?.description || "No description available"}</p>
+                            </ScrollArea>
+                        </div>
+                        <div className="flex justify-end space-x-4">{renderButtons()}</div>
                     </div>
-                    <div>
-                        <h3 className="font-semibold">Appointment ID</h3>
-                        <p>{appointment._id}</p>
-                    </div>
-                    <div>
-                        <h3 className="font-semibold">Date</h3>
-                        <p>{formatDate(appointment.date)}</p>
-                    </div>
-                    <div>
-                        <h3 className="font-semibold">Time</h3>
-                        <p>{formatTime(appointment.start)} - {formatTime(appointment.end)}</p>
-                    </div>
-                    <div>
-                        <h3 className="font-semibold">Status</h3>
-                        <Badge className={`${getStatusColor(appointment.status)} text-white`}>
-                            {appointment.status}
-                        </Badge>
-                    </div>
-                    <div>
-                        <h3 className="font-semibold">Fees</h3>
-                        <p>Rs.{appointment.fees}</p>
-                    </div>
-                    <div>
-                        <h3 className="font-semibold">Payment Method</h3>
-                        <p>{appointment.paymentMethod}</p>
-                    </div>
-                    <div>
-                        <h3 className="font-semibold">Payment Status</h3>
-                        <p>{appointment.paymentStatus}</p>
-                    </div>
-                    <div>
-                        <h3 className="font-semibold">Payment ID</h3>
-                        <p>{appointment.paymentId}</p>
-                    </div>
-                </div>
-                {appointment.reason && (
-                    <div className="mt-4">
-                        <h3 className="font-semibold">Reason for Visit</h3>
-                        <p>{appointment.reason}</p>
-                    </div>
-                )}
-                {appointment.prescription && (
-                    <div className="mt-4">
-                        <h3 className="font-semibold">Prescription</h3>
-                        <p>{appointment.prescription}</p>
-                    </div>
-                )}
-            </CardContent>
-            <CardFooter className="flex justify-between">
-                <Button variant="destructive" onClick={onCancel}>
-                    Cancel Appointment
-                </Button>
-                <div className="space-x-2">
-                    {appointment.status.toLowerCase() === 'completed' && (
-                        <Button onClick={onAddPrescription}>
-                            Add Prescription
-                        </Button>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Medical Records</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Patient Name</TableHead>
+                                <TableHead>Date</TableHead>
+                                <TableHead className="text-right">Prescription</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {medicalRecords.map((record: any) => (
+                                <TableRow key={record._id}>
+                                    <TableCell>{record.patientNAme}</TableCell>
+                                    <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
+                                    <TableCell className="text-right">
+                                        {record.prescription ? (
+                                            <Button variant="outline" size="sm" onClick={() => downloadPrescription(record)}>
+                                                <Download className="mr-2 h-4 w-4" /> Download
+                                            </Button>
+                                        ) : (
+                                            <span className="text-gray-500 text-sm">No Prescription</span>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{appointmentStatus === "cancelled by Dr" ? "Cancellation Reason" : "Cancel Appointment"}</DialogTitle>
+                    </DialogHeader>
+                    {appointmentStatus === "cancelled by Dr" ? (
+                        <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+                            <p>{appointment?.reason}</p>
+                        </ScrollArea>
+                    ) : (
+                        <form onSubmit={formik.handleSubmit} className="space-y-4">
+                            <Textarea
+                                placeholder="Enter cancellation reason..."
+                                {...formik.getFieldProps("cancelReason")}
+                            />
+                            {formik.touched.cancelReason && formik.errors.cancelReason && (
+                                <p className="text-red-500 text-sm">{formik.errors.cancelReason}</p>
+                            )}
+                            <div className="flex justify-end space-x-4">
+                                <Button variant="outline" onClick={closeModal}>
+                                    Cancel
+                                </Button>
+                                <Button type="submit" variant="destructive">
+                                    Submit
+                                </Button>
+                            </div>
+                        </form>
                     )}
-                    <Button
-                        onClick={onChat}
-                        disabled={!isChatEnabled}
-                        variant={isChatEnabled ? "default" : "secondary"}
-                    >
-                        {isChatEnabled ? "Start Chat" : "Chat Unavailable"}
-                    </Button>
-                </div>
-            </CardFooter>
-        </Card>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isPrescriptionModalOpen} onOpenChange={setIsPrescriptionModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add Prescription</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={prescriptionFormik.handleSubmit} className="space-y-4">
+                        <div>
+                            <p className="font-semibold">Patient: {appointment?.patientName || "N/A"}</p>
+
+                        </div>
+                        <Textarea
+                            placeholder="Enter prescription..."
+                            {...prescriptionFormik.getFieldProps("prescription")}
+                        />
+                        {prescriptionFormik.touched.prescription && prescriptionFormik.errors.prescription && (
+                            <p className="text-red-500 text-sm">{prescriptionFormik.errors.prescription}</p>
+                        )}
+                        <div className="flex justify-end space-x-4">
+                            <Button variant="outline" onClick={closePrescriptionModal}>
+                                Cancel
+                            </Button>
+                            <Button type="submit">Submit</Button>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
+        </div>
     )
 }

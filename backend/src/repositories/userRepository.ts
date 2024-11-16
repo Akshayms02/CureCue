@@ -350,4 +350,117 @@ export class UserRepository implements IUserRepository {
       throw new Error(error.message);
     }
   }
+  async addReview(
+    appointmentId: string,
+    rating: number,
+    reviewText: string
+  ): Promise<any> {
+    try {
+      const updatedAppointment = await appointmentModel.findOneAndUpdate(
+        { _id: appointmentId },
+        {
+          $set: {
+            "review.rating": rating,
+            "review.description": reviewText,
+          },
+        },
+        { new: true }
+      );
+
+      if (!updatedAppointment) {
+        throw new Error("Appointment not found");
+      }
+
+      return updatedAppointment;
+    } catch (error: any) {
+      console.error("Error adding review:", error.message);
+      throw new Error(error.message);
+    }
+  }
+
+  async getDoctorReview(doctorId: string) {
+    try {
+      const isReviewDataPresent = true;
+
+      const doctor = await doctorModel.aggregate([
+        {
+          $match: { doctorId: doctorId }, // Match the doctor by doctorId
+        },
+        {
+          $lookup: {
+            from: "appointments",
+            let: { doctorId: "$doctorId" }, // Pass the doctorId to the next stage
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$doctorId", "$$doctorId"], // Match doctorId in both collections
+                  },
+                },
+              },
+              {
+                $project: {
+                  patientName: 1,
+                  review: 1,
+                  prescription: 1,
+                  date: 1,
+                  start: 1,
+                  end: 1,
+                  status: 1,
+                }, // Only include necessary fields
+              },
+            ],
+            as: "appointments",
+          },
+        },
+        {
+          $project: {
+            name: 1,
+            _id: 1,
+            doctorId: 1,
+            email: 1,
+            department: 1,
+            fees: 1,
+            image: 1,
+            appointments: {
+              $cond: [
+                { $eq: [isReviewDataPresent, true] }, // Check if review filtering is needed
+                {
+                  $map: {
+                    input: {
+                      $filter: {
+                        input: "$appointments", // Filter appointments based on review.rating
+                        as: "appointment",
+                        cond: {
+                          $gt: [
+                            { $ifNull: ["$$appointment.review.rating", 0] }, // Default rating to 0 if null
+                            0,
+                          ],
+                        },
+                      },
+                    },
+                    as: "appointment",
+                    in: {
+                      review: "$$appointment.review",
+                      patientName: "$$appointment.patientName",
+                    },
+                  },
+                },
+                [], // If no review data is present, return an empty array
+              ],
+            },
+          },
+        },
+      ]);
+
+      if (doctor.length === 0) {
+        return null;
+      }
+
+      return doctor[0];
+    } catch (error: any) {
+      console.error("Error getting doctor:", error.message);
+      throw new Error(`Failed to fetch doctor ${doctorId}: ${error.message}`);
+    }
+  }
 }

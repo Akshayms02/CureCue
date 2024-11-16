@@ -39,7 +39,7 @@ export default function AppointmentList() {
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const DoctorData = localStorage.getItem("doctorInfo")
     const parsedDocData = JSON.parse(DoctorData as string)
-    const navigate=useNavigate()
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchAppointments = async () => {
@@ -68,12 +68,14 @@ export default function AppointmentList() {
                 return <Badge variant="success">Completed</Badge>
             case 'cancelled':
                 return <Badge variant="destructive">Cancelled</Badge>
+            case "prescription pending":
+                return <Badge variant="secondary">Prescription pending</Badge>
             default:
                 return <Badge variant="secondary">Pending</Badge>
         }
     }
 
-    const viewDetails=(appointment:any)=>{
+    const viewDetails = (appointment: any) => {
         console.log(appointment)
         navigate('/doctor/appointmentDetails', { state: { appointment: appointment } })
 
@@ -98,6 +100,8 @@ export default function AppointmentList() {
                             <SelectItem value="completed">Completed</SelectItem>
                             <SelectItem value="cancelled">Cancelled</SelectItem>
                             <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="prescription pending">Prescription Pending</SelectItem>
+
                         </SelectContent>
                     </Select>
                 </div>
@@ -122,7 +126,7 @@ export default function AppointmentList() {
                                 </TableCell>
                                 <TableCell>{getStatusBadge(appointment.status)}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="outline" size="sm" onClick={()=>viewDetails(appointment)}>
+                                    <Button variant="outline" size="sm" onClick={() => viewDetails(appointment)}>
                                         View Details
                                         <ChevronRightIcon className="ml-2 h-4 w-4" />
                                     </Button>

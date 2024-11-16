@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from "../../../components/ui/card"
 import { Button } from "../../../components/ui/button"
 import { PhoneOff, Mic, Video, } from "lucide-react"
+import axiosUrl from '../../Utils/axios'
 
 export default function VideoChatDoctor() {
     const { socket } = useSocket()
@@ -17,6 +18,7 @@ export default function VideoChatDoctor() {
     const { roomIdDoctor, videoCall } = useSelector((state: RootState) => state.doctor)
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    console.log(videoCall)
 
     useEffect(() => {
         const appId = parseInt(import.meta.env.VITE_APP_ID)
@@ -34,9 +36,17 @@ export default function VideoChatDoctor() {
             turnOnCameraWhenJoining: true,
             showPreJoinView: false,
             onLeaveRoom: () => {
+                console.log("about toooooo end the call")
                 socket?.emit('leave-room', ({ to: videoCall.userID }))
                 dispatch(setShowVideoCall(false))
                 dispatch(setRoomId(null))
+                axiosUrl.post('/api/chat/end-call', {
+                    appointmentId: videoCall?.appointmentId,
+
+                }).catch(error => {
+                    console.error("Error ending the call:", error);
+                });
+                console.log("call ended")
                 dispatch(setVideoCall(null))
             },
         })

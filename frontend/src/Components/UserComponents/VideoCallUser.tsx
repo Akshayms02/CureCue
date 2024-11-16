@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from "../../../components/ui/card"
 import { Button } from "../../../components/ui/button"
 import { PhoneOff, Mic, Video } from "lucide-react"
+import axiosUrl from '../../Utils/axios'
 
 export function getUrlParams(url = window.location.href) {
     const urlStr = url.split('?')[1]
@@ -20,9 +21,10 @@ export function getUrlParams(url = window.location.href) {
 function VideoChatUser() {
     const { socket } = useSocket()
     const videoCallRef = useRef(null)
-    const { showIncomingVideoCall, roomIdUser } = useSelector((state: RootState) => state.user)
+    const { showIncomingVideoCall, roomIdUser, videoCall } = useSelector((state: RootState) => state.user)
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    console.log(videoCall)
 
     console.log("show", showIncomingVideoCall)
 
@@ -44,13 +46,22 @@ function VideoChatUser() {
             turnOnCameraWhenJoining: true, // Automatically turn on the camera when joining
             showPreJoinView: false, // Skip the pre-join view
             onLeaveRoom: () => {
+                console.log("ended the call dddddddddddddd")
                 socket?.emit('leave-room', ({ to: showIncomingVideoCall._id }))
 
                 dispatch(setShowVideoCall(false))
                 dispatch(setRoomId(null))
-                dispatch(setVideoCall(null))
+
                 dispatch(setShowIncomingVideoCall(null))
+                console.log("about to make api call")
+                axiosUrl.post(`/api/chat/end-call`, {
+                    appointmentId: videoCall?.appointmentId,
+                }).catch(error => {
+                    console.error("Error ending the call:", error);
+                });
+                dispatch(setVideoCall(null))
             },
+
         })
 
         socket?.on('user-left', () => {

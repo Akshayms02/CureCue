@@ -1,3 +1,4 @@
+import appointmentModel from "../models/appointmentModel";
 import ChatModel from "../models/chatModel";
 import doctorModel from "../models/doctorModel";
 import userModel from "../models/userModel";
@@ -68,5 +69,15 @@ export class chatRepository {
       console.error("Error retrieving chat:", error);
       throw new Error("Failed to retrieve chat");
     }
+  };
+
+  updateAppointment = async (appointmentId: string): Promise<any> => {
+    const result = await appointmentModel.findByIdAndUpdate(
+      appointmentId, // Use appointmentId directly as the _id
+      { status: "prescription pending" },
+      { new: true } // Return the updated document
+    );
+
+    return result;
   };
 }

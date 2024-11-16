@@ -22,9 +22,9 @@ export const SocketProvider: React.FC<any> = ({ children }) => {
     const userInRedux = useSelector((state: RootState) => state.user)
     const doctorInRedux = useSelector((state: RootState) => state.doctor)
     const loggedUser = userInRedux.userInfo != null ? userInRedux?.userInfo?.userId : doctorInRedux?.doctorInfo?.doctorId
-    console.log("afasfgv", doctorInRedux.doctorInfo?.doctorId);
-    console.log("bfasfgv", userInRedux);
-    console.log("cddjdhgfghk", loggedUser);
+    console.log("doctorId: ", doctorInRedux.doctorInfo?.doctorId);
+    console.log("userId: ", userInRedux);
+    console.log("loggedUser: ", loggedUser);
 
     const dispatch: any = useDispatch()
 

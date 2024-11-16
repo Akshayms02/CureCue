@@ -4,7 +4,7 @@ import DoctorOtpPage from "../Pages/Doctor/DoctorOtp";
 import DoctorLogin from "../Pages/Doctor/DoctorLogin";
 
 import DoctorLayout from "../Components/Common/DoctorLayout";
-import { DoctorDashboard } from "../Components/DoctorComponents/DoctorDashBoardComponent";
+import  DoctorDashboard  from "../Components/DoctorComponents/DoctorDashBoardComponent";
 import DoctorProtectedRoute from "./ProtectedRoutes/DoctorProtectedRoute";
 import ProfileCard from "../Pages/Doctor/Profile";
 import SlotManagement from "../Pages/Doctor/SlotManagement";

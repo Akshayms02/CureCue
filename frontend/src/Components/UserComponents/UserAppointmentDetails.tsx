@@ -5,7 +5,7 @@ import { Formik, Form, Field, ErrorMessage, FieldProps } from "formik";
 import * as Yup from "yup";
 import axiosUrl from "../../Utils/axios";
 import { toast } from "sonner";
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
@@ -66,7 +66,7 @@ export default function UserAppointmentDetails() {
 
     const handleSubmitReview = async (values: ReviewFormValues, { resetForm }: { resetForm: () => void }) => {
         try {
-            const response = await axiosUrl.post('/addReview', {
+            const response = await axiosUrl.post('/api/user/addReview', {
                 appointmentId: appointment?._id,
                 rating: values.rating,
                 reviewText: values.reviewText,
@@ -81,60 +81,67 @@ export default function UserAppointmentDetails() {
     };
 
     const downloadPrescription = async () => {
-        if (appointment?.prescription) {
-            const doc = new jsPDF();
-            doc.setFont("Helvetica", "normal");
-            doc.setFontSize(12);
+        console.log(appointment)
+        try {
+            if (appointment?.prescription) {
+                const doc = new jsPDF();
+                doc.setFont("Helvetica", "normal");
+                doc.setFontSize(12);
 
-            const darkBlue = "rgb(0, 51, 102)";
-            const lightBlue = "rgb(0, 102, 204)";
-            const darkGrey = "rgb(50, 50, 50)";
-            const lightGrey = "rgb(150, 150, 150)";
+                const darkBlue = "rgb(0, 51, 102)";
+                const lightBlue = "rgb(0, 102, 204)";
+                const darkGrey = "rgb(50, 50, 50)";
+                const lightGrey = "rgb(150, 150, 150)";
 
-            doc.setFontSize(18);
-            doc.setTextColor(darkBlue);
-            doc.text("CureCue", 10, 15);
+                doc.setFontSize(18);
+                doc.setTextColor(darkBlue);
+                doc.text("CureCue", 10, 15);
 
-            doc.setFontSize(22);
-            doc.setTextColor(lightBlue);
-            doc.text("Prescription", 10, 30);
+                doc.setFontSize(22);
+                doc.setTextColor(lightBlue);
+                doc.text("Prescription", 10, 30);
 
-            doc.setDrawColor(0, 102, 204);
-            doc.setLineWidth(1);
-            doc.line(10, 35, 200, 35);
+                doc.setDrawColor(0, 102, 204);
+                doc.setLineWidth(1);
+                doc.line(10, 35, 200, 35);
 
-            doc.setFontSize(14);
-            doc.setTextColor(darkGrey);
-            doc.text(`Patient Name: ${appointment.patientName}`, 10, 45);
-            doc.text(`Age: ${appointment.age.toString()}`, 10, 55);
-            doc.text(`Date: ${moment(appointment.date).format("MMMM Do YYYY")}`, 10, 65);
-            doc.text(`Time: ${appointment.start} - ${appointment.end}`, 10, 75);
-
-            doc.setLineWidth(0.5);
-            doc.line(10, 80, 200, 80);
-
-            doc.setFontSize(16);
-            doc.setTextColor(darkBlue);
-            doc.text("Prescription Details:", 10, 90);
-
-            const prescriptionSpacing = 10;
-            let yPosition = 90 + prescriptionSpacing;
-
-            const prescriptionLines = appointment.prescription.split('\n');
-            prescriptionLines.forEach((line) => {
+                doc.setFontSize(14);
                 doc.setTextColor(darkGrey);
-                doc.text(line, 10, yPosition);
-                yPosition += 8;
-            });
+                doc.text(`Patient Name: ${appointment.patientName}`, 10, 45);
 
-            doc.setFontSize(10);
-            doc.setTextColor(lightGrey);
-            doc.text("Thank you for choosing our service!", 10, 280);
-            doc.text("For any questions, please contact us.", 10, 285);
-            doc.text("CureCue | curecue@gmail.com", 10, 290);
+                doc.text(`Date: ${moment(appointment.date).format("MMMM Do YYYY")}`, 10, 65);
+                doc.text(`Time: ${moment(appointment.start).format('h:mm A')} - ${moment(appointment.end).format('h:mm A')}`, 10, 75);
+                doc.setLineWidth(0.5);
+                doc.line(10, 80, 200, 80);
 
-            doc.save(`Prescription_${appointment.patientName}.pdf`);
+                doc.setFontSize(16);
+                doc.setTextColor(darkBlue);
+                doc.text("Prescription Details:", 10, 90);
+
+                const prescriptionSpacing = 10;
+                let yPosition = 90 + prescriptionSpacing;
+
+                const prescriptionLines = appointment.prescription.split('\n');
+                prescriptionLines.forEach((line) => {
+                    doc.setTextColor(darkGrey);
+                    doc.text(line, 10, yPosition);
+                    yPosition += 8;
+                });
+
+                doc.setFontSize(15);
+                doc.setTextColor(lightGrey);
+                doc.text("Thank you for choosing our service!", 10, 280);
+                doc.text("For any questions, please contact us.", 10, 285);
+                doc.text("CureCue | curecue@gmail.com", 10, 290);
+
+                doc.save(`Prescription_${appointment.patientName}.pdf`);
+            } else {
+                console.error("no prescription")
+            }
+        } catch (error) {
+            console.log(error)
         }
+
     };
 
     const navigateChat = () => {

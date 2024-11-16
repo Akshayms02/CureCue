@@ -27,4 +27,9 @@ export interface IDoctorRepository {
     gender: string;
     phone: string;
   }): Promise<any>;
+  getAllStatistics(doctorId: string): Promise<any>;
+  completeAppointment(
+    appointmentId: string,
+    prescription: string
+  ): Promise<any>;
 }

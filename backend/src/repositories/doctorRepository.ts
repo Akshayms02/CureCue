@@ -6,6 +6,7 @@ import { DoctorData } from "../interfaces/doctorInterfaces";
 import { docDetails } from "../controllers/doctorController";
 import Slot from "../models/doctorSlotsModel";
 import appointmentModel from "../models/appointmentModel";
+import walletModel, { ITransaction } from "../models/walletModel";
 
 export class DoctorRepository implements IDoctorRepository {
   async existUser(email: string): Promise<IDoctor | null> {
@@ -300,8 +301,10 @@ export class DoctorRepository implements IDoctorRepository {
   }) {
     try {
       // Find the doctor by ID
-      console.log(updateData)
-      const doctor = await doctorModel.findOne({ doctorId: updateData.doctorId });
+      console.log(updateData);
+      const doctor = await doctorModel.findOne({
+        doctorId: updateData.doctorId,
+      });
       if (!doctor) {
         throw new Error("doctor not found");
       }
@@ -314,6 +317,157 @@ export class DoctorRepository implements IDoctorRepository {
     } catch (error: any) {
       console.error("Error updating profile:", error.message);
       throw new Error(`Failed to update profile: ${error.message}`);
+    }
+  }
+
+  async getAllStatistics(doctorId: string) {
+    try {
+      // Get wallet details
+      const wallet = await walletModel.findOne({ doctorId });
+
+      // Calculate total revenue from transactions
+      const totalRevenue = wallet
+        ? wallet.transactions.reduce((acc, transaction) => {
+            return transaction.transactionType === "credit"
+              ? acc + transaction.amount
+              : acc; // Ignore debit amounts
+          }, 0)
+        : 0;
+
+      // Get current date and calculate the start of 12 months ago
+      const currentDate = new Date();
+      const startOfLastYear = new Date(currentDate);
+      startOfLastYear.setMonth(currentDate.getMonth() - 11); // 11 months back from current month
+
+      // Create an array of months for the last 12 months
+      const months = Array.from({ length: 12 }, (_, i) => {
+        const date = new Date(startOfLastYear);
+        date.setMonth(startOfLastYear.getMonth() + i);
+        return {
+          month: date,
+          monthStr: `${date.getFullYear()}-${String(
+            date.getMonth() + 1
+          ).padStart(2, "0")}`,
+        };
+      });
+
+      // Get monthly revenue from transactions for the past 12 months
+      const monthlyRevenue = await walletModel.aggregate([
+        { $match: { doctorId } },
+        { $unwind: "$transactions" },
+        {
+          $match: {
+            "transactions.date": {
+              $gte: startOfLastYear, // Filter for the last 12 months
+              $lte: currentDate,
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: { format: "%Y-%m", date: "$transactions.date" },
+            },
+            total: {
+              $sum: {
+                $cond: [
+                  { $eq: ["$transactions.transactionType", "credit"] },
+                  "$transactions.amount",
+                  0,
+                ],
+              },
+            },
+          },
+        },
+        { $sort: { _id: 1 } }, // Sort by month
+      ]);
+
+      // Create a map of the monthly revenue results for easy access
+      const revenueMap = monthlyRevenue.reduce((acc, item) => {
+        acc[item._id] = item.total;
+        return acc;
+      }, {});
+
+      const monthlyRevenueArray = months.map((month) => ({
+        month: month.monthStr,
+        totalRevenue: revenueMap[month.monthStr] || 0,
+      }));
+
+      // Get total appointments and today's appointments
+      const totalAppointments = await appointmentModel.countDocuments({
+        doctorId: doctorId,
+      });
+      const today = new Date();
+      const startOfToday = new Date(today.setHours(0, 0, 0, 0));
+      const endOfToday = new Date(today.setHours(23, 59, 59, 999));
+      const todaysAppointments = await appointmentModel.countDocuments({
+        doctorId: doctorId,
+        date: { $gte: startOfToday, $lte: endOfToday },
+      });
+
+      const uniquePatients = await appointmentModel.distinct("userId", {
+        doctorId: doctorId,
+      });
+
+      return {
+        totalRevenue,
+        monthlyRevenue: monthlyRevenueArray,
+        totalAppointments,
+        todaysAppointments,
+        numberOfPatients: uniquePatients.length,
+      };
+    } catch (error: any) {
+      console.error("Error fetching statistics:", error.message);
+      throw new Error(error.message);
+    }
+  }
+  async completeAppointment(
+    appointmentId: string,
+    prescription: string
+  ): Promise<any> {
+    try {
+      const appointment = await appointmentModel.findOneAndUpdate(
+        { _id: appointmentId },
+        { status: "completed", prescription: prescription },
+        { new: true }
+      );
+
+      if (!appointment) {
+        throw new Error("Appointment not found");
+      }
+
+      let wallet = await walletModel.findOne({
+        doctorId: appointment.doctorId,
+      });
+
+      const transactionId =
+        "txn_" + Date.now() + Math.floor(Math.random() * 10000);
+      const transactionAmount = 0.9 * appointment.fees;
+
+      const transaction: ITransaction = {
+        amount: transactionAmount,
+        transactionId: transactionId,
+        transactionType: "credit",
+        appointmentId: appointmentId,
+      };
+
+      if (wallet) {
+        wallet.transactions.push(transaction);
+        wallet.balance += transactionAmount;
+        await wallet.save();
+      } else {
+        wallet = new walletModel({
+          doctorId: appointment.doctorId,
+          balance: transactionAmount,
+          transactions: [transaction],
+        });
+        await wallet.save();
+      }
+
+      return appointment;
+    } catch (error: any) {
+      console.error("Error completing appointment:", error.message);
+      throw new Error(error.message);
     }
   }
 }

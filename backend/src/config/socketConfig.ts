@@ -77,7 +77,6 @@ const configSocketIO = (server: HttpServer) => {
           console.log("sss", savedMessage);
 
           io.to(chatRoom).emit("receiveMessage", savedMessage);
-
         } catch (error) {
           console.log(error);
         }
@@ -97,7 +96,7 @@ const configSocketIO = (server: HttpServer) => {
 
       socket.on("accept-incoming-call", (data) => {
         const friendSocketId = getReceiverSocketId(data.to);
-        console.log(data)
+        console.log(data);
         console.log("accept call", friendSocketId);
         if (friendSocketId) {
           socket.to(friendSocketId).emit("accept-call", data);

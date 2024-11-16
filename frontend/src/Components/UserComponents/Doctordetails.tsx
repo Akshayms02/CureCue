@@ -11,6 +11,7 @@ import { Button } from "../../../components/ui/button"
 import { Card, CardContent, CardTitle, CardDescription } from "../../../components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
 import { Badge } from "../../../components/ui/badge"
+import { Star } from 'lucide-react'
 
 interface Department {
     name: string
@@ -46,6 +47,13 @@ interface UserInfo {
     profileImage: any;
     bio: string;
 }
+interface Review {
+    patientName: string;
+    review: {
+        description: string;
+        rating: number;
+    };
+}
 
 const Doctordetails: React.FC = () => {
     const { doctorId } = useParams<{ doctorId: string }>();
@@ -58,6 +66,7 @@ const Doctordetails: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [doctorData, setDoctorData] = useState<DoctorInfo | null>(null)
     const [selectedTimeslot, setSelectedTimeslot] = useState<Date | null>(null);
+    const [reviews, setReviews] = useState<Review[]>([])
 
     useEffect(() => {
         const storedData = localStorage.getItem("userInfo");
@@ -113,6 +122,27 @@ const Doctordetails: React.FC = () => {
 
         fetchTimeslots();
     }, [selectedDate, doctorId]);
+
+    useEffect(() => {
+        // Fetch reviews for the doctor
+        const fetchReviews = async () => {
+            try {
+
+                const response = await axiosUrl.get(`/api/user/doctorReviews/${doctorId}`)
+                console.log("review : ",response.data.response.appointments)
+
+                setReviews(response.data?.response?.appointments)
+            } catch (error) {
+                console.error('Error fetching reviews:', error)
+            }
+        }
+
+        fetchReviews()
+    }, [doctorId])
+
+    const averageRating = reviews.length > 0
+        ? reviews.reduce((sum, review) => sum + review.review.rating, 0) / reviews.length
+        : 0
 
     const handlePayment = async () => {
         if (!selectedTimeslot) {
@@ -217,7 +247,7 @@ const Doctordetails: React.FC = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                     <div className="flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5-V3z" />
                                         </svg>
                                         <span className="text-gray-700">Call: {doctorData?.phone}</span>
                                     </div>
@@ -239,6 +269,56 @@ const Doctordetails: React.FC = () => {
                                     Book Appointment
                                 </Button>
                             </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+                <Card>
+                    <CardContent className="p-6">
+                        <CardTitle className="text-2xl font-bold mb-4">Ratings and Reviews</CardTitle>
+                        <div className="flex items-center mb-4">
+                            <div className="flex items-center">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star
+                                        key={star}
+                                        className={`w-6 h-6 ${star <= Math.round(averageRating)
+                                            ? 'text-yellow-400 fill-current'
+                                            : 'text-gray-300'
+                                            }`}
+                                    />
+                                ))}
+                            </div>
+                            <span className="ml-2 text-xl font-semibold">{averageRating.toFixed(1)}</span>
+                            <span className="ml-2 text-gray-600">({reviews.length} reviews)</span>
+                        </div>
+                        <div className="space-y-4">
+                            {reviews.map((review) => (
+                                <div key={review.review.description} className="border-b border-gray-200 pb-4">
+                                    <div className="flex items-center mb-2">
+                                        <Avatar className="w-10 h-10 mr-3">
+                                            <AvatarFallback>{review.patientName[0]}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="font-semibold">{review.patientName}</p>
+                                            <div className="flex items-center">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <Star
+                                                        key={star}
+                                                        className={`w-4 h-4 ${star <= review.review.rating
+                                                            ? 'text-yellow-400 fill-current'
+                                                            : 'text-gray-300'
+                                                            }`}
+                                                    />
+                                                ))}
+                                                <span className="ml-2 text-sm text-gray-600">{review.review.rating}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p className="text-gray-700">{review.review.description}</p>
+                                </div>
+                            ))}
                         </div>
                     </CardContent>
                 </Card>

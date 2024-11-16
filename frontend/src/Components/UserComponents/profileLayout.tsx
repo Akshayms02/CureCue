@@ -12,6 +12,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "../../../components/ui/sheet";
+import MyImage from "../../assets/Screenshot_2024-08-15_191834-removebg-preview.png"
 
 const ProfileLayout: React.FC = () => {
   const dispatch = useDispatch();
@@ -74,7 +75,7 @@ const ProfileLayout: React.FC = () => {
       {/* Sidebar for larger screens */}
       <aside className="hidden md:flex w-64 flex-col bg-card p-4 shadow-lg">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-card-foreground">DashBoard</h2>
+          <img src={MyImage} alt="curecure" className="text-2xl font-bold text-card-foreground cursor-pointer" onClick={() => navigate('/')} />
         </div>
         <SidebarContent />
       </aside>

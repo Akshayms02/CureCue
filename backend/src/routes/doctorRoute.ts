@@ -5,6 +5,7 @@ import { doctorServices } from "../services/doctorServices";
 import { refreshTokenHandler } from "../config/refreshTokenConfig";
 import multer from "multer";
 import { AwsConfig } from "../config/awsConfig";
+import { verifyDocToken } from "../config/jwtConfig";
 
 const storage = multer.memoryStorage();
 
@@ -35,30 +36,68 @@ route.post("/login", doctorController.verifyLogin.bind(doctorController));
 route.post("/logout", doctorController.doctorLogout.bind(doctorController));
 route.post(
   "/uploadDoctorKycDetails",
+  verifyDocToken,
   uploadDoctorDataFiles,
   doctorController.uploadDoctorDetails.bind(doctorController)
 );
 route.get(
   "/check-status/:email",
+  verifyDocToken,
   doctorController.checkStatus.bind(doctorController)
 );
-route.post("/slots", doctorController.scheduleSlots.bind(doctorController));
+route.post(
+  "/slots",
+  verifyDocToken,
+  doctorController.scheduleSlots.bind(doctorController)
+);
 
 route.get(
   "/checkslots",
+  verifyDocToken,
   doctorController.checkAvialableSlots.bind(doctorController)
 );
 
-route.post("/deleteSlot", doctorController.deleteSlot.bind(doctorController));
+route.post(
+  "/deleteSlot",
+  verifyDocToken,
+  doctorController.deleteSlot.bind(doctorController)
+);
 
-route.post("/checkAvialability",doctorController.checkAvialability.bind(doctorController))
+route.post(
+  "/checkAvialability",
+  verifyDocToken,
+  doctorController.checkAvialability.bind(doctorController)
+);
 
 route.post("/refresh-token", refreshTokenHandler);
 
-route.get("/getDoctorData/:doctorId",doctorController.getDoctorData.bind(doctorController))
+route.get(
+  "/getDoctorData/:doctorId",
+  verifyDocToken,
+  doctorController.getDoctorData.bind(doctorController)
+);
 
-route.get("/appointments/:doctorId",doctorController.getAppointments.bind(doctorController))
+route.get(
+  "/appointments/:doctorId",
+  verifyDocToken,
+  doctorController.getAppointments.bind(doctorController)
+);
 
-route.put("/updateDoctor",doctorController.updateDoctorProfile.bind(doctorController))
+route.put(
+  "/updateDoctor",
+  verifyDocToken,
+  doctorController.updateDoctorProfile.bind(doctorController)
+);
+
+route.get(
+  "/dashboardData",
+  verifyDocToken,
+  doctorController.getDashboardData.bind(doctorController)
+);
+
+route.put(
+  "/addPrescription",
+  doctorController.addPrescription.bind(doctorController)
+);
 
 export default route;

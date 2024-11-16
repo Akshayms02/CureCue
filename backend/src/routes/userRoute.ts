@@ -21,6 +21,7 @@ route.post("/resendOtp", userController.resendOtp.bind(userController));
 route.post("/login", userController.verifyLogin.bind(userController));
 route.get(
   "/check-status/:email",
+  verifyToken,
   userController.checkStatus.bind(userController)
 );
 route.post("/logout", userController.logoutUser.bind(userController));
@@ -40,6 +41,7 @@ route.get(
 );
 route.post(
   "/createAppointment",
+  verifyToken,
   userController.createAppointment.bind(userController)
 );
 route.post(
@@ -47,12 +49,27 @@ route.post(
   verifyToken,
   userController.holdSlot.bind(userController)
 );
-route.put("/updateUser", userController.updateUserProfile.bind(userController));
+route.put(
+  "/updateUser",
+  verifyToken,
+  userController.updateUserProfile.bind(userController)
+);
 route.get(
   "/getAppointments/:userId",
+  verifyToken,
   userController.getAllAppointments.bind(userController)
 );
-route.get('/getAppointment/:appointmentId', userController.getAppointment.bind(userController));
+route.get(
+  "/getAppointment/:appointmentId",
+  verifyToken,
+  userController.getAppointment.bind(userController)
+);
+route.post(
+  "/addReview",
+  verifyToken,
+  userController.addReview.bind(userController)
+);
+route.get("/doctorReviews/:doctorId", userController.getReviews.bind(userController));
 route.post("/refresh-token", refreshTokenHandler);
 
 export default route;

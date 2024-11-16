@@ -3,6 +3,7 @@ import AdminController from "../controllers/adminController";
 import { AdminRepository } from "../repositories/adminRepository";
 import { adminServices } from "../services/adminServices";
 import { AwsConfig } from "../config/awsConfig";
+import { verifyAdminToken } from "../config/jwtConfig";
 
 const route = Router();
 const adminRepository = new AdminRepository();
@@ -12,48 +13,48 @@ const adminController = new AdminController(adminService);
 
 route.post("/login", adminController.loginAdmin.bind(adminController));
 route.post(
-  "/addSpecialization",
+  "/addSpecialization",verifyAdminToken,
   adminController.addSpecialization.bind(adminController)
 );
 route.post("/logout", adminController.adminLogout.bind(adminController));
 route.get(
-  "/getSpecializations",
+  "/getSpecializations",verifyAdminToken,
   adminController.getSpecialization.bind(adminController)
 );
 route.put(
-  "/updateSpecialization",
+  "/updateSpecialization",verifyAdminToken,
   adminController.editSpecialization.bind(adminController)
 );
 route.put(
-  "/listUnlistSpecialization",
+  "/listUnlistSpecialization",verifyAdminToken,
   adminController.listUnlistSpecialization.bind(adminController)
 );
-route.get("/getUsers", adminController.getUsers.bind(adminController));
+route.get("/getUsers",verifyAdminToken, adminController.getUsers.bind(adminController));
 route.put(
-  "/listUnlistUser/:userId",
+  "/listUnlistUser/:userId",verifyAdminToken,
   adminController.listUnlistUser.bind(adminController)
 );
-route.get("/getDoctors", adminController.getDoctors.bind(adminController));
+route.get("/getDoctors",verifyAdminToken, adminController.getDoctors.bind(adminController));
 route.put(
-  "/listUnlistDoctor/:doctorId",
+  "/listUnlistDoctor/:doctorId",verifyAdminToken,
   adminController.listUnlistDoctor.bind(adminController)
 );
 
 route.get(
-  "/getApplications",
+  "/getApplications",verifyAdminToken,
   adminController.getAllApplications.bind(adminController)
 );
 
 route.get(
-  "/doctorApplication/:id",
+  "/doctorApplication/:id",verifyAdminToken,
   adminController.getDoctorApplication.bind(adminController)
 );
 
 route.post(
-  "/accept-doctor/:doctorId",
+  "/accept-doctor/:doctorId",verifyAdminToken,
   adminController.acceptApplication.bind(adminController)
 );
 
-route.get("/getDoctor",adminController.getDoctorData.bind(adminController))
+route.get("/getDoctor",verifyAdminToken,adminController.getDoctorData.bind(adminController))
 
 export default route;
