@@ -45,7 +45,7 @@ export default function UserAppointmentsList() {
                     console.error("Error fetching appointments:", error);
                 });
         }
-     
+
     };
 
     useEffect(() => {
@@ -128,10 +128,10 @@ export default function UserAppointmentsList() {
                             <Card key={appointment._id}>
                                 <CardContent className="flex justify-between items-start p-6">
                                     <div>
-                                        
+
                                         <h3 className="text-lg font-semibold">Patient: {appointment.patientName}</h3>
                                         <p className="text-sm text-muted-foreground">
-                                        
+
                                             Appointment: {moment(appointment.date).format('MMMM Do YYYY')}
                                             <br /> from {
                                                 moment(appointment.start).format("h:mm A")

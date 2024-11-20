@@ -10,7 +10,7 @@ class NotificationController {
 
   async getNotifications(req: Request, res: Response): Promise<void> {
     try {
-      const userId: string = req.body.user._id;
+      const userId: string = req.body.userId;
       const notifications =
         await this.notificationService.getUnreadNotifications(userId);
       res.json(notifications);
@@ -22,7 +22,7 @@ class NotificationController {
 
   async markNotificationsAsRead(req: Request, res: Response): Promise<void> {
     try {
-      const userId: string = req.body._id;
+      const userId: string = req.body.userId;
       const notificationId: string = req.params.id;
       await this.notificationService.markNotificationsAsRead(userId, [
         notificationId,

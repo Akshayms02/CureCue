@@ -1,7 +1,7 @@
 import { Notification, NotificationData } from "../models/notificationModel";
 
 class NotificationRepository {
-  async create(notificationData: NotificationData): Promise<Notification> {
+  async create(notificationData: NotificationData): Promise<any> {
     const notification = new Notification(notificationData);
     return notification.save();
   }

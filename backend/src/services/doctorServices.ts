@@ -527,4 +527,37 @@ export class doctorServices {
       throw new Error(`Failed to add prescription: ${error.message}`);
     }
   }
+  async getWallet(
+    doctorId: string,
+    status: string,
+    page: number,
+    limit: number
+  ) {
+    try {
+      const response = await this.doctorRepository.getWalletDetails(
+        doctorId,
+        status,
+        page,
+        limit
+      );
+      return response;
+    } catch (error: any) {
+      console.error("Error in getWallet:", error.stack || error.message);
+      throw new Error(`Failed to get wallet details: ${error.message}`);
+    }
+  }
+
+  async withdraw(doctorId: string, withdrawalAmount: number) {
+    try {
+      const response = await this.doctorRepository.withdrawMoney(
+        doctorId,
+        withdrawalAmount
+      );
+
+      return response;
+    } catch (error: any) {
+      console.error("Error in withdraw:", error.stack || error.message);
+      throw new Error(`Failed to withdraw: ${error.message}`);
+    }
+  }
 }

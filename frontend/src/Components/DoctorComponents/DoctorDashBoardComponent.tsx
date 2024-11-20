@@ -24,6 +24,7 @@ function DoctorDashboard() {
         const response = await doctorAxiosUrl.get('/api/doctor/dashboardData', {
           params: { doctorId: DoctorData?.doctorInfo?.doctorId },
         });
+        console.log(response.data.response.monthlyRevenue)
         setDashboardData(response.data.response);
       } catch (error) {
         console.error("Error fetching data", error);
@@ -46,7 +47,7 @@ function DoctorDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-white p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
 
@@ -80,12 +81,12 @@ function DoctorDashboard() {
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Monthly Revenue</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={dashboardData.monthlyRevenue}>
+            <BarChart data={dashboardData?.monthlyRevenue}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="revenue" fill="#4F46E5" />
+              <Bar dataKey="totalRevenue" fill="#4F46E5" />
             </BarChart>
           </ResponsiveContainer>
         </div>

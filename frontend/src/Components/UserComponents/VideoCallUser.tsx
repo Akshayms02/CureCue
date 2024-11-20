@@ -7,7 +7,7 @@ import { setVideoCall } from '../../Redux/Slice/doctorSlice'
 import { RootState } from '../../Redux/store'
 import { useSocket } from '../../Context/SocketIO'
 import { setRoomId, setShowIncomingVideoCall, setShowVideoCall } from '../../Redux/Slice/userSlice'
-import { useNavigate } from 'react-router-dom'
+
 import { Card, CardContent } from "../../../components/ui/card"
 import { Button } from "../../../components/ui/button"
 import { PhoneOff, Mic, Video } from "lucide-react"
@@ -23,7 +23,7 @@ function VideoChatUser() {
     const videoCallRef = useRef(null)
     const { showIncomingVideoCall, roomIdUser, videoCall } = useSelector((state: RootState) => state.user)
     const dispatch = useDispatch()
-    const navigate = useNavigate()
+
     console.log(videoCall)
 
     console.log("show", showIncomingVideoCall)
@@ -40,11 +40,11 @@ function VideoChatUser() {
         zp.joinRoom({
             container: videoCallRef.current,
             scenario: {
-                mode: ZegoUIKitPrebuilt.OneONoneCall, // 1-on-1 call scenario
+                mode: ZegoUIKitPrebuilt.OneONoneCall,
             },
-            turnOnMicrophoneWhenJoining: true, // Automatically turn on the microphone when joining
-            turnOnCameraWhenJoining: true, // Automatically turn on the camera when joining
-            showPreJoinView: false, // Skip the pre-join view
+            turnOnMicrophoneWhenJoining: true,
+            turnOnCameraWhenJoining: true,
+            showPreJoinView: false,
             onLeaveRoom: () => {
                 console.log("ended the call dddddddddddddd")
                 socket?.emit('leave-room', ({ to: showIncomingVideoCall._id }))

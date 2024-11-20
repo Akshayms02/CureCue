@@ -32,4 +32,11 @@ export interface IDoctorRepository {
     appointmentId: string,
     prescription: string
   ): Promise<any>;
+  getWalletDetails(
+    doctorId: string,
+    status: string,
+    page: number,
+    limit: number
+  ): Promise<any>;
+  withdrawMoney(doctorId: string, withdrawalAmount: number): Promise<any>;
 }

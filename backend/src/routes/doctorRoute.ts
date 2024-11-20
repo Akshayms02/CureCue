@@ -95,9 +95,15 @@ route.get(
   doctorController.getDashboardData.bind(doctorController)
 );
 
+route.get(
+  "/getWallet/:doctorId",
+  verifyDocToken,
+  doctorController.getWallet.bind(doctorController)
+);
 route.put(
   "/addPrescription",
   doctorController.addPrescription.bind(doctorController)
 );
+route.post('/withdraw/:doctorId', doctorController.withdraw.bind(doctorController));
 
 export default route;
