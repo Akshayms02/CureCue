@@ -7,6 +7,8 @@ import { docDetails } from "../controllers/doctorController";
 import Slot from "../models/doctorSlotsModel";
 import appointmentModel from "../models/appointmentModel";
 import walletModel, { ITransaction } from "../models/walletModel";
+import mongoose from "mongoose";
+import NotificationModel from "../models/notificationModel";
 
 export class DoctorRepository implements IDoctorRepository {
   async existUser(email: string): Promise<IDoctor | null> {
@@ -554,6 +556,75 @@ export class DoctorRepository implements IDoctorRepository {
       return wallet;
     } catch (error: any) {
       console.error("Error processing withdrawal:", error.message);
+      throw new Error(error.message);
+    }
+  }
+
+  async cancelAppointment(appointmentId: string, reason: string): Promise<any> {
+    try {
+      const appointment = await appointmentModel.findOneAndUpdate(
+        { _id: new mongoose.Types.ObjectId(appointmentId) },
+        {
+          status: "cancelled by Doctor",
+          reason: reason,
+          paymentStatus: "refunded",
+        },
+        { new: true }
+      );
+
+      if (!appointment) {
+        throw new Error(`Appointment with ID ${appointmentId} not found`);
+      }
+
+      if (appointment) {
+        const slotUpdation = await Slot.findOne({
+          doctorId: appointment.doctorId,
+          date: appointment.date,
+        });
+
+        if (slotUpdation) {
+          const matchingSlot = slotUpdation.timeSlots.find(
+            (slot: any) =>
+              new Date(slot.start).getTime() ===
+              new Date(appointment.start).getTime()
+          );
+
+          if (matchingSlot) {
+            matchingSlot.isBooked = false;
+            matchingSlot.isOnHold = false;
+            matchingSlot.heldBy = undefined;
+            matchingSlot.holdExpiresAt = undefined;
+
+            await slotUpdation.save();
+          }
+        }
+
+        const userNotificationContent = {
+          content: "Application was cancelled by the doctor",
+          type: "appointment cancellation",
+          read: false,
+          appointmentId: appointmentId,
+        };
+        const doctorNotificationContent = {
+          content: "Application cancellation successful",
+          type: "appointment cancellation",
+          read: false,
+          appointmentId: appointmentId,
+        };
+
+        await NotificationModel.findOneAndUpdate(
+          { receiverId: appointment.userId },
+          { $push: { notifications: userNotificationContent } },
+          { new: true, upsert: true }
+        );
+        await NotificationModel.findOneAndUpdate(
+          { receiverId: appointment.doctorId },
+          { $push: { notifications: doctorNotificationContent } },
+          { new: true, upsert: true }
+        );
+      }
+    } catch (error: any) {
+      console.error("Error processing cancellation:", error.message);
       throw new Error(error.message);
     }
   }

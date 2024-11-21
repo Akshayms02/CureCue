@@ -429,7 +429,7 @@ export default class UserController {
 
       res
         .status(200)
-        .json({ message: "Appointment canceled successfully", data: response });
+        .json({ message: "Appointment cancelled successfully", data: response });
     } catch (error: any) {
       console.error("Error canceling appointment:", error.message);
 

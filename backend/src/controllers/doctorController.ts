@@ -482,4 +482,21 @@ export default class DoctorController {
       }
     }
   }
+  async cancelAppointment(req: Request, res: Response): Promise<any> {
+    try {
+      const { appointmentId, reason } = req.body;
+      const response = this.doctorService.cancelAppointment(
+        appointmentId,
+        reason
+      );
+      res
+        .status(200)
+        .json({ message: "Appointment has been cancelled", data: response });
+    } catch (error: any) {
+      console.error(error);
+      res
+        .status(500)
+        .json({ success: false, message: "An unexpected error has occured" });
+    }
+  }
 }

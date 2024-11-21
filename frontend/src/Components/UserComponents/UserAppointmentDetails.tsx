@@ -251,14 +251,15 @@ export default function UserAppointmentDetails() {
                         <Badge variant="destructive">Cancelled</Badge>
                     )}
 
-                    {appointment?.status === "cancelled by Dr" && (
+                    {appointment?.status === "cancelled by Doctor" && (
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button variant="destructive">Cancelled by Dr</Button>
+                                <Button variant="destructive">Cancelled by Doctor</Button>
+
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
-                                    <DialogTitle>Appointment Cancelled</DialogTitle>
+                                    <DialogTitle>Cancellation Reason</DialogTitle>
                                 </DialogHeader>
                                 <p>{appointment?.reason || "No reason provided."}</p>
                             </DialogContent>

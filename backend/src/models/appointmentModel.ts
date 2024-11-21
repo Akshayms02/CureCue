@@ -87,7 +87,7 @@ const AppointmentSchema = new Schema<IAppointment>(
         "completed",
         "cancelled",
         "prescription pending",
-        "cancelled by Dr",
+        "cancelled by Doctor",
       ],
       default: "pending",
     },

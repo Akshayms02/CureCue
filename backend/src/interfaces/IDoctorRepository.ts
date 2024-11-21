@@ -39,4 +39,5 @@ export interface IDoctorRepository {
     limit: number
   ): Promise<any>;
   withdrawMoney(doctorId: string, withdrawalAmount: number): Promise<any>;
+  cancelAppointment(appointmentId: string, reason: string): Promise<any>;
 }

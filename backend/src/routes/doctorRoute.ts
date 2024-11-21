@@ -104,6 +104,16 @@ route.put(
   "/addPrescription",
   doctorController.addPrescription.bind(doctorController)
 );
-route.post('/withdraw/:doctorId', doctorController.withdraw.bind(doctorController));
+route.post(
+  "/withdraw/:doctorId",
+  verifyDocToken,
+  doctorController.withdraw.bind(doctorController)
+);
+
+route.put(
+  "/cancelAppointment",
+  verifyDocToken,
+  doctorController.cancelAppointment.bind(doctorController)
+);
 
 export default route;

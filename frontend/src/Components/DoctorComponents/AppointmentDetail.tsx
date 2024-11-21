@@ -61,7 +61,7 @@ export default function AppointmentDetails() {
                             reason: values.cancelReason,
                         })
                         .then(() => {
-                            setAppointmentStatus("cancelled by Dr")
+                            setAppointmentStatus("cancelled by Doctor")
                             Swal.fire("Cancelled!", "Your appointment has been cancelled.", "success")
                             closeModal()
                         })
@@ -112,7 +112,7 @@ export default function AppointmentDetails() {
     useEffect(() => {
         const fetchMedicalRecords = async () => {
             try {
-                const response = await doctorAxiosUrl.get(`/api/doctor/getMedical-records/${appointment?._id}`)
+                const response = await doctorAxiosUrl.get(`/api/doctor/getMedicalRecords/${appointment?._id}`)
                 setMedicalRecords(response.data.response)
             } catch (error) {
                 console.error("Error fetching medical records:", error)
@@ -206,6 +206,8 @@ export default function AppointmentDetails() {
                 )
             case "cancelled":
                 return <p className="text-red-600 text-lg font-medium">Cancelled By Patient</p>
+            case "cancelled by Doctor":
+                return <p className="text-red-600 text-lg font-medium">Cancelled By Yourself</p>
             case "cancelled by Dr":
                 return (
                     <Button variant="outline" onClick={openModal}>
@@ -284,9 +286,9 @@ export default function AppointmentDetails() {
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{appointmentStatus === "cancelled by Dr" ? "Cancellation Reason" : "Cancel Appointment"}</DialogTitle>
+                        <DialogTitle>{appointmentStatus === "cancelled by Doctor" ? "Cancellation Reason" : "Cancel Appointment"}</DialogTitle>
                     </DialogHeader>
-                    {appointmentStatus === "cancelled by Dr" ? (
+                    {appointmentStatus === "cancelled by Doctor" ? (
                         <ScrollArea className="h-[200px] w-full rounded-md border p-4">
                             <p>{appointment?.reason}</p>
                         </ScrollArea>

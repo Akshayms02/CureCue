@@ -70,6 +70,8 @@ export default function AppointmentList() {
                 return <Badge variant="destructive">Cancelled</Badge>
             case "prescription pending":
                 return <Badge variant="secondary">Prescription pending</Badge>
+            case "cancelled by Doctor":
+                return <Badge variant="destructive">Cancelld by Yourself</Badge>
             default:
                 return <Badge variant="secondary">Pending</Badge>
         }

@@ -560,4 +560,21 @@ export class doctorServices {
       throw new Error(`Failed to withdraw: ${error.message}`);
     }
   }
+
+  async cancelAppointment(appointmentId: string, reason: string): Promise<any> {
+    try {
+      const response = this.doctorRepository.cancelAppointment(
+        appointmentId,
+        reason
+      );
+      if (response) {
+        return response;
+      } else {
+        throw new Error("Something went wrong");
+      }
+    } catch (error: any) {
+      console.error("Error in cancel:", error.stack || error.message);
+      throw new Error(`Failed to cancel: ${error.message}`);
+    }
+  }
 }

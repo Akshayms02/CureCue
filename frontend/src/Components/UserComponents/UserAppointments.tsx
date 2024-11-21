@@ -97,8 +97,9 @@ export default function UserAppointmentsList() {
             case "completed":
                 return <Badge variant="success">Completed</Badge>;
             case "cancelled":
-            case "cancelled by Dr":
                 return <Badge variant="destructive">Cancelled</Badge>;
+            case "cancelled by Doctor":
+                return <Badge variant="destructive">Cancelled by doctor</Badge>;
             default:
                 return <Badge>{status}</Badge>;
         }
@@ -112,7 +113,7 @@ export default function UserAppointmentsList() {
                 </CardHeader>
                 <CardContent>
                     <div className="flex justify-end items-center space-x-2 mb-4">
-                        {["All", "pending", "completed", "cancelled", "cancelled by Dr"].map((statusOption) => (
+                        {["All", "pending", "completed", "cancelled", "cancelled by Doctor"].map((statusOption) => (
                             <Button
                                 key={statusOption}
                                 variant={status === statusOption ? "default" : "outline"}
@@ -146,7 +147,7 @@ export default function UserAppointmentsList() {
                                         <Button variant="outline" onClick={() => handleViewAppointment(appointment)}>
                                             View Details
                                         </Button>
-                                        {appointment.status !== "cancelled" && appointment.status !== "cancelled by Dr" && appointment.status !== "completed" && (
+                                        {appointment.status !== "cancelled" && appointment.status !== "cancelled by Doctor" && appointment.status !== "completed" && (
                                             <Button variant="destructive" onClick={() => handleCancelAppointment(appointment._id)}>
                                                 Cancel
                                             </Button>
