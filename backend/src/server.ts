@@ -13,6 +13,7 @@ import "./config/cronjob";
 import { createServer } from "http";
 import { configSocketIO } from "./config/socketConfig";
 import chatRoute from "../src/routes/chatRoutes";
+import notificationRoute from "../src/routes/notificationRoutes";
 
 connectDB();
 const server = createServer(app);
@@ -39,16 +40,16 @@ app.get("/", async (req, res) => {
 });
 
 app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
   next();
 });
-
 
 app.use("/api/user", userRoute);
 app.use("/api/doctor", doctorRoute);
 app.use("/api/admin", adminRoute);
 app.use("/api/chat", chatRoute);
+app.use("/api/notification", notificationRoute);
 
 server.listen(port, () => {
   console.log(`Server is running on port http://localhost:${port}/`);

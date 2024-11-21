@@ -74,7 +74,6 @@ route.post(
 
 route.get(
   "/getDoctor",
-  verifyAdminToken,
   adminController.getDoctorData.bind(adminController)
 );
 

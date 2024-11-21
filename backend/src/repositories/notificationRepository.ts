@@ -1,20 +1,12 @@
-import { Notification, NotificationData } from "../models/notificationModel";
+import NotificationModel from "../models/notificationModel";
 
 class NotificationRepository {
-  async create(notificationData: NotificationData): Promise<any> {
-    const notification = new Notification(notificationData);
-    return notification.save();
-  }
-
-  async findByUserId(
-    userId: string,
-    options: { read?: boolean } = { read: false }
-  ): Promise<Notification[]> {
-    return Notification.find({ userId, ...options });
-  }
-
-  async updateMany(filter: any, update: any): Promise<any> {
-    return Notification.updateMany(filter, update);
+  async findByUserId(userId: string): Promise<Notification[]> {
+    const notification = await NotificationModel.aggregate([
+      { $match: { receiverId: userId } },
+      { $unwind: "$notifications" },
+    ]);
+    return notification;
   }
 }
 

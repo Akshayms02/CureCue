@@ -239,11 +239,7 @@ export default function AppointmentDetails() {
                         </div>
                     </div>
                     <div className="space-y-4">
-                        <div>
-                            <h3 className="font-semibold">Description</h3>
-                            <ScrollArea className="h-[100px] w-full rounded-md border p-4">
-                                <p>{appointment?.description || "No description available"}</p>
-                            </ScrollArea>
+                        <div style={{ height: '100px' }}>
                         </div>
                         <div className="flex justify-end space-x-4">{renderButtons()}</div>
                     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { FaUserCircle, FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram, FaBell } from "react-icons/fa"
 import { useSelector } from "react-redux"
 import { RootState } from "../../Redux/store"
@@ -10,9 +10,11 @@ import {
   SheetContent,
   SheetTrigger,
 } from "../../../components/ui/sheet"
+import axiosUrl from "../../Utils/axios"
 
 const UserLayout: React.FC = () => {
   const isLoggedIn = useSelector((state: RootState) => state.user.userInfo)
+  const [notifications, setNotifications] = useState<any>([]);
   const navigate = useNavigate()
 
   const handleLogin = () => {
@@ -24,6 +26,27 @@ const UserLayout: React.FC = () => {
   }
 
   const [notificationCount, setNotificationCount] = useState(2)
+  const fetchUnreadNotifications = async () => {
+
+    try {
+      console.log("hellow");
+      console.log(isLoggedIn?.userId)
+
+      const response = await axiosUrl.get(`/api/notification/getNotifications/${isLoggedIn?.userId}`);
+      console.log(response)
+
+
+      setNotifications(response.data);
+      setNotificationCount(response.data.length)
+
+
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
+  useEffect(() => {
+    fetchUnreadNotifications();
+  }, [isLoggedIn]);
 
   const handleNotificationsRead = () => {
     setNotificationCount(0)
@@ -78,7 +101,7 @@ const UserLayout: React.FC = () => {
                   >
                     <FaBell className="h-5 w-5" />
                     {notificationCount > 0 && (
-                      <span className="absolute top-0 right-0 w-4 h-4 text-[10px] font-bold flex items-center justify-center bg-primary text-primary-foreground rounded-full transform translate-x-1/3 -translate-y-1/3">
+                      <span className="absolute top-0 right-0 w-4 h-4 text-[10px] font-bold flex items-center justify-center bg-red-600 text-primary-foreground rounded-full transform translate-x-1/3 -translate-y-1/3">
                         {notificationCount}
                       </span>
                     )}
@@ -88,14 +111,16 @@ const UserLayout: React.FC = () => {
                 <SheetContent side="right" className="w-[300px] sm:w-[400px]" onOpenAutoFocus={handleNotificationsRead}>
                   <h2 className="text-lg font-semibold mb-4">Notifications</h2>
                   <div className="space-y-4">
-                    <div className="p-4 bg-secondary rounded-lg">
-                      <h3 className="font-medium">Appointment Reminder</h3>
-                      <p className="text-sm text-muted-foreground">Your appointment with Dr. Smith is tomorrow at 2 PM.</p>
-                    </div>
-                    <div className="p-4 bg-secondary rounded-lg">
-                      <h3 className="font-medium">New Message</h3>
-                      <p className="text-sm text-muted-foreground">You have a new message from your doctor.</p>
-                    </div>
+                    {notifications.length > 0 ? (
+                      notifications.map((notification, index) => (
+                        <div key={notification._id || index} className="p-4 bg-secondary rounded-lg">
+                          <h3 className="font-medium capitalize">{notification.notifications.type || "Notification"}</h3>
+                          <p className="text-sm text-muted-foreground">{notification.notifications.content || "No content available."}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-muted-foreground">No notifications available.</p>
+                    )}
                   </div>
                 </SheetContent>
               </Sheet>

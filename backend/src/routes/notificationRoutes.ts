@@ -1,14 +1,17 @@
-import express from 'express';
-import NotificationController from '../controllers/notificationController';
-import { NotificationService } from '../services/notificationServices';
+import express from "express";
+import NotificationController from "../controllers/notificationController";
+import { NotificationService } from "../services/notificationServices";
+import { NotificationRepository } from "../repositories/notificationRepository";
 
 const router = express.Router();
 
-// Dependency injection
-const notificationService = new NotificationService();
+const notificationRepository = new NotificationRepository();
+const notificationService = new NotificationService(notificationRepository);
 const notificationController = new NotificationController(notificationService);
 
-router.get('/notifications', (req, res) => notificationController.getNotifications(req, res));
-router.put('/notifications/:id/read', (req, res) => notificationController.markNotificationsAsRead(req, res));
+router.get(
+  "/getNotifications/:userId",
+  notificationController.getNotifications.bind(notificationController)
+);
 
 export default router;
