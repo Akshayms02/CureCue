@@ -13,48 +13,75 @@ const adminController = new AdminController(adminService);
 
 route.post("/login", adminController.loginAdmin.bind(adminController));
 route.post(
-  "/addSpecialization",verifyAdminToken,
+  "/addSpecialization",
+  verifyAdminToken,
   adminController.addSpecialization.bind(adminController)
 );
 route.post("/logout", adminController.adminLogout.bind(adminController));
 route.get(
-  "/getSpecializations",verifyAdminToken,
+  "/getSpecializations",
+  verifyAdminToken,
   adminController.getSpecialization.bind(adminController)
 );
 route.put(
-  "/updateSpecialization",verifyAdminToken,
+  "/updateSpecialization",
+  verifyAdminToken,
   adminController.editSpecialization.bind(adminController)
 );
 route.put(
-  "/listUnlistSpecialization",verifyAdminToken,
+  "/listUnlistSpecialization",
+  verifyAdminToken,
   adminController.listUnlistSpecialization.bind(adminController)
 );
-route.get("/getUsers",verifyAdminToken, adminController.getUsers.bind(adminController));
+route.get(
+  "/getUsers",
+  verifyAdminToken,
+  adminController.getUsers.bind(adminController)
+);
 route.put(
-  "/listUnlistUser/:userId",verifyAdminToken,
+  "/listUnlistUser/:userId",
+  verifyAdminToken,
   adminController.listUnlistUser.bind(adminController)
 );
-route.get("/getDoctors",verifyAdminToken, adminController.getDoctors.bind(adminController));
+route.get(
+  "/getDoctors",
+  verifyAdminToken,
+  adminController.getDoctors.bind(adminController)
+);
 route.put(
-  "/listUnlistDoctor/:doctorId",verifyAdminToken,
+  "/listUnlistDoctor/:doctorId",
+  verifyAdminToken,
   adminController.listUnlistDoctor.bind(adminController)
 );
 
 route.get(
-  "/getApplications",verifyAdminToken,
+  "/getApplications",
+  verifyAdminToken,
   adminController.getAllApplications.bind(adminController)
 );
 
 route.get(
-  "/doctorApplication/:id",verifyAdminToken,
+  "/doctorApplication/:id",
+  verifyAdminToken,
   adminController.getDoctorApplication.bind(adminController)
 );
 
 route.post(
-  "/accept-doctor/:doctorId",verifyAdminToken,
+  "/accept-doctor/:doctorId",
+  verifyAdminToken,
   adminController.acceptApplication.bind(adminController)
 );
 
-route.get("/getDoctor",verifyAdminToken,adminController.getDoctorData.bind(adminController))
+route.get(
+  "/getDoctor",
+  verifyAdminToken,
+  adminController.getDoctorData.bind(adminController)
+);
+
+route.get(
+  "/dashboardData",
+  verifyAdminToken,
+  adminController.getDashboardData.bind(adminController)
+);
 
 export default route;

@@ -6,6 +6,7 @@ import specializationModel from "../models/specializationModel";
 import mongoose from "mongoose";
 import Slot from "../models/doctorSlotsModel";
 import appointmentModel from "../models/appointmentModel";
+import NotificationModel from "../models/notificationModel";
 
 export class UserRepository implements IUserRepository {
   async existUser(email: string): Promise<IUser | null> {
@@ -241,13 +242,22 @@ export class UserRepository implements IUserRepository {
     userId: string,
     holdDurationMinutes: number = 5
   ) {
+    console.log(date, startTime);
     date.setUTCHours(0, 0, 0, 0);
     const convertedDate = date.toISOString().replace("Z", "+00:00");
     const convertedDateString = startTime.toISOString().replace("Z", "+00:00");
     const holdExpiresAt = new Date();
     holdExpiresAt.setMinutes(holdExpiresAt.getMinutes() + holdDurationMinutes);
     console.log(convertedDate, convertedDateString);
-
+    console.log(
+      doctorId,
+      " ",
+      convertedDate,
+      " ",
+      userId,
+      " ",
+      convertedDateString
+    );
     return await Slot.findOneAndUpdate(
       {
         doctorId,
@@ -461,6 +471,80 @@ export class UserRepository implements IUserRepository {
     } catch (error: any) {
       console.error("Error getting doctor:", error.message);
       throw new Error(`Failed to fetch doctor ${doctorId}: ${error.message}`);
+    }
+  }
+
+  async cancelAppointment(appointmentId: string): Promise<any> {
+    try {
+      console.log(appointmentId);
+      const appointment = await appointmentModel.findOneAndUpdate(
+        { _id: new mongoose.Types.ObjectId(appointmentId) },
+        { status: "cancelled", paymentStatus: "refunded" },
+        { new: true }
+      );
+
+      if (!appointment) {
+        throw new Error(`Appointment with ID ${appointmentId} not found`);
+      }
+
+      if (appointment) {
+        const slotUpdation = await Slot.findOne({
+          doctorId: appointment.doctorId,
+          date: appointment.date,
+        });
+
+        if (slotUpdation) {
+          const matchingSlot = slotUpdation.timeSlots.find(
+            (slot: any) =>
+              new Date(slot.start).getTime() ===
+              new Date(appointment.start).getTime()
+          );
+
+          if (matchingSlot) {
+            matchingSlot.isBooked = false;
+            matchingSlot.isOnHold = false;
+            matchingSlot.heldBy = undefined;
+            matchingSlot.holdExpiresAt = undefined;
+
+            await slotUpdation.save();
+          }
+        }
+
+        const userNotificationContent = {
+          content: "Your Appointment cancelled successfully",
+          type: "appointment cancellation", // Assume "message" type for chat notifications; adjust as needed
+          read: false,
+          appointmentId: appointmentId,
+        };
+        const doctorNotificationContent = {
+          content: "Appointment has been cancelled by patient",
+          type: "appointment cancellation", // Assume "message" type for chat notifications; adjust as needed
+          read: false,
+          appointmentId: appointmentId,
+        };
+
+        // Find the receiver's notification document, or create a new one if it doesn't exist
+        await NotificationModel.findOneAndUpdate(
+          { receiverId: appointment.userId },
+          { $push: { notifications: userNotificationContent } },
+          { new: true, upsert: true }
+        );
+        await NotificationModel.findOneAndUpdate(
+          { receiverId: appointment.doctorId },
+          { $push: { notifications: doctorNotificationContent } },
+          { new: true, upsert: true }
+        );
+
+        // sendAppointmentCancellationNotification(
+        //   appointment.doctorId,
+        //   appointment.userId
+        // );
+      }
+
+      return appointment;
+    } catch (error: any) {
+      console.error("Error canceling appointment:", error.message);
+      throw new Error(error.message);
     }
   }
 }

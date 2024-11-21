@@ -1,18 +1,35 @@
 import mongoose from "mongoose";
+const NotificationContentSchema = new mongoose.Schema(
+  {
+    content: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String,
+      enum: ["message", "appointment", "welcome"],
+      required: true,
+    },
+    appointmentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Appointment",
+      required: false,
+    },
+    read: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
 
-export interface NotificationData {
-  userId: string;
-  message: string;
-  read?: boolean;
-  appointmentId: string;
-}
-
-const notificationSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  message: { type: String, required: true },
-  read: { type: Boolean, default: false },
-  appointmentId: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
+const NotificationSchema = new mongoose.Schema({
+  receiverId: {
+    type: String,
+    required: true,
+  },
+  notifications: [NotificationContentSchema],
 });
 
-export const Notification = mongoose.model("Notification", notificationSchema);
+const NotificationModel = mongoose.model("Notification", NotificationSchema);
+export default NotificationModel;

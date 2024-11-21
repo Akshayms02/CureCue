@@ -42,4 +42,5 @@ export interface IUserRepository {
     review: string
   ): Promise<any>;
   getDoctorReview(doctorId: string): Promise<any>;
+  cancelAppointment(appointmentId: string): Promise<any>;
 }

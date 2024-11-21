@@ -317,4 +317,25 @@ export class adminServices {
       }
     }
   }
+
+  async getDashboardData() {
+    try {
+      console.log("Entering getDashboardData method in adminService");
+
+      const response = await this.adminRepository.getAllStatistics();
+
+      if (response) {
+        console.log("Dashboardsss data successfully retrieved:", response);
+        return response;
+      } else {
+        console.error("Failed to retrieve dashboard data: Response is invalid");
+        throw new Error(
+          "Something went wrong while retrieving dashboard data."
+        );
+      }
+    } catch (error: any) {
+      console.error("Error in getDashboardData:", error.message);
+      throw new Error(`Failed to retrieve dashboard data: ${error.message}`);
+    }
+  }
 }

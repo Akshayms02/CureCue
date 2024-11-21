@@ -357,6 +357,7 @@ export class userServices {
     userId: string,
     holdDurationMinutes: number = 5
   ) {
+    console.log("holding time slot service");
     console.log(startTime);
     return await this.userRepositary.holdSlot(
       doctorId,
@@ -506,6 +507,27 @@ export class userServices {
     } catch (error: any) {
       console.error("Error in getDoctor:", error.message);
       throw new Error(`Failed to get specialization: ${error.message}`);
+    }
+  }
+
+  async cancelAppointment(appointmentId: string): Promise<any> {
+    try {
+      const response = await this.userRepositary.cancelAppointment(
+        appointmentId
+      );
+
+      if (response) {
+        const paymentId = response.paymentId;
+
+        if (paymentId) {
+          return response;
+        } else {
+          throw new Error("No payment ID available for refund");
+        }
+      }
+    } catch (error: any) {
+      console.error("Error in cancelAppointment:", error.message);
+      throw new Error(`Failed to cancel appointment: ${error.message}`);
     }
   }
 }

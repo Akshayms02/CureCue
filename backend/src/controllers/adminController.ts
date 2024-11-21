@@ -295,8 +295,8 @@ export default class AdminController {
   async getDoctorData(req: Request, res: Response): Promise<void> {
     try {
       const { doctorId } = req.query;
-      console.log(req.query)
-      console.log(doctorId)
+      console.log(req.query);
+      console.log(doctorId);
       const response = await this.adminService.getDoctorData(
         doctorId as string
       );
@@ -304,6 +304,32 @@ export default class AdminController {
     } catch (error: any) {
       console.log(error);
       res.status(500).json(error.message);
+    }
+  }
+
+  async getDashboardData(req: Request, res: Response): Promise<void> {
+    try {
+      const response = await this.adminService.getDashboardData();
+
+      res
+        .status(200)
+        .json({ message: "Dashboard data retrieved successfully", response });
+    } catch (error: any) {
+      console.error("Error in getDashboardData controller:", error.message);
+
+      if (
+        error.message ===
+        "Something went wrong while retrieving dashboard data."
+      ) {
+        res.status(400).json({ message: "Failed to retrieve dashboard data." });
+      } else {
+        res
+          .status(500)
+          .json({
+            message: "An unexpected error occurred",
+            error: error.message,
+          });
+      }
     }
   }
 }

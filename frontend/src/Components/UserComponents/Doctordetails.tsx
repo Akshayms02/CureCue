@@ -129,7 +129,7 @@ const Doctordetails: React.FC = () => {
             try {
 
                 const response = await axiosUrl.get(`/api/user/doctorReviews/${doctorId}`)
-                console.log("review : ",response.data.response.appointments)
+                console.log("review : ", response.data.response.appointments)
 
                 setReviews(response.data?.response?.appointments)
             } catch (error) {
@@ -145,6 +145,7 @@ const Doctordetails: React.FC = () => {
         : 0
 
     const handlePayment = async () => {
+        console.log("clicked")
         if (!selectedTimeslot) {
             toast.error("Please select a timeslot.");
             return;
@@ -208,6 +209,7 @@ const Doctordetails: React.FC = () => {
             }
         } catch (error: any) {
             if (error.status == 400) {
+                console.log(error)
                 toast.error("Slot is On hold Please Select another Slot")
             } else if (error.status == 401) {
                 toast.error("Please Login first")
@@ -217,6 +219,24 @@ const Doctordetails: React.FC = () => {
                 console.error("Error during holding slot or payment process:", error);
                 toast.error("Error during the process.");
             }
+        }
+    };
+
+    const handleDateChange = (date: Date | null) => {
+        if (date) {
+
+            const localMidnightDate = new Date(date.setHours(0, 0, 0, 0));
+
+            // Convert the date to UTC
+            const utcDate = new Date(Date.UTC(
+                localMidnightDate.getFullYear(),
+                localMidnightDate.getMonth(),
+                localMidnightDate.getDate()
+            ));
+
+            setSelectedDate(utcDate);
+        } else {
+            setSelectedDate(null);
         }
     };
 
@@ -332,10 +352,7 @@ const Doctordetails: React.FC = () => {
                     <div className="grid gap-4 py-4">
                         <DatePicker
                             selected={selectedDate}
-                            onChange={(date: Date | null) => {
-                                setSelectedDate(date);
-                                setSelectedTimeslot(null);
-                            }}
+                            onChange={handleDateChange}
                             dateFormat="yyyy-MM-dd"
                             disabled={isLoading}
                             className='w-full border border-gray-300 rounded-md h-11 px-3 mb-4'

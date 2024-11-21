@@ -13,7 +13,8 @@ import { Badge } from "../../../components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/ui/dialog";
 import { Textarea } from "../../../components/ui/textarea";
 import { Label } from "../../../components/ui/label";
-import { ScrollArea } from "../../../components/ui/scroll-area";
+import Swal from "sweetalert2";
+
 
 interface ReviewFormValues {
     rating: number | null;
@@ -36,6 +37,10 @@ interface Appointment {
     };
     prescription: string;
     fees: string;
+    paymentMethod: string;
+    amount: number;
+    paymentStatus: string;
+    paymentId: string;
 }
 
 export default function UserAppointmentDetails() {
@@ -148,6 +153,38 @@ export default function UserAppointmentDetails() {
         navigate("/chat", { state: { appointment: appointment } });
     };
 
+    const handleCancelAppointment = (appointmentId: string) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to cancel this appointment?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, cancel it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axiosUrl
+                    .put(`/api/user/cancelAppointment/${appointmentId}`)
+                    .then(() => {
+                        toast.success("Appointment cancelled");
+                        Swal.fire(
+                            "Cancelled!",
+                            "The appointment has been cancelled. Your money will be refunded to your bank account.",
+                            "success"
+                        );
+
+                        navigate("/appointments")
+
+                    })
+                    .catch((error) => {
+                        console.error("Error canceling appointment:", error);
+                        Swal.fire("Failed!", "Failed to cancel the appointment. Please try again.", "error");
+                    });
+            }
+        });
+    };
+
     return (
         <Card className="w-full max-w-4xl mx-auto mt-10">
             <CardHeader>
@@ -173,11 +210,29 @@ export default function UserAppointmentDetails() {
                     </div>
                 </div>
 
-                <div>
-                    <CardDescription>Description</CardDescription>
-                    <ScrollArea className="h-[100px] w-full rounded-md border p-4">
-                        <p>{appointment?.description || "No description provided."}</p>
-                    </ScrollArea>
+
+
+                <div className="payment-details-container bg-gray-50 p-6 rounded-2xl shadow-md">
+                    <CardDescription className="text-xl font-bold text-primary">Payment Details</CardDescription>
+
+                    <div className="payment-info w-full rounded-md border p-4 bg-white">
+                        <div className="payment-method flex justify-between items-center mb-4">
+                            <span className="font-medium text-gray-600">Payment Method:</span>
+                            <span className="text-lg font-bold">{appointment?.paymentMethod || "N/A"}</span>
+                        </div>
+                        <div className="payment-amount flex justify-between items-center mb-4">
+                            <span className="font-medium text-gray-600">Amount:</span>
+                            <span className="text-lg font-bold">{appointment?.fees || "N/A"}</span>
+                        </div>
+                        <div className="payment-status flex justify-between items-center mb-4">
+                            <span className="font-medium text-gray-600">Payment Status:</span>
+                            <span className={`text-lg font-bold ${appointment?.paymentStatus === "payment completed" ? "text-green-600" : "text-red-600"}`}>{appointment?.paymentStatus || "N/A"}</span>
+                        </div>
+                        <div className="payment-id flex justify-between items-center">
+                            <span className="font-medium text-gray-600">Payment ID:</span>
+                            <span className="text-lg font-bold">{appointment?.paymentId || "N/A"}</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="flex justify-end space-x-2">
@@ -217,7 +272,7 @@ export default function UserAppointmentDetails() {
                     {appointment?.status === "pending" && (
                         <>
                             <Button onClick={navigateChat}>Chat</Button>
-                            <Button variant="destructive">Cancel</Button>
+                            <Button variant="destructive" onClick={() => handleCancelAppointment(appointment._id)}>Cancel</Button>
                         </>
                     )}
                 </div>

@@ -230,6 +230,7 @@ export default class UserController {
         new Date(startTime)
       );
       if (checkHold) {
+        console.log(checkHold);
         if (checkHold.length > 0) {
           const timeslot = checkHold[0].timeSlots.filter((element: any) => {
             return element.start.toISOString() == startTime;
@@ -411,7 +412,32 @@ export default class UserController {
           message: "Something went wrong while creating the specialization.",
         });
       } else {
-        console.log(error)
+        console.log(error);
+        res.status(500).json({
+          message: "An unexpected error occurred",
+          error: error.message,
+        });
+      }
+    }
+  }
+
+  async cancelAppointment(req: Request, res: Response): Promise<void> {
+    try {
+      const appointmentId = req.params.appointmentId;
+
+      const response = await this.userService.cancelAppointment(appointmentId);
+
+      res
+        .status(200)
+        .json({ message: "Appointment canceled successfully", data: response });
+    } catch (error: any) {
+      console.error("Error canceling appointment:", error.message);
+
+      if (error.message.includes("Failed to cancel appointment")) {
+        res
+          .status(400)
+          .json({ message: `Failed to cancel appointment: ${error.message}` });
+      } else {
         res.status(500).json({
           message: "An unexpected error occurred",
           error: error.message,
