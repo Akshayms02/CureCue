@@ -112,7 +112,8 @@ export default function AppointmentDetails() {
     useEffect(() => {
         const fetchMedicalRecords = async () => {
             try {
-                const response = await doctorAxiosUrl.get(`/api/doctor/getMedicalRecords/${appointment?._id}`)
+                console.log(appointment)
+                const response = await doctorAxiosUrl.get(`/api/doctor/getMedicalRecords/${appointment?.userId}`)
                 setMedicalRecords(response.data.response)
             } catch (error) {
                 console.error("Error fetching medical records:", error)
@@ -148,10 +149,10 @@ export default function AppointmentDetails() {
 
             doc.setFontSize(14)
             doc.setTextColor(darkGrey)
-            doc.text(`Patient Name: ${record.patientNAme}`, 10, 45)
-            doc.text(`Age: ${record.age.toString()}`, 10, 55)
+            doc.text(`Patient Name: ${record.patientName}`, 10, 45)
+
             doc.text(`Date: ${moment(record.date).format("MMMM Do YYYY")}`, 10, 65)
-            doc.text(`Time: ${record.start} - ${record.end}`, 10, 75)
+            doc.text(`Time: ${moment(record.start).format("h:mm A")} - ${moment(record.end).format("h:mm A")}`, 10, 75)
 
             doc.setLineWidth(0.5)
             doc.line(10, 80, 200, 80)
@@ -176,7 +177,7 @@ export default function AppointmentDetails() {
             doc.text("For any questions, please contact us.", 10, 285)
             doc.text("CureCue | curecue@gmail.com", 10, 290)
 
-            doc.save(`Prescription_${record.patientNAme}.pdf`)
+            doc.save(`Prescription_${record.patientName}.pdf`)
         }
     }
 
@@ -265,7 +266,7 @@ export default function AppointmentDetails() {
                         <TableBody>
                             {medicalRecords.map((record: any) => (
                                 <TableRow key={record._id}>
-                                    <TableCell>{record.patientNAme}</TableCell>
+                                    <TableCell>{record.patientName}</TableCell>
                                     <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
                                     <TableCell className="text-right">
                                         {record.prescription ? (

@@ -110,6 +110,12 @@ route.post(
   doctorController.withdraw.bind(doctorController)
 );
 
+route.get(
+  "/getMedicalRecords/:userId",
+  verifyDocToken,
+  doctorController.getMedicalRecords.bind(doctorController)
+);
+
 route.put(
   "/cancelAppointment",
   verifyDocToken,

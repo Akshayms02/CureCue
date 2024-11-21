@@ -546,6 +546,16 @@ export class doctorServices {
       throw new Error(`Failed to get wallet details: ${error.message}`);
     }
   }
+  async getMedicalRecords(userId: string): Promise<any> {
+    try {
+      const response = await this.doctorRepository.getMedicalRecords(userId);
+
+      return response;
+    } catch (error: any) {
+      console.error("Error in getDoctor:", error.message);
+      throw new Error(`Failed to get specialization: ${error.message}`);
+    }
+  }
 
   async withdraw(doctorId: string, withdrawalAmount: number) {
     try {

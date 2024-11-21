@@ -560,6 +560,22 @@ export class DoctorRepository implements IDoctorRepository {
     }
   }
 
+  async getMedicalRecords(userId: string): Promise<any> {
+    try {
+      const medicalRecords = await appointmentModel.find({
+        userId: userId,
+        prescription: { $ne: null },
+      });
+
+      return medicalRecords;
+    } catch (error: any) {
+      console.error("Error getting medical records:", error.message);
+      throw new Error(
+        `Failed to fetch medical records for user ${userId}: ${error.message}`
+      );
+    }
+  }
+
   async cancelAppointment(appointmentId: string, reason: string): Promise<any> {
     try {
       const appointment = await appointmentModel.findOneAndUpdate(

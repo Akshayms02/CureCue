@@ -32,6 +32,7 @@ export interface IDoctorRepository {
     appointmentId: string,
     prescription: string
   ): Promise<any>;
+  getMedicalRecords(userId: string): Promise<any>;
   getWalletDetails(
     doctorId: string,
     status: string,
