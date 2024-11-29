@@ -8,6 +8,18 @@ class NotificationRepository {
     ]);
     return notification;
   }
+
+  async deleteNotification(id: string, notificationId: string): Promise<any> {
+    console.log(id, notificationId)
+    const result = await NotificationModel.findByIdAndUpdate(
+      id,
+      {
+        $pull: { notifications: { _id: notificationId } },
+      },
+      { new: true }
+    );
+    return result
+  }
 }
 
 export { NotificationRepository };

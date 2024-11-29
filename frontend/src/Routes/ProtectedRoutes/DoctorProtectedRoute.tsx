@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { clearUser, setDocStatus } from "../../Redux/Slice/doctorSlice";
-import axiosUrl from "../../Utils/axios";
 import { VerificationPending } from "../../Components/DoctorComponents/VerficationPending";
 import doctorAxiosUrl from "../../Utils/doctorAxios";
 

@@ -14,4 +14,6 @@ router.get(
   notificationController.getNotifications.bind(notificationController)
 );
 
+router.post("/deleteNotification", notificationController.deleteNotification.bind(notificationController))
+
 export default router;

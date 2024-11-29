@@ -19,6 +19,16 @@ class NotificationController {
       res.status(500).json({ error: "Failed to fetch notifications" });
     }
   }
+  async deleteNotification(req: Request, res: Response): Promise<void> {
+    try {
+      const { id, notificationId } = req.query
+      const response = await this.notificationService.deleteNotification(id as string, notificationId as string)
+      res.status(200).json(response)
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to delete notification" })
+    }
+  }
 }
 
 export default NotificationController;

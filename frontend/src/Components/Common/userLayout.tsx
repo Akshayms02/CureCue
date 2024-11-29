@@ -52,6 +52,11 @@ const UserLayout: React.FC = () => {
     setNotificationCount(0)
   }
 
+  const handleClose = async (id) => {
+    const notificationId = notifications[0]._id
+    await axiosUrl.post(`/api/notification/deleteNotification?id=${notificationId}&notificationId=${id}`)
+    setNotifications(notifications.filter((n: any) => n.notifications._id !== id));
+  };
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-xl">
@@ -113,10 +118,27 @@ const UserLayout: React.FC = () => {
                   <div className="space-y-4">
                     {notifications.length > 0 ? (
                       notifications.map((notification, index) => (
-                        <div key={notification._id || index} className="p-4 bg-secondary rounded-lg">
-                          <h3 className="font-medium capitalize">{notification.notifications.type || "Notification"}</h3>
-                          <p className="text-sm text-muted-foreground">{notification.notifications.content || "No content available."}</p>
+                        <div key={notification.notifications_id || index} className="p-4 bg-secondary rounded-lg relative">
+                          {/* Notification Header with Close Button */}
+                          <div className="flex justify-between items-center">
+                            <h3 className="font-medium capitalize">
+                              {notification.notifications.type || "Notification"}
+                            </h3>
+                            <button
+                              className="text-muted-foreground hover:text-primary text-lg font-bold"
+                              aria-label="Close notification"
+                              onClick={() => handleClose(notification.notifications._id || index)}
+                            >
+                              ×
+                            </button>
+                          </div>
+
+                          {/* Notification Content */}
+                          <p className="text-sm text-muted-foreground mt-2">
+                            {notification.notifications.content || "No content available."}
+                          </p>
                         </div>
+
                       ))
                     ) : (
                       <p className="text-muted-foreground">No notifications available.</p>

@@ -13,7 +13,7 @@ interface UserProtectedRouteProps {
 function UserProtectedRoute({ children }: UserProtectedRouteProps) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const userData = useSelector((state: RootState) => state.user); // Assuming 'user' is the slice where user data is stored
+  const userData = useSelector((state: RootState) => state.user); 
 
   useEffect(() => {
     const checkUserStatus = async () => {
