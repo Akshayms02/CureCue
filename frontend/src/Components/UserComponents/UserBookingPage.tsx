@@ -17,28 +17,40 @@ const UserBookingPage: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [totalPages, setTotalPages] = useState<number>(1)
 
-  useEffect(() => {
-    const fetchDepartments = async () => {
-      try {
-        const response = await getDepartments()
-        console.log(response)
-        setDepartments(response)
-        setLoading(false)
-      } catch (err: unknown) {
-        setError("Failed to load departments")
-        setLoading(false)
+  const fetchDepartments = async (page: number) => {
+    try {
+      setLoading(true)
+      const response = await getDepartments(page) // Assuming backend supports pagination with `page` query param
+      console.log(response)
+      setDepartments(response.data) // Assuming `response.data` contains the departments
+      setTotalPages(response.totalPages) // Assuming `response.totalPages` contains total pages info
+      setLoading(false)
+    } catch (err: unknown) {
+      setError("Failed to load departments")
+      setLoading(false)
 
-        if (err instanceof Error) {
-          toast.error(err.message)
-        } else {
-          toast.error("An unknown error occurred")
-        }
+      if (err instanceof Error) {
+        toast.error(err.message)
+      } else {
+        toast.error("An unknown error occurred")
       }
     }
+  }
 
-    fetchDepartments()
-  }, [])
+  useEffect(() => {
+    fetchDepartments(currentPage)
+  }, [currentPage])
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1)
+  }
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1)
+  }
 
   if (loading) {
     return (
@@ -93,6 +105,23 @@ const UserBookingPage: React.FC = () => {
             </Card>
           </Link>
         ))}
+      </div>
+      <div className="flex justify-between items-center mt-6">
+        <button
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-200 text-gray-600 rounded hover:bg-gray-300 disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span className="text-gray-600">Page {currentPage} of {totalPages}</span>
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-200 text-gray-600 rounded hover:bg-gray-300 disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   )

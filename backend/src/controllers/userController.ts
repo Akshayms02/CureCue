@@ -125,14 +125,21 @@ export default class UserController {
   }
   async getSpecializations(req: Request, res: Response): Promise<void> {
     try {
-      const response = await this.userService.getSpecialization();
+      console.log("get specializations reached")
+      const page = parseInt(req.query.page as string, 10) || 1;
+      const limit = parseInt(req.query.limit as string, 10) || 10;
 
+
+      const response = await this.userService.getSpecialization(page, limit);
+
+      console.log(response)
       res.status(200).json(response);
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Failed to fetch specializations" });
     }
   }
+
 
   async getDepDoctors(req: Request, res: Response): Promise<void> {
     try {
@@ -443,6 +450,17 @@ export default class UserController {
           error: error.message,
         });
       }
+    }
+  }
+
+  async changePassword(req: Request, res: Response): Promise<any> {
+    const { currentPassword, newPassword, userId } = req.body;
+
+    try {
+      await this.userService.changePassword(userId, currentPassword, newPassword);
+      res.status(200).json({ message: 'Password changed successfully.' });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message || 'Failed to change password.' });
     }
   }
 }

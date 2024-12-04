@@ -5,7 +5,7 @@ export interface IUserRepository {
   createUser(userData: IUser): Promise<IUser>;
   userLoginValidate(email: string, password: string): Promise<IUser>;
   getDoctors(): Promise<any>;
-  getSpecializations(): Promise<any>;
+  getSpecializations(skip: number, limit: number): Promise<any>;
   getDepDoctors(departmentId: string): Promise<any>;
   getDoctorData(doctorId: string): Promise<any>;
   getSlots(doctorId: string, date: Date): Promise<any>;
@@ -43,4 +43,6 @@ export interface IUserRepository {
   ): Promise<any>;
   getDoctorReview(doctorId: string): Promise<any>;
   cancelAppointment(appointmentId: string): Promise<any>;
+  updatePassword(userId: string, hashedPassword: string): Promise<any>
+  getUserById(userId: string): Promise<IUser | null>
 }

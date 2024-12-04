@@ -13,6 +13,13 @@ export class UserRepository implements IUserRepository {
     return await userModel.findOne({ email });
   }
 
+  async getUserById(userId: string): Promise<IUser | null> {
+    return await userModel.findOne({ userId: userId })
+  }
+
+  async updatePassword(userId: string, hashedPassword: string): Promise<any> {
+    return await userModel.findOneAndUpdate({ userId: userId }, { password: hashedPassword });
+  }
   async createUser(userData: IUser): Promise<IUser> {
     try {
       const newUser = new userModel(userData);
@@ -82,21 +89,26 @@ export class UserRepository implements IUserRepository {
 
     return doctors;
   }
-  async getSpecializations() {
+  async getSpecializations(skip: number, limit: number) {
     try {
-      const specializations = await specializationModel.find({
-        isListed: true,
-      });
 
-      if (specializations) {
-        return specializations;
-      }
+      const specializations = await specializationModel.find({ isListed: true })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+
+      const total = await specializationModel.countDocuments({ isListed: true });
+
+      return { specializations, total };
     } catch (error: any) {
       if (error instanceof Error) {
         throw new Error(error.message);
       }
+      throw new Error("Error fetching specializations from repository");
     }
   }
+
 
   async getDepDoctors(departmentId: string) {
     try {
@@ -159,9 +171,10 @@ export class UserRepository implements IUserRepository {
       const response = await Slot.findOne({
         doctorId: doctorId,
         date: date,
+        "timeSlots.end": { $gte: new Date() }
       }).lean();
       if (response) {
-        return response.timeSlots;
+        return response.timeSlots.filter(slot => new Date(slot.end) >= new Date());
       } else {
         return [];
       }

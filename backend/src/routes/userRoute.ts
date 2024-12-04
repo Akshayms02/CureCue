@@ -70,7 +70,8 @@ route.post(
   userController.addReview.bind(userController)
 );
 route.get("/doctorReviews/:doctorId", userController.getReviews.bind(userController));
-route.put('/cancelAppointment/:appointmentId',verifyToken, userController.cancelAppointment.bind(userController));
+route.put('/cancelAppointment/:appointmentId', verifyToken, userController.cancelAppointment.bind(userController));
+route.post('/changePassword', verifyToken, userController.changePassword.bind(userController))
 route.post("/refresh-token", refreshTokenHandler);
 
 export default route;

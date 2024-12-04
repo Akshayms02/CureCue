@@ -14,6 +14,7 @@ import Doctordetails from "../Components/UserComponents/Doctordetails";
 import UserAppointmentsList from "../Components/UserComponents/UserAppointments";
 import UserAppointmentDetails from "../Components/UserComponents/UserAppointmentDetails";
 import UserChatUI from "../Components/UserComponents/UserChatUI";
+import { ChangePassword } from "../Components/UserComponents/ChangePassword";
 
 function UserRoutes() {
   return (
@@ -63,6 +64,9 @@ function UserRoutes() {
             </UserProtectedRoute>
           }
         />
+        <Route path="security" element={<UserProtectedRoute>
+          <ChangePassword />
+        </UserProtectedRoute>} />
 
         {/* <Route path="settings" element={<ProfileSettings />} />
           <Route path="security" element={<ProfileSecurity />} /> */}

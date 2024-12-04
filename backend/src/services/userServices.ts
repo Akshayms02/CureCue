@@ -7,12 +7,13 @@ import sendEmailOtp from "../config/nodemailer";
 import { AwsConfig } from "../config/awsConfig";
 import { createToken, createRefreshToken } from "../config/jwtConfig";
 import mongoose from "mongoose";
+import razorpay from "../config/razorpay";
 
 export class userServices {
   constructor(
     private userRepositary: IUserRepository,
     private S3Service: AwsConfig
-  ) {}
+  ) { }
 
   private getFolderPathByFileType(fileType: string): string {
     switch (fileType) {
@@ -198,18 +199,31 @@ export class userServices {
       throw new Error(error);
     }
   }
-  async getSpecialization() {
+  async getSpecialization(page: number, limit: number) {
     try {
-      const response = await this.userRepositary.getSpecializations();
-      if (response) {
-        return response;
-      }
+
+      const skip = (page - 1) * limit;
+
+
+      const { specializations, total } = await this.userRepositary.getSpecializations(skip, limit);
+
+
+      const totalPages = Math.ceil(total / limit);
+
+
+      return {
+        specializations,
+        totalPages,
+        currentPage: page,
+      };
     } catch (error: any) {
       if (error instanceof Error) {
         throw new Error(error.message);
       }
+      throw new Error("Error fetching specializations");
     }
   }
+
 
   async getDepDoctors(departmentId: string) {
     try {
@@ -519,15 +533,47 @@ export class userServices {
       if (response) {
         const paymentId = response.paymentId;
 
+
         if (paymentId) {
+          const paymentDetails = await razorpay.payments.fetch(paymentId);
+          console.log("Payment Details:", paymentDetails);
+          const captureResponse = await razorpay.payments.capture(paymentId, response.fees * 100, "INR");
+          console.log("Payment Captured:", captureResponse);
+          const refundOptions = {
+            amount: response.fees * 100,
+            speed: "normal",
+            notes: {
+              reason: "Appointment canceled",
+            },
+          };
+
+          // Call Razorpay's refund API
+          const refund = await razorpay.payments.refund(paymentId, refundOptions);
+          console.log("refund was successful : ", refund)
           return response;
         } else {
           throw new Error("No payment ID available for refund");
         }
       }
     } catch (error: any) {
-      console.error("Error in cancelAppointment:", error.message);
+      console.error("Error in cancelAppointment:", error);
       throw new Error(`Failed to cancel appointment: ${error.message}`);
     }
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<any> {
+    const user = await this.userRepositary.getUserById(userId);
+
+    if (!user) {
+      throw new Error('User not found.');
+    }
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      throw new Error('Current password is incorrect.');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.userRepositary.updatePassword(userId, hashedPassword);
   }
 }

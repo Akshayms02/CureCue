@@ -1,3 +1,4 @@
+import axios from "axios";
 import axiosUrl from "../Utils/axios";
 
 export const getDepDoctors = async (departmentId: string) => {
@@ -30,17 +31,22 @@ export const userLogout = async () => {
   }
 };
 
-export const getDepartments = async () => {
+export const getDepartments = async (page: number) => {
   try {
-    const response = await axiosUrl.get("/api/user/specializations");
+    const response = await axiosUrl.get(`/api/user/specializations?page=${page}`);
+    console.log(response)
     if (response?.data) {
-      return response.data;
+      return {
+        data: response.data.specializations,
+        totalPages: response.data.totalPages,
+      };
     }
-    return [];
+    return { data: [], totalPages: 1 };
   } catch (error: any) {
     if (error instanceof Error) {
       throw new Error(error.message);
     }
+    throw new Error("An unknown error occurred");
   }
 };
 
@@ -70,7 +76,7 @@ export const getDoctorData = async (doctorId: string) => {
   }
 };
 
-export const fetchAvialableTimeslots = async (doctorId: string,date:string) => {
+export const fetchAvialableTimeslots = async (doctorId: string, date: string) => {
   try {
     const response = await axiosUrl.get(`/api/user/getSlots/${doctorId}/${date}`);
     if (response) {
@@ -79,6 +85,19 @@ export const fetchAvialableTimeslots = async (doctorId: string,date:string) => {
   } catch (error: any) {
     if (error instanceof Error) {
       throw new Error(error.message);
+    }
+  }
+};
+
+export const changePassword = async (currentPassword: string, newPassword: string, userId: string) => {
+  try {
+    console.log(currentPassword, newPassword, userId)
+    const response = await axiosUrl.post('/api/user/changePassword', { currentPassword, newPassword, userId });
+    return response.data;
+  } catch (error: unknown) {
+    console.error(error)
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message || 'An unknown error occurred');
     }
   }
 };
