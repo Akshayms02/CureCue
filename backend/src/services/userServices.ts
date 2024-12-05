@@ -8,8 +8,9 @@ import { AwsConfig } from "../config/awsConfig";
 import { createToken, createRefreshToken } from "../config/jwtConfig";
 import mongoose from "mongoose";
 import razorpay from "../config/razorpay";
+import { IUserServices } from "../interfaces/IUserServices";
 
-export class userServices {
+export class userServices implements IUserServices {
   constructor(
     private userRepositary: IUserRepository,
     private S3Service: AwsConfig
@@ -162,7 +163,7 @@ export class userServices {
     }
   }
 
-  async checkStatus(email: string) {
+  async checkStatus(email: string): Promise<any> {
     try {
       const response = this.userRepositary.existUser(email);
       return response;
@@ -225,7 +226,7 @@ export class userServices {
   }
 
 
-  async getDepDoctors(departmentId: string) {
+  async getDepDoctors(departmentId: string): Promise<any> {
     try {
       const response = await this.userRepositary.getDepDoctors(departmentId);
       console.log(departmentId);
@@ -422,36 +423,32 @@ export class userServices {
     }
   }
 
-  async getAppointments(userId: string, status: string) {
+  async getAppointments(
+    userId: string,
+    status: string,
+    page: number,
+    limit: number
+  ) {
     try {
       const response = await this.userRepositary.getAllAppointments(
         userId,
-        status
+        status,
+        page,
+        limit
       );
 
-      if (response) {
-        console.log("appointments", response);
-
-        const updatedAppointments = response.map((appointment: any) => ({
-          ...appointment,
-          start: new Date(appointment.start),
-          end: new Date(appointment.end),
-        }));
-
-        console.log("up", updatedAppointments);
-
-        return updatedAppointments;
+      if (response.appointments) {
+        return response;
       } else {
         console.error("Failed to get appointments: Response is invalid");
-        throw new Error(
-          "Something went wrong while fetching the appointments."
-        );
+        throw new Error("Something went wrong while fetching the appointments.");
       }
     } catch (error: any) {
       console.error("Error in getAppointments:", error.message);
       throw new Error(`Failed to get appointments: ${error.message}`);
     }
   }
+
 
   async getAppointment(appointmentId: string) {
     try {

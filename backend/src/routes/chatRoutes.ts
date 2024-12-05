@@ -2,6 +2,7 @@ import { Router } from "express";
 import { chatService } from "../services/chatServices";
 import { chatRepository } from "../repositories/chatRepository";
 import { chatController } from "../controllers/chatController";
+import { verifyDocToken, verifyToken } from "../config/jwtConfig";
 
 
 
@@ -13,7 +14,7 @@ const chatServiceInstance = new chatService(chatRepositoryInstance)
 const chatControllerInstance = new chatController(chatServiceInstance)
 
 
-route.get('/fetchTwoMembersChat', chatControllerInstance.getChat.bind(chatControllerInstance));
+route.get('/fetchTwoMembersChat', verifyToken,verifyDocToken, chatControllerInstance.getChat.bind(chatControllerInstance));
 route.post('/end-call', chatControllerInstance.updateAppointment.bind(chatControllerInstance));
 
 export default route;

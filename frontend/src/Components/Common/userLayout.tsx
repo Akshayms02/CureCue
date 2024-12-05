@@ -11,11 +11,13 @@ import {
   SheetTrigger,
 } from "../../../components/ui/sheet"
 import axiosUrl from "../../Utils/axios"
+import { useSocket } from "../../Context/SocketIO"
 
 const UserLayout: React.FC = () => {
   const isLoggedIn = useSelector((state: RootState) => state.user.userInfo)
   const [notifications, setNotifications] = useState<any>([]);
   const navigate = useNavigate()
+  const { socket } = useSocket()
 
   const handleLogin = () => {
     navigate("/login")
@@ -47,6 +49,18 @@ const UserLayout: React.FC = () => {
   useEffect(() => {
     fetchUnreadNotifications();
   }, [isLoggedIn]);
+
+
+  useEffect(() => {
+
+    socket?.on('AppointmentCancellation', () => {
+      console.log("socket worked")
+      fetchUnreadNotifications()
+
+    });
+
+  }, [socket])
+
 
   const handleNotificationsRead = () => {
     setNotificationCount(0)

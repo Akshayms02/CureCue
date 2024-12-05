@@ -13,12 +13,13 @@ import {
   FileData,
 } from "../interfaces/doctorInterfaces";
 import { AwsConfig } from "../config/awsConfig";
+import { IDoctorService } from "../interfaces/IDoctorServices";
 
 interface ITimeSlot {
   start: string;
   end: string;
 }
-export class doctorServices {
+export class doctorServices implements IDoctorService {
   constructor(
     private doctorRepository: IDoctorRepository,
     private S3Service: AwsConfig
@@ -281,13 +282,13 @@ export class doctorServices {
       throw new Error(error.message);
     }
   }
-  async checkStatus(email: string) {
+  async checkStatus(email: string): Promise<{ isBlocked: boolean; kycStatus: string } | undefined> {
     try {
       const user = await this.doctorRepository.existUser(email);
       if (!user) {
         throw new Error("User not found");
       }
-      return { isBlocked: user.isBlocked, kycStatus: user.kycStatus };
+      return { isBlocked: user.isBlocked as boolean, kycStatus: user.kycStatus as string };
     } catch (error: any) {
       if (error instanceof Error) {
         throw new Error(error.message);

@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import { userServices } from "../services/userServices";
+import { IUserController } from "../interfaces/IUserController";
 
-export default class UserController {
+export default class UserController implements IUserController {
   private userService: userServices;
   constructor(userService: userServices) {
     this.userService = userService;
   }
 
-  async register(req: Request, res: Response) {
+  async register(req: Request, res: Response): Promise<any> {
     try {
       const user = await this.userService.registeUser(req.body);
       res.status(201).json(user);
@@ -187,7 +188,7 @@ export default class UserController {
     }
   }
 
-  async createAppointment(req: Request, res: Response) {
+  async createAppointment(req: Request, res: Response): Promise<any> {
     try {
       const {
         amount,
@@ -226,7 +227,7 @@ export default class UserController {
     }
   }
 
-  async holdSlot(req: Request, res: Response) {
+  async holdSlot(req: Request, res: Response): Promise<any> {
     const { doctorId, date, startTime, userId } = req.body;
     console.log(req.body);
 
@@ -289,7 +290,7 @@ export default class UserController {
     }
   }
 
-  async updateUserProfile(req: Request, res: Response) {
+  async updateUserProfile(req: Request, res: Response): Promise<any> {
     try {
       const { userId, name, DOB, gender, phone, email } = req.body;
 
@@ -322,23 +323,25 @@ export default class UserController {
   async getAllAppointments(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.params.userId;
-      const { status } = req.query;
+      const { status, page = 1, limit = 5 } = req.query;
 
-      const response = await this.userService.getAppointments(
+      const { appointments, totalPages } = await this.userService.getAppointments(
         userId,
-        status as string
+        status as string,
+        parseInt(page as string),
+        parseInt(limit as string)
       );
 
-      res
-        .status(200)
-        .json({ message: "Appointments fetched successfully", data: response });
+      res.status(200).json({
+        message: "Appointments fetched successfully",
+        data: appointments,
+        totalPages,
+      });
     } catch (error: any) {
       console.error("Error fetching appointments:", error.message);
 
       if (error.message.includes("Failed to get appointments")) {
-        res
-          .status(400)
-          .json({ message: `Failed to get appointments: ${error.message}` });
+        res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
       } else {
         res.status(500).json({
           message: "An unexpected error occurred",
@@ -347,6 +350,7 @@ export default class UserController {
       }
     }
   }
+
 
   async getAppointment(req: Request, res: Response): Promise<void> {
     try {

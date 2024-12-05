@@ -9,6 +9,7 @@ import appointmentModel from "../models/appointmentModel";
 import walletModel, { ITransaction } from "../models/walletModel";
 import mongoose from "mongoose";
 import NotificationModel from "../models/notificationModel";
+import { sendAppointmentCancellationNotification } from "../config/socketConfig";
 
 export class DoctorRepository implements IDoctorRepository {
   async existUser(email: string): Promise<IDoctor | null> {
@@ -330,10 +331,10 @@ export class DoctorRepository implements IDoctorRepository {
       // Calculate total revenue from transactions
       const totalRevenue = wallet
         ? wallet.transactions.reduce((acc, transaction) => {
-            return transaction.transactionType === "credit"
-              ? acc + transaction.amount
-              : acc; // Ignore debit amounts
-          }, 0)
+          return transaction.transactionType === "credit"
+            ? acc + transaction.amount
+            : acc; // Ignore debit amounts
+        }, 0)
         : 0;
 
       // Get current date and calculate the start of 12 months ago
@@ -637,6 +638,11 @@ export class DoctorRepository implements IDoctorRepository {
           { receiverId: appointment.doctorId },
           { $push: { notifications: doctorNotificationContent } },
           { new: true, upsert: true }
+        );
+
+        sendAppointmentCancellationNotification(
+          appointment.doctorId,
+          appointment.userId
         );
       }
     } catch (error: any) {

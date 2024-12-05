@@ -34,7 +34,10 @@ export interface IUserRepository {
     phone: string;
     email: string;
   }): Promise<any>;
-  getAllAppointments(userId: string, status: string): Promise<any>;
+  getAllAppointments(userId: string,
+    status: string,
+    page: number,
+    limit: number): Promise<any>;
   getAppointment(appointmentId: string): Promise<any>;
   addReview(
     appointmentId: string,

@@ -27,33 +27,34 @@ export default function UserAppointmentsList() {
     const userData = useSelector((state: RootState) => state.user.userInfo);
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [status, setStatus] = useState<string>("All");
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
 
     const navigate = useNavigate();
 
-    const fetchAppointments = (status: string) => {
+    const fetchAppointments = (status: string, page: number, limit: number) => {
         if (userData?.userId) {
             axiosUrl
-                .get(`/api/user/getAppointments/${userData.userId}`, {
-                    params: { status },
+                .get(`/api/user/getAppointments/${userData.userId}?status=${status}&page=${page}&limit=${limit}`, {
+                    params: { status, page },
                 })
                 .then((response) => {
                     setAppointments(response.data.data);
-                    console.log('Start Time:', appointments);
-                    console.log('End Time:', appointments[0]?.end);
+                    setTotalPages(response.data.totalPages); // Assuming the backend returns totalPages
                 })
                 .catch((error) => {
                     console.error("Error fetching appointments:", error);
                 });
         }
-
     };
 
     useEffect(() => {
-        fetchAppointments(status);
-    }, [status]);
+        fetchAppointments(status, currentPage, 3);
+    }, [status, currentPage]);
 
     const handleStatusChange = (newStatus: string) => {
         setStatus(newStatus);
+        setCurrentPage(1); // Reset to the first page when status changes
     };
 
     const handleCancelAppointment = (appointmentId: string) => {
@@ -76,7 +77,7 @@ export default function UserAppointmentsList() {
                             "The appointment has been cancelled. Your money will be refunded to your bank account.",
                             "success"
                         );
-                        fetchAppointments(status);
+                        fetchAppointments(status, currentPage,3);
                     })
                     .catch((error) => {
                         console.error("Error canceling appointment:", error);
@@ -156,6 +157,27 @@ export default function UserAppointmentsList() {
                                 </CardContent>
                             </Card>
                         ))}
+                    </div>
+
+                    {/* Pagination Controls */}
+                    <div className="flex justify-between items-center mt-4">
+                        <Button
+                            variant="outline"
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </Button>
+                        <div>
+                            <span>Page {currentPage} of {totalPages}</span>
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                        >
+                            Next
+                        </Button>
                     </div>
                 </CardContent>
             </Card>

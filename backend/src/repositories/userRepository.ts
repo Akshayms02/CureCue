@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import Slot from "../models/doctorSlotsModel";
 import appointmentModel from "../models/appointmentModel";
 import NotificationModel from "../models/notificationModel";
+import { sendAppointmentCancellationNotification } from "../config/socketConfig";
 
 export class UserRepository implements IUserRepository {
   async existUser(email: string): Promise<IUser | null> {
@@ -310,7 +311,7 @@ export class UserRepository implements IUserRepository {
     email: string;
   }) {
     try {
-      // Find the user by ID
+
       const user = await userModel.findOne({ userId: updateData.userId });
       if (!user) {
         throw new Error("User not found");
@@ -327,17 +328,34 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  async getAllAppointments(userId: string, status: string) {
+  async getAllAppointments(
+    userId: string,
+    status: string,
+    page: number,
+    limit: number
+  ) {
     try {
-      let appointments = [];
-
-      if (status === "All") {
-        appointments = await appointmentModel.find({ userId: userId }).lean();
-      } else {
-        appointments = await appointmentModel
-          .find({ userId: userId, status: status })
-          .lean();
+      const query: any = { userId: userId };
+      console.log(status)
+      if (status[0] !== "All") {
+        query.status = status[0];
       }
+
+
+
+      const skip = (page - 1) * limit;
+
+      const appointments = await appointmentModel
+        .find(query)
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+
+      const totalAppointments = await appointmentModel.countDocuments(query);
+
+
+      const totalPages = Math.ceil(totalAppointments / limit);
 
       const populatedAppointments = await Promise.all(
         appointments.map(async (appointment) => {
@@ -348,12 +366,13 @@ export class UserRepository implements IUserRepository {
         })
       );
 
-      return populatedAppointments;
+      return { appointments: populatedAppointments, totalPages };
     } catch (error: any) {
       console.error("Error getting appointments:", error.message);
       throw new Error(error.message);
     }
   }
+
 
   async getAppointment(appointmentId: string) {
     try {
@@ -548,10 +567,10 @@ export class UserRepository implements IUserRepository {
           { new: true, upsert: true }
         );
 
-        // sendAppointmentCancellationNotification(
-        //   appointment.doctorId,
-        //   appointment.userId
-        // );
+        sendAppointmentCancellationNotification(
+          appointment.doctorId,
+          appointment.userId
+        );
       }
 
       return appointment;

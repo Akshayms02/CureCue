@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { doctorServices } from "../services/doctorServices";
+import IDoctorController from "../interfaces/IDoctorController";
 
 interface FileData {
   fieldname: string;
@@ -38,7 +39,7 @@ export interface docDetails {
     url: string;
   };
 }
-export default class DoctorController {
+export default class DoctorController implements IDoctorController {
   private doctorService: doctorServices;
   constructor(doctorService: doctorServices) {
     this.doctorService = doctorService;

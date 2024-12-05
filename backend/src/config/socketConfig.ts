@@ -132,5 +132,21 @@ const configSocketIO = (server: HttpServer) => {
     console.log("error", error);
   }
 };
+const sendAppointmentCancellationNotification = (doctorId: any, userId: any) => {
+  const doctorSocketId = getReceiverSocketId(doctorId);
+  const userSocketId = getReceiverSocketId(userId);
+  console.log("reached here")
+  if (doctorSocketId) {
+    console.log(doctorSocketId);
+    io.to(doctorSocketId).emit("AppointmentCancellation");
+  } else {
+    console.log(`Doctor with ID ${doctorId} is not connected.`);
+  }
 
-export { configSocketIO, io };
+  if (userSocketId) {
+    io.to(userSocketId).emit("AppointmentCancellation");
+  } else {
+    console.log(`User with ID ${userId} is not connected.`);
+  }
+};
+export { configSocketIO, io, sendAppointmentCancellationNotification };
