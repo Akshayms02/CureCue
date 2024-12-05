@@ -301,16 +301,20 @@ export default class DoctorController implements IDoctorController {
 
   async getAppointments(req: Request, res: Response): Promise<any> {
     const doctorId = req.params.doctorId;
+    const page = parseInt(req.query.page as string) || 1; // Default to page 1
+    const limit = parseInt(req.query.limit as string) || 10; // Default to 10 items per page
+    const status = req.query.status as string
 
     try {
-      const appointments = await this.doctorService.getAppointments(doctorId);
-      res.status(200).json(appointments);
+      const result = await this.doctorService.getAppointments(doctorId, page, limit,status);
+      res.status(200).json(result);
     } catch (error: any) {
       res
         .status(500)
         .json({ message: "Error fetching appointments", error: error.message });
     }
   }
+
 
   async updateDoctorProfile(req: Request, res: Response): Promise<void> {
     try {

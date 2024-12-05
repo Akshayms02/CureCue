@@ -20,7 +20,7 @@ export interface IDoctorRepository {
     parsedEnd: Date
   ): Promise<any>;
   getDoctorData(doctorId: string): Promise<any>;
-  findAppointmentsByDoctor(doctorId: string): Promise<any>;
+  findAppointmentsByDoctor(doctorId: string, page: number, limit: number, status: string): Promise<any>;
   updateProfile(updateData: {
     doctorId: string;
     fees: number;

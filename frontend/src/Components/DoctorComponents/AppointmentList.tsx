@@ -23,7 +23,6 @@ import { toast } from 'sonner'
 import doctorAxiosUrl from '../../Utils/doctorAxios'
 import { useNavigate } from 'react-router-dom'
 
-
 interface Appointment {
     _id: string
     patientName: string
@@ -36,7 +35,9 @@ interface Appointment {
 export default function AppointmentList() {
     const [appointments, setAppointments] = useState<Appointment[]>([])
     const [loading, setLoading] = useState(false)
-    const [statusFilter, setStatusFilter] = useState<string>('all')
+    const [statusFilter, setStatusFilter] = useState<string>('All')
+    const [currentPage, setCurrentPage] = useState<number>(1)
+    const [totalPages, setTotalPages] = useState<number>(1)
     const DoctorData = localStorage.getItem("doctorInfo")
     const parsedDocData = JSON.parse(DoctorData as string)
     const navigate = useNavigate()
@@ -45,8 +46,18 @@ export default function AppointmentList() {
         const fetchAppointments = async () => {
             setLoading(true)
             try {
-                const response = await doctorAxiosUrl.get(`/api/doctor/appointments/${parsedDocData.doctorId}`)
-                setAppointments(response.data)
+                const response = await doctorAxiosUrl.get(
+                    `/api/doctor/appointments/${parsedDocData.doctorId}`,
+                    {
+                        params: {
+                            page: currentPage,
+                            status: statusFilter !== 'all' ? statusFilter : undefined,
+                            limit:4
+                        },
+                    }
+                )
+                setAppointments(response.data.appointments)
+                setTotalPages(response.data.totalPages)
             } catch (err: any) {
                 console.log(err)
                 toast.error('Failed to fetch appointments.')
@@ -56,11 +67,7 @@ export default function AppointmentList() {
         }
 
         fetchAppointments()
-    }, [])
-
-    const filteredAppointments = appointments.filter(appointment =>
-        statusFilter === 'all' || appointment.status === statusFilter
-    )
+    }, [currentPage, statusFilter])
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -71,7 +78,7 @@ export default function AppointmentList() {
             case "prescription pending":
                 return <Badge variant="secondary">Prescription pending</Badge>
             case "cancelled by Doctor":
-                return <Badge variant="destructive">Cancelld by Yourself</Badge>
+                return <Badge variant="destructive">Cancelled by Yourself</Badge>
             default:
                 return <Badge variant="secondary">Pending</Badge>
         }
@@ -80,11 +87,17 @@ export default function AppointmentList() {
     const viewDetails = (appointment: any) => {
         console.log(appointment)
         navigate('/doctor/appointmentDetails', { state: { appointment: appointment } })
+    }
 
+    const handlePageChange = (direction: 'prev' | 'next') => {
+        if (direction === 'prev' && currentPage > 1) {
+            setCurrentPage((prev) => prev - 1)
+        } else if (direction === 'next' && currentPage < totalPages) {
+            setCurrentPage((prev) => prev + 1)
+        }
     }
 
     if (loading) return <div className="flex justify-center items-center h-screen">Loading appointments...</div>
-
 
     return (
         <Card className="w-full max-w-4xl mx-auto my-auto">
@@ -98,12 +111,11 @@ export default function AppointmentList() {
                             <SelectValue placeholder="Filter by status" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Statuses</SelectItem>
+                            <SelectItem value="All">All Statuses</SelectItem>
                             <SelectItem value="completed">Completed</SelectItem>
                             <SelectItem value="cancelled">Cancelled</SelectItem>
                             <SelectItem value="pending">Pending</SelectItem>
                             <SelectItem value="prescription pending">Prescription Pending</SelectItem>
-
                         </SelectContent>
                     </Select>
                 </div>
@@ -118,7 +130,7 @@ export default function AppointmentList() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredAppointments.map((appointment) => (
+                        {appointments.map((appointment) => (
                             <TableRow key={appointment._id}>
                                 <TableCell className="font-medium">{appointment.patientName}</TableCell>
                                 <TableCell>{format(new Date(appointment.date), 'PPP')}</TableCell>
@@ -137,6 +149,27 @@ export default function AppointmentList() {
                         ))}
                     </TableBody>
                 </Table>
+                <div className="flex justify-between mt-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange('prev')}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </Button>
+                    <span className="text-sm">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePageChange('next')}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </Button>
+                </div>
             </CardContent>
         </Card>
     )

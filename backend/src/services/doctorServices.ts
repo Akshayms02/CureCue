@@ -425,18 +425,26 @@ export class doctorServices implements IDoctorService {
     }
   }
 
-  async getAppointments(doctorId: string) {
+  async getAppointments(doctorId: string, page: number, limit: number,status:string) {
     try {
-      const appointments = await this.doctorRepository.findAppointmentsByDoctor(
-        doctorId
-      );
+        const { appointments, total } = await this.doctorRepository.findAppointmentsByDoctor(
+            doctorId,
+            page,
+            limit,
+            status,
+        );
 
-      return appointments;
+        return {
+            appointments,
+            total,
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+        };
     } catch (error: any) {
-      console.log(error);
-      throw new Error("Error fetching appointments from service");
+        console.log(error);
+        throw new Error("Error fetching appointments from service");
     }
-  }
+}
 
   async updateProfile(updateData: {
     doctorId: string;

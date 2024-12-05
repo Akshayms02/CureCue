@@ -10,7 +10,7 @@ import {
   Calendar,
   DollarSign,
   User,
-  Users,
+
 
 } from "lucide-react";
 import { FaCheckToSlot } from "react-icons/fa6";
@@ -51,7 +51,7 @@ export function DoctorSidebar() {
     { to: "/doctor/slots", icon: FaCheckToSlot, label: "Slots" },
     { to: "/doctor/appointments", icon: Calendar, label: "Appointments" },
     { to: "/doctor/wallet", icon: DollarSign, label: "Wallet" },
-    { to: "/doctor/patients", icon: Users, label: "Patients" },
+
   ];
 
   return (

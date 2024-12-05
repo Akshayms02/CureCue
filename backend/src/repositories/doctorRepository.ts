@@ -286,16 +286,31 @@ export class DoctorRepository implements IDoctorRepository {
       }
     }
   }
-  async findAppointmentsByDoctor(doctorId: string) {
+  async findAppointmentsByDoctor(doctorId: string, page: number, limit: number, status: string) {
     try {
-      const appointments = await appointmentModel.find({ doctorId });
-      return appointments;
+      const skip = (page - 1) * limit; // Calculate how many documents to skip
+      const query: any = { doctorId: doctorId };
+      console.log(status)
+      if (status !== "All") {
+        query.status = status;
+      }
+
+      const appointments = await appointmentModel
+        .find(query)
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      const total = await appointmentModel.countDocuments(query);
+
+      return { appointments, total };
     } catch (error: any) {
       if (error instanceof Error) {
         throw new Error(error.message);
       }
     }
   }
+
   async updateProfile(updateData: {
     doctorId: string;
     fees: number;
