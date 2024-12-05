@@ -72,16 +72,26 @@ export class AdminRepository implements IAdminRepository {
       throw new Error(error.message);
     }
   }
-
-  async getAllUsers() {
+  async getAllUsers(page: number = 1, limit: number = 10) {
     try {
-      const users = await userModel.find();
+      const skip = (page - 1) * limit;
+      const users = await userModel.find()
+        .skip(skip)
+        .limit(limit);
 
-      return users;
+      const totalUsers = await userModel.countDocuments();
+
+      return {
+        users,
+        totalUsers,
+        totalPages: Math.ceil(totalUsers / limit),
+        currentPage: page,
+      };
     } catch (error: any) {
       throw new Error(error.message);
     }
   }
+
   async getAllDoctors() {
     try {
       const doctors = await doctorModel.find({ kycStatus: "approved" });
@@ -303,9 +313,8 @@ export class AdminRepository implements IAdminRepository {
 
       // Fill in registration data for users
       usersAndDoctorsRegistrationData[0].forEach((userData) => {
-        const key = `${userData._id.year}-${
-          userData._id.month < 10 ? "0" : ""
-        }${userData._id.month}`;
+        const key = `${userData._id.year}-${userData._id.month < 10 ? "0" : ""
+          }${userData._id.month}`;
         if (monthlyStatistics[key]) {
           monthlyStatistics[key].users = userData.count;
         }
@@ -313,9 +322,8 @@ export class AdminRepository implements IAdminRepository {
 
       // Fill in registration data for doctors
       usersAndDoctorsRegistrationData[1].forEach((doctorData) => {
-        const key = `${doctorData._id.year}-${
-          doctorData._id.month < 10 ? "0" : ""
-        }${doctorData._id.month}`;
+        const key = `${doctorData._id.year}-${doctorData._id.month < 10 ? "0" : ""
+          }${doctorData._id.month}`;
         if (monthlyStatistics[key]) {
           monthlyStatistics[key].doctors = doctorData.count;
         }
@@ -339,9 +347,8 @@ export class AdminRepository implements IAdminRepository {
 
       // Update monthly statistics with revenue data
       revenueByMonth.forEach((revenueData: any) => {
-        const key = `${revenueData._id.year}-${
-          revenueData._id.month < 10 ? "0" : ""
-        }${revenueData._id.month}`;
+        const key = `${revenueData._id.year}-${revenueData._id.month < 10 ? "0" : ""
+          }${revenueData._id.month}`;
         if (monthlyStatistics[key]) {
           monthlyStatistics[key].revenue = revenueData.totalFees;
           monthlyStatistics[key].totalFees = revenueData.totalFees;

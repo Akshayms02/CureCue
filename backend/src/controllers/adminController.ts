@@ -165,9 +165,18 @@ export default class AdminController {
 
   async getUsers(req: Request, res: Response): Promise<void> {
     try {
-      const response = await this.adminService.getUsers();
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
 
-      res.status(200).json({ message: "fetch users successfully", response });
+      const response = await this.adminService.getUsers(page, limit);
+
+      res.status(200).json({
+        message: "Fetched users successfully",
+        response: response.users,
+        totalUsers: response.totalUsers,
+        totalPages: response.totalPages,
+        currentPage: response.currentPage,
+      });
     } catch (error: any) {
       if (
         error.message ===
@@ -184,6 +193,7 @@ export default class AdminController {
       }
     }
   }
+
   async getDoctors(req: Request, res: Response): Promise<void> {
     try {
       const response = await this.adminService.getDoctors();

@@ -5,6 +5,7 @@ import { userServices } from "../services/userServices";
 import { refreshTokenHandler } from "../config/refreshTokenConfig";
 import { AwsConfig } from "../config/awsConfig";
 import { verifyToken } from "../config/jwtConfig";
+import userAuth from "../config/Auth";
 
 const route = Router();
 
@@ -51,7 +52,7 @@ route.post(
 );
 route.put(
   "/updateUser",
-  verifyToken,
+  verifyToken, userAuth,
   userController.updateUserProfile.bind(userController)
 );
 route.get(

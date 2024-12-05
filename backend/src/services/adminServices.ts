@@ -7,7 +7,7 @@ export class adminServices {
   constructor(
     private adminRepository: IAdminRepository,
     private S3Service: AwsConfig
-  ) {}
+  ) { }
 
   private getFolderPathByFileType(fileType: string): string {
     switch (fileType) {
@@ -149,38 +149,26 @@ export class adminServices {
     }
   }
 
-  async getUsers() {
+  async getUsers(page: number, limit: number) {
     try {
-      const response = await this.adminRepository.getAllUsers();
-
-      // Check if the response is valid
-      if (response) {
-        return response;
-      } else {
-        // Handle the case where the response is not as expected
-
-        throw new Error("Something went wrong while fetching the user.");
-      }
+      const response = await this.adminRepository.getAllUsers(page, limit);
+      return response;
     } catch (error: any) {
-      // Log the error and rethrow it with a message
-
-      throw new Error(`Failed to user: ${error.message}`);
+      throw new Error(`Failed to fetch users: ${error.message}`);
     }
   }
+
   async getDoctors() {
     try {
       const response = await this.adminRepository.getAllDoctors();
 
-      // Check if the response is valid
       if (response) {
         return response;
       } else {
-        // Handle the case where the response is not as expected
 
         throw new Error("Something went wrong while fetching the user.");
       }
     } catch (error: any) {
-      // Log the error and rethrow it with a message
 
       throw new Error(`Failed to user: ${error.message}`);
     }

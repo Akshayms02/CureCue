@@ -10,7 +10,7 @@ export interface IAdminRepository {
     description: string
   ): Promise<any>;
   changeSpecializationStatus(id: number): Promise<any>;
-  getAllUsers(): Promise<any>;
+  getAllUsers(page: number, limit: number): Promise<any>;
   getAllDoctors(): Promise<any>;
   changeUserStatus(id: string): Promise<any>;
   changeDoctorStatus(id: string): Promise<any>;
