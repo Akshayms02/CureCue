@@ -148,7 +148,7 @@ export default function UserAppointmentsList() {
                                         <Button variant="outline" onClick={() => handleViewAppointment(appointment)}>
                                             View Details
                                         </Button>
-                                        {appointment.status !== "cancelled" && appointment.status !== "cancelled by Doctor" && appointment.status !== "completed" && (
+                                        {appointment.status !== "cancelled" && appointment.status !== "cancelled by Doctor" && appointment.status !== "completed" &&appointment.status!="prescription pending"&& (
                                             <Button variant="destructive" onClick={() => handleCancelAppointment(appointment._id)}>
                                                 Cancel
                                             </Button>

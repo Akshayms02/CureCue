@@ -127,12 +127,19 @@ const UserLayout: React.FC = () => {
                     <span className="sr-only">Notifications</span>
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[300px] sm:w-[400px]" onOpenAutoFocus={handleNotificationsRead}>
+                <SheetContent
+                  side="right"
+                  className="w-[300px] sm:w-[400px]"
+                  onOpenAutoFocus={handleNotificationsRead}
+                >
                   <h2 className="text-lg font-semibold mb-4">Notifications</h2>
-                  <div className="space-y-4">
+                  <div className="space-y-4 overflow-y-auto max-h-[400px]">
                     {notifications.length > 0 ? (
                       notifications.map((notification, index) => (
-                        <div key={notification.notifications_id || index} className="p-4 bg-secondary rounded-lg relative">
+                        <div
+                          key={notification.notifications_id || index}
+                          className="p-4 bg-secondary rounded-lg relative"
+                        >
                           {/* Notification Header with Close Button */}
                           <div className="flex justify-between items-center">
                             <h3 className="font-medium capitalize">
@@ -147,18 +154,26 @@ const UserLayout: React.FC = () => {
                             </button>
                           </div>
 
-                          {/* Notification Content */}
+
                           <p className="text-sm text-muted-foreground mt-2">
                             {notification.notifications.content || "No content available."}
                           </p>
-                        </div>
 
+
+                          <p className="text-xs text-muted-foreground mt-1 text-end">
+                            {new Intl.DateTimeFormat("en-US", {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            }).format(new Date(notification.notifications.createdAt))}
+                          </p>
+                        </div>
                       ))
                     ) : (
                       <p className="text-muted-foreground">No notifications available.</p>
                     )}
                   </div>
                 </SheetContent>
+
               </Sheet>
               {isLoggedIn ? (
                 <Button
