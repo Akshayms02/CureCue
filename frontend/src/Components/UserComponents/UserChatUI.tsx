@@ -16,6 +16,7 @@ function UserChatUI() {
     const { appointment } = location.state || {};
     const [newMsg, setNewMsg] = useState("");
     const [chatHistory, setChatHistory] = useState<any[]>([]);
+    const [doc, setDoc] = useState<any>()
 
     const { socket } = useSocket()
     const scrollAreaRef = useRef<HTMLDivElement | null>(null);
@@ -31,6 +32,7 @@ function UserChatUI() {
                 });
                 console.log("response", response)
                 setChatHistory(response?.data?.chatResult.messages);
+                setDoc(response?.data)
                 socket.emit("joinChatRoom", {
                     doctorID: appointment?.doctorId,
                     userID: appointment?.userId
@@ -102,7 +104,8 @@ function UserChatUI() {
                 <CardTitle className="flex justify-between items-center">
                     <div className="flex items-center space-x-4">
                         <Avatar>
-                            <AvatarImage src="https://github.com/shadcn.png" alt="Doctor" />
+                            <AvatarImage src={doc?.signedDoctorImageUrl
+                            } alt="Doctor" />
                             <AvatarFallback>DR</AvatarFallback>
                         </Avatar>
                         <div>
@@ -116,37 +119,35 @@ function UserChatUI() {
                 </CardTitle>
             </CardHeader>
             <CardContent className="flex-grow overflow-hidden">
-      <div className="h-full pr-4 overflow-auto scrollbar rounded-lg" ref={scrollAreaRef}>
-        {chatHistory?.length > 0 ? (
-          chatHistory.map((chat: any, index: number) => (
-            <div key={index} className={`flex ${chat.sender === "user" ? "justify-end" : "justify-start"} mb-4`}>
-              <div className={`flex ${chat.sender === "user" ? "flex-row-reverse" : "flex-row"} items-end`}>
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={chat.profileImage} alt={`${chat.sender} profile`} />
-                  <AvatarFallback>{chat.sender === "user" ? "U" : "D"}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col mx-2">
-                  <div className={`py-2 px-3 rounded-lg ${
-                    chat.sender === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
-                  }`}>
-                    <p>{chat.message}</p>
-                  </div>
-                  <span className={`text-xs mt-1 ${
-                    chat.sender === "user" ? "text-right" : "text-left"
-                  } text-muted-foreground`}>
-                    {format(new Date(chat.createdAt), 'MMM d, yyyy h:mm a')}
-                  </span>
+                <div className="h-full pr-4 overflow-auto scrollbar rounded-lg" ref={scrollAreaRef}>
+                    {chatHistory?.length > 0 ? (
+                        chatHistory.map((chat: any, index: number) => (
+                            <div key={index} className={`flex ${chat.sender === "user" ? "justify-end" : "justify-start"} mb-4`}>
+                                <div className={`flex ${chat.sender === "user" ? "flex-row-reverse" : "flex-row"} items-end`}>
+                                    <Avatar className="w-8 h-8">
+                                        <AvatarImage src={chat.sender === "user" ? chat.profileImage : doc.signedDoctorImageUrl} alt={`${chat.sender} profile`} />
+                                        <AvatarFallback>{chat.sender === "user" ? "U" : "D"}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex flex-col mx-2">
+                                        <div className={`py-2 px-3 rounded-lg ${chat.sender === "user"
+                                            ? "bg-primary text-primary-foreground"
+                                            : "bg-secondary text-secondary-foreground"
+                                            }`}>
+                                            <p>{chat.message}</p>
+                                        </div>
+                                        <span className={`text-xs mt-1 ${chat.sender === "user" ? "text-right" : "text-left"
+                                            } text-muted-foreground`}>
+                                            {format(new Date(chat.createdAt), 'MMM d, yyyy h:mm a')}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center text-muted-foreground">No messages yet...</p>
+                    )}
                 </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-center text-muted-foreground">No messages yet...</p>
-        )}
-      </div>
-    </CardContent>
+            </CardContent>
             <CardFooter className="border-t">
                 <form onSubmit={(e) => { e.preventDefault(); sendMessage(newMsg); }} className="flex w-full items-center space-x-2">
                     <Input

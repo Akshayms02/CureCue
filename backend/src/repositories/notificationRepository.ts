@@ -5,6 +5,7 @@ class NotificationRepository {
     const notification = await NotificationModel.aggregate([
       { $match: { receiverId: userId } },
       { $unwind: "$notifications" },
+      { $sort: { "notifications.createdAt": -1 } },
     ]);
     return notification;
   }

@@ -100,4 +100,4 @@ export const changePassword = async (currentPassword: string, newPassword: strin
       throw new Error(error.response.data.message || 'An unknown error occurred');
     }
   }
-};
+}
