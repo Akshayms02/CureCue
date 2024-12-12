@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import axiosUrl from '../../Utils/axios';
 import { Button } from "../../../components/ui/button"
 import { Input } from "../../../components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
@@ -9,6 +8,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../../c
 import { Send } from 'lucide-react'
 import { useSocket } from '../../Context/SocketIO';
 import { format } from 'date-fns';
+import { fetchTwoMembersChat } from '../../services/userServices';
 
 function UserChatUI() {
     const location = useLocation();
@@ -24,12 +24,9 @@ function UserChatUI() {
     useEffect(() => {
         const fetchChatHistory = async () => {
             try {
-                const response = await axiosUrl.get(`/api/chat/fetchTwoMembersChat`, {
-                    params: {
-                        doctorID: appointment?.doctorId,
-                        userID: appointment?.userId
-                    }
-                });
+                const doctorId = appointment?.doctorId
+                const userId = appointment?.userId
+                const response = await fetchTwoMembersChat(doctorId, userId)
                 console.log("response", response)
                 setChatHistory(response?.data?.chatResult.messages);
                 setDoc(response?.data)

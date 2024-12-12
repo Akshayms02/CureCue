@@ -101,3 +101,96 @@ export const changePassword = async (currentPassword: string, newPassword: strin
     }
   }
 }
+
+export const createAppointment = async (body: any) => {
+  try {
+    const response = await axiosUrl.post(`api/user/createAppointment`, body)
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+
+export const getAppointmentDetails = async (appointmentId: string) => {
+  try {
+    const response = await axiosUrl.get(`/api/user/getAppointment/${appointmentId}`)
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const addReview = async (body: {
+  appointmentId: string, rating: number,
+  reviewText: string
+}) => {
+  try {
+    const response = await axiosUrl.post('/api/user/addReview', body);
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const cancelAppointment = async (appointmentId: string) => {
+  try {
+    const response = await axiosUrl.put(`/api/user/cancelAppointment/${appointmentId}`)
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const getAllAppointments = async (userId: string, status: string, page: number, limit: number) => {
+  try {
+    const response = await axiosUrl.get(`/api/user/getAppointments/${userId}?status=${status}&page=${page}&limit=${limit}`, {
+      params: {
+        status: status,
+        page: page
+      }
+    });
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const fetchTwoMembersChat = async (doctorId: string, userId: string) => {
+  try {
+    const response = await axiosUrl.get(`/api/chat/fetchTwoMembersChat`, {
+      params: {
+        doctorID: doctorId,
+        userID: userId
+      }
+    });
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const endCall = async (appointmentId: string) => {
+  try {
+    const response = await axiosUrl.post(`/api/chat/end-call`, {
+      appointmentId: appointmentId,
+    })
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}

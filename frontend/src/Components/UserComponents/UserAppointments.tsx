@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
-import axiosUrl from "../../Utils/axios";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +9,7 @@ import moment from "moment";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
+import { cancelAppointment, getAllAppointments } from "../../services/userServices";
 
 interface Appointment {
     _id: string;
@@ -34,13 +34,11 @@ export default function UserAppointmentsList() {
 
     const fetchAppointments = (status: string, page: number, limit: number) => {
         if (userData?.userId) {
-            axiosUrl
-                .get(`/api/user/getAppointments/${userData.userId}?status=${status}&page=${page}&limit=${limit}`, {
-                    params: { status, page },
-                })
+            const userId = userData?.userId
+            getAllAppointments(userId, status, page, limit)
                 .then((response) => {
-                    setAppointments(response.data.data);
-                    setTotalPages(response.data.totalPages); // Assuming the backend returns totalPages
+                    setAppointments(response?.data.data);
+                    setTotalPages(response?.data.totalPages); // Assuming the backend returns totalPages
                 })
                 .catch((error) => {
                     console.error("Error fetching appointments:", error);
@@ -68,8 +66,7 @@ export default function UserAppointmentsList() {
             confirmButtonText: "Yes, cancel it!",
         }).then((result) => {
             if (result.isConfirmed) {
-                axiosUrl
-                    .put(`/api/user/cancelAppointment/${appointmentId}`)
+                cancelAppointment(appointmentId)
                     .then(() => {
                         toast.success("Appointment cancelled");
                         Swal.fire(
@@ -77,7 +74,7 @@ export default function UserAppointmentsList() {
                             "The appointment has been cancelled. Your money will be refunded to your bank account.",
                             "success"
                         );
-                        fetchAppointments(status, currentPage,3);
+                        fetchAppointments(status, currentPage, 3);
                     })
                     .catch((error) => {
                         console.error("Error canceling appointment:", error);
@@ -148,7 +145,7 @@ export default function UserAppointmentsList() {
                                         <Button variant="outline" onClick={() => handleViewAppointment(appointment)}>
                                             View Details
                                         </Button>
-                                        {appointment.status !== "cancelled" && appointment.status !== "cancelled by Doctor" && appointment.status !== "completed" &&appointment.status!="prescription pending"&& (
+                                        {appointment.status !== "cancelled" && appointment.status !== "cancelled by Doctor" && appointment.status !== "completed" && appointment.status != "prescription pending" && (
                                             <Button variant="destructive" onClick={() => handleCancelAppointment(appointment._id)}>
                                                 Cancel
                                             </Button>

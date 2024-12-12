@@ -11,7 +11,7 @@ import { setRoomId, setShowIncomingVideoCall, setShowVideoCall } from '../../Red
 import { Card, CardContent } from "../../../components/ui/card"
 import { Button } from "../../../components/ui/button"
 import { PhoneOff, Mic, Video } from "lucide-react"
-import axiosUrl from '../../Utils/axios'
+import { endCall } from '../../services/userServices'
 
 export function getUrlParams(url = window.location.href) {
     const urlStr = url.split('?')[1]
@@ -54,9 +54,8 @@ function VideoChatUser() {
 
                 dispatch(setShowIncomingVideoCall(null))
                 console.log("about to make api call")
-                axiosUrl.post(`/api/chat/end-call`, {
-                    appointmentId: videoCall?.appointmentId,
-                }).catch(error => {
+                const appointmentId = videoCall?.appointmentId
+                endCall(appointmentId).catch(error => {
                     console.error("Error ending the call:", error);
                 });
                 dispatch(setVideoCall(null))
@@ -110,3 +109,4 @@ function VideoChatUser() {
 }
 
 export default VideoChatUser
+

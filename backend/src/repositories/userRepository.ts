@@ -348,7 +348,7 @@ export class UserRepository implements IUserRepository {
       const appointments = await appointmentModel
         .find(query)
         .skip(skip)
-        .limit(limit)
+        .limit(limit).sort({ createdAt: -1 })
         .lean();
 
 

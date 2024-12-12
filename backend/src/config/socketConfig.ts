@@ -142,7 +142,6 @@ const sendAppointmentCancellationNotification = (doctorId: any, userId: any) => 
   } else {
     console.log(`Doctor with ID ${doctorId} is not connected.`);
   }
-
   if (userSocketId) {
     io.to(userSocketId).emit("AppointmentCancellation");
   } else {

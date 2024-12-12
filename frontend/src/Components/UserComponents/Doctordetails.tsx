@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate, useParams } from 'react-router-dom';
-import { fetchAvialableTimeslots, getDoctorData } from '../../services/userServices';
+import { createAppointment, fetchAvialableTimeslots, getDoctorData } from '../../services/userServices';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import axiosUrl from '../../Utils/axios';
@@ -173,7 +173,7 @@ const Doctordetails: React.FC = () => {
                         razorpay_order_id: any;
                     }) {
                         try {
-                            await axiosUrl.post(`api/user/createAppointment`, {
+                            const body = {
                                 amount: parseInt(doctorData?.fees as string),
                                 currency: "INR",
                                 email: doctorData?.email,
@@ -184,7 +184,8 @@ const Doctordetails: React.FC = () => {
                                 timeslotId: selectedTimeslot,
                                 patientName: userData?.name,
                                 date: selectedDate
-                            });
+                            }
+                            await createAppointment(body);
 
                             toast.success("Payment successful and appointment booked.");
                             setTimeout(() => {

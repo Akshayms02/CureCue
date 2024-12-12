@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
 import { Formik, Form, Field, ErrorMessage, FieldProps } from "formik";
 import * as Yup from "yup";
-import axiosUrl from "../../Utils/axios";
+
 import { toast } from "sonner";
 import { jsPDF } from 'jspdf';
 
@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from "../../../components/ui/textarea";
 import { Label } from "../../../components/ui/label";
 import Swal from "sweetalert2";
+import { addReview, cancelAppointment, getAppointmentDetails } from "../../services/userServices";
 
 
 interface ReviewFormValues {
@@ -54,8 +55,8 @@ export default function UserAppointmentDetails() {
     useEffect(() => {
         const fetchAppointmentDetails = async () => {
             try {
-                const response = await axiosUrl.get(`/api/user/getAppointment/${appointmentId}`);
-                setAppointment(response.data.data);
+                const response = await getAppointmentDetails(appointmentId)
+                setAppointment(response?.data.data);
             } catch (error) {
                 console.error("Error fetching appointment details:", error);
             }
@@ -71,12 +72,13 @@ export default function UserAppointmentDetails() {
 
     const handleSubmitReview = async (values: ReviewFormValues, { resetForm }: { resetForm: () => void }) => {
         try {
-            const response = await axiosUrl.post('/api/user/addReview', {
-                appointmentId: appointment?._id,
-                rating: values.rating,
-                reviewText: values.reviewText,
-            });
-            setAppointment(response.data.data);
+            const body = {
+                appointmentId: appointment?._id as string,
+                rating: values.rating as number,
+                reviewText: values.reviewText as string,
+            }
+            const response = await addReview(body);
+            setAppointment(response?.data.data);
             toast.success("Your Review Added Successfully");
             resetForm();
             setIsReviewModalOpen(false);
@@ -164,8 +166,7 @@ export default function UserAppointmentDetails() {
             confirmButtonText: "Yes, cancel it!",
         }).then((result) => {
             if (result.isConfirmed) {
-                axiosUrl
-                    .put(`/api/user/cancelAppointment/${appointmentId}`)
+                cancelAppointment(appointmentId)
                     .then(() => {
                         toast.success("Appointment cancelled");
                         Swal.fire(
