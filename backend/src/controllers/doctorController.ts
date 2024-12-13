@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { doctorServices } from "../services/doctorServices";
 import IDoctorController from "../interfaces/IDoctorController";
+import { docCookieSettings } from "../config/cookieConfig";
 
 interface FileData {
   fieldname: string;
@@ -80,13 +81,7 @@ export default class DoctorController implements IDoctorController {
       if (!result) {
         res.status(401).json({ message: "Invalid Login Credentials" });
       }
-      res.cookie("docrefreshToken", result.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-      });
+      res.cookie("docrefreshToken", result.refreshToken, docCookieSettings);
 
       const { docaccessToken, doctorInfo } = result;
 
@@ -306,7 +301,7 @@ export default class DoctorController implements IDoctorController {
     const status = req.query.status as string
 
     try {
-      const result = await this.doctorService.getAppointments(doctorId, page, limit,status);
+      const result = await this.doctorService.getAppointments(doctorId, page, limit, status);
       res.status(200).json(result);
     } catch (error: any) {
       res

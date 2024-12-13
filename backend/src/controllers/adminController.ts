@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { adminServices } from "../services/adminServices";
+import { adminCookieSettings } from "../config/cookieConfig";
 
 export default class AdminController {
   private adminService: adminServices;
@@ -22,12 +23,7 @@ export default class AdminController {
         adminInfo: loginResponse.adminInfo,
       };
 
-      res.cookie("adminRefreshToken", loginResponse.adminRefreshToken, {
-        httpOnly: true,
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        sameSite: "strict",
-      });
+      res.cookie("adminRefreshToken", loginResponse.adminRefreshToken, adminCookieSettings);
 
       res.status(200).json({ message: "Login successful", response });
     } catch (error: any) {

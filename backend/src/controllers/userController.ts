@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { userServices } from "../services/userServices";
 import { IUserController } from "../interfaces/IUserController";
+import { cookieSettings } from "../config/cookieConfig";
 
 export default class UserController implements IUserController {
   private userService: userServices;
@@ -43,12 +44,7 @@ export default class UserController implements IUserController {
       if (!result) {
         res.status(401).json({ message: "Invalid Login Credentials" });
       }
-      res.cookie("refreshToken", result.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-      });
+      res.cookie("refreshToken", result.refreshToken, cookieSettings);
 
       const { accessToken, userInfo } = result;
       const Credentials = { accessToken, userInfo };
