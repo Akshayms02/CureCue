@@ -10,8 +10,8 @@ import {
   SheetContent,
   SheetTrigger,
 } from "../../../components/ui/sheet"
-import axiosUrl from "../../Utils/axios"
 import { useSocket } from "../../Context/SocketIO"
+import { deleteNotification, getNotifications } from "../../services/userServices"
 
 const UserLayout: React.FC = () => {
   const isLoggedIn = useSelector((state: RootState) => state.user.userInfo)
@@ -33,13 +33,12 @@ const UserLayout: React.FC = () => {
     try {
       console.log("hellow");
       console.log(isLoggedIn?.userId)
-
-      const response = await axiosUrl.get(`/api/notification/getNotifications/${isLoggedIn?.userId}`);
+      const response = await getNotifications(isLoggedIn?.userId as string)
       console.log(response)
 
 
-      setNotifications(response.data);
-      setNotificationCount(response.data.length)
+      setNotifications(response?.data);
+      setNotificationCount(response?.data.length)
 
 
     } catch (error) {
@@ -68,7 +67,7 @@ const UserLayout: React.FC = () => {
 
   const handleClose = async (id) => {
     const notificationId = notifications[0]._id
-    await axiosUrl.post(`/api/notification/deleteNotification?id=${notificationId}&notificationId=${id}`)
+    await deleteNotification(notificationId, id)
     setNotifications(notifications.filter((n: any) => n.notifications._id !== id));
   };
   return (
@@ -133,7 +132,7 @@ const UserLayout: React.FC = () => {
                   onOpenAutoFocus={handleNotificationsRead}
                 >
                   <h2 className="text-lg font-semibold mb-4">Notifications</h2>
-                  <div className="space-y-4 overflow-y-auto max-h-[400px]">
+                  <div className="space-y-4 overflow-y-auto max-h-full">
                     {notifications.length > 0 ? (
                       notifications.map((notification, index) => (
                         <div

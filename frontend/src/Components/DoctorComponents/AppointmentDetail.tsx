@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Textarea } from "../../../components/ui/textarea"
 import { ScrollArea } from "../../../components/ui/scroll-area"
 import { Download, MessageCircle, X } from 'lucide-react'
-import doctorAxiosUrl from "../../Utils/doctorAxios"
+import { addPrescription, cancelAppointment, getMedicalRecords } from "../../services/doctorServices"
 
 export default function AppointmentDetails() {
 
@@ -55,11 +55,7 @@ export default function AppointmentDetails() {
                 confirmButtonText: "Yes, cancel it!",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    doctorAxiosUrl
-                        .put("/api/doctor/cancelAppointment", {
-                            appointmentId: appointment?._id,
-                            reason: values.cancelReason,
-                        })
+                    cancelAppointment(appointment?._id as string, values.cancelReason as string)
                         .then(() => {
                             setAppointmentStatus("cancelled by Doctor")
                             Swal.fire("Cancelled!", "Your appointment has been cancelled.", "success")
@@ -89,11 +85,7 @@ export default function AppointmentDetails() {
                 confirmButtonText: "Yes, submit it!",
             }).then((result) => {
                 if (result.isConfirmed && appointment?._id) {
-                    doctorAxiosUrl
-                        .put("/api/doctor/addPrescription", {
-                            appointmentId: appointment._id,
-                            prescription: values.prescription,
-                        })
+                    addPrescription(appointment?._id as string, values.prescription as string)
                         .then(() => {
                             setAppointmentStatus("completed")
                             Swal.fire("Submitted!", "The prescription has been added.", "success")
@@ -113,8 +105,9 @@ export default function AppointmentDetails() {
         const fetchMedicalRecords = async () => {
             try {
                 console.log(appointment)
-                const response = await doctorAxiosUrl.get(`/api/doctor/getMedicalRecords/${appointment?.userId}`)
-                setMedicalRecords(response.data.response)
+                const response = await getMedicalRecords(appointment?.userId as string)
+                console.log(response)
+                setMedicalRecords(response?.data.response)
             } catch (error) {
                 console.error("Error fetching medical records:", error)
             }

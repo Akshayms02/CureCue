@@ -5,8 +5,8 @@ import { RootState } from '../../Redux/store';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { FaUsers, FaUserMd, FaCalendarCheck, FaChartLine } from 'react-icons/fa';
 import { GiReceiveMoney } from 'react-icons/gi';
-import doctorAxiosUrl from '../../Utils/doctorAxios';
 import { NavLink } from 'react-router-dom';
+import { getDashboardData } from '../../services/doctorServices';
 
 function DoctorDashboard() {
   const DoctorData = useSelector((state: RootState) => state.doctor);
@@ -21,11 +21,9 @@ function DoctorDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await doctorAxiosUrl.get('/api/doctor/dashboardData', {
-          params: { doctorId: DoctorData?.doctorInfo?.doctorId },
-        });
-        console.log(response.data.response.monthlyRevenue)
-        setDashboardData(response.data.response);
+        const response = await getDashboardData(DoctorData?.doctorInfo?.doctorId as string)
+        console.log(response?.data.response.monthlyRevenue)
+        setDashboardData(response?.data.response);
       } catch (error) {
         console.error("Error fetching data", error);
       }

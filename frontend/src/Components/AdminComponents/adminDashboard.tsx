@@ -6,9 +6,9 @@ import DoctorRevenueChart from "./DoctorRevenueChart"
 import UserDoctorChart from "./UserDoctorChart"
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs"
-import adminAxiosUrl from "../../Utils/adminAxios"
+import { getAdminDashboard } from "../../services/adminServices"
 
-export  function AdminDashboard() {
+export function AdminDashboard() {
   const [dashboardData, setDashboardData] = useState({
     totalRevenue: 0,
     totalUsers: 0,
@@ -23,16 +23,17 @@ export  function AdminDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await adminAxiosUrl.get("/api/admin/dashboardData")
+        const response = await getAdminDashboard()
+
         setDashboardData({
-          totalRevenue: response.data.response.totalRevenue,
-          totalUsers: response.data.response.totalUsers,
-          totalDoctors: response.data.response.totalDoctors,
-          activeUsers: response.data.response.activeUsers,
-          activeDoctors: response.data.response.activeDoctors,
-          userDoctorChartData: response.data.response.userDoctorChartData,
-          adminRevenue: response.data.response.adminRevenue,
-          doctorRevenue: response.data.response.doctorRevenue,
+          totalRevenue: response?.data.response.totalRevenue,
+          totalUsers: response?.data.response.totalUsers,
+          totalDoctors: response?.data.response.totalDoctors,
+          activeUsers: response?.data.response.activeUsers,
+          activeDoctors: response?.data.response.activeDoctors,
+          userDoctorChartData: response?.data.response.userDoctorChartData,
+          adminRevenue: response?.data.response.adminRevenue,
+          doctorRevenue: response?.data.response.doctorRevenue,
         })
       } catch (err) {
         console.error("Error fetching dashboard data:", err)
@@ -44,7 +45,7 @@ export  function AdminDashboard() {
 
   return (
     <div className="container mx-auto p-6 space-y-8 min-h-screen ">
-      
+
       <h1 className="text-3xl font-bold mb-6">Dashboard Overview</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>

@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "../../../components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table"
 import { ArrowLeft, ArrowRight, CreditCard, DollarSign } from 'lucide-react'
-import doctorAxiosUrl from '../../Utils/doctorAxios'
+import { getWalletData, withDrawMoney } from '../../services/doctorServices'
 
 interface Transaction {
   transactionId: string
@@ -33,18 +33,16 @@ export default function DoctorWallet() {
     try {
       const doctorId = DoctorData?.doctorInfo?.doctorId
       if (doctorId) {
-        const response = await doctorAxiosUrl.get(`/api/doctor/getWallet/${doctorId}`, {
-          params: { status, page, limit: 7 }
-        })
-        const convertedData = response.data.response.transactions.map((walletData: any) => ({
+        const response = await getWalletData(doctorId as string, status as string, page as number)
+        const convertedData = response?.data.response.transactions.map((walletData: any) => ({
           transactionId: walletData.transactionId,
           amount: walletData.amount,
           date: new Date(walletData.date).toISOString().split('T')[0],
           transactionType: walletData.transactionType,
         }))
-        setBalance(response.data.response.balance)
+        setBalance(response?.data.response.balance)
         setTransactions(convertedData)
-        setTotalPages(response.data.response.totalPages)
+        setTotalPages(response?.data.response.totalPages)
       }
     } catch (error) {
       console.error('Error fetching wallet data:', error)
@@ -88,17 +86,16 @@ export default function DoctorWallet() {
         if (result.isConfirmed) {
           try {
             const doctorId = DoctorData?.doctorInfo?.doctorId
-            const response = await doctorAxiosUrl.post(`/api/doctor/withdraw/${doctorId}`, {
-              withdrawAmount: values.withdrawAmount,
-            })
-            if (response.status === 200) {
-              const convertedData = response.data.response.transactions.map((walletData: any) => ({
+            const response = await withDrawMoney(doctorId as string, values.withdrawAmount as string)
+            console.log(response)
+            if (response?.status === 200) {
+              const convertedData = response?.data.response.transactions.map((walletData: any) => ({
                 transactionId: walletData.transactionId,
                 amount: walletData.amount,
                 date: new Date(walletData.date).toISOString().split('T')[0],
                 transactionType: walletData.transactionType,
               }))
-              setBalance(response.data.response.balance)
+              setBalance(response?.data.response.balance)
               setTransactions(convertedData)
               Swal.fire({
                 title: 'Success!',

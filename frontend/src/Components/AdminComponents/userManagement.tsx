@@ -27,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import adminAxiosUrl from "../../Utils/adminAxios";
+import { getAllUsers, userBlockUnblock } from "../../services/adminServices";
 
 interface UserDetails {
   _id: string;
@@ -54,12 +54,10 @@ function UserManagement() {
 
   const fetchUsers = async (page: number) => {
     try {
-      const response = await adminAxiosUrl.get("/api/admin/getUsers", {
-        params: { page, limit: usersPerPage },
-      });
+      const response = await getAllUsers(page, usersPerPage as number)
       console.log(response)
-      setUsers(response.data.response);
-      setTotalPages(Math.ceil(response.data.totalPages / usersPerPage)); // Calculate total pages
+      setUsers(response?.data.response);
+      setTotalPages(Math.ceil(response?.data.totalPages / usersPerPage)); // Calculate total pages
     } catch (error: any) {
       toast.error(`Failed to fetch users: ${error.message}`);
     }
@@ -71,7 +69,8 @@ function UserManagement() {
 
   const toggleListState = async (id: string) => {
     console.log("hello toggled");
-    const response = await adminAxiosUrl.put(`/api/admin/listUnlistUser/${id}`);
+    const response = await userBlockUnblock(id as string)
+    console.log(response)
     if (response) {
       toast.success("The Action was successful");
     }

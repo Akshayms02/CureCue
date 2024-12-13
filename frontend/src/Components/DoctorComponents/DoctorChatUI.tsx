@@ -7,11 +7,11 @@ import { Input } from "../../../components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card"
 import { Send, Video } from 'lucide-react'
-import doctorAxiosUrl from '../../Utils/doctorAxios';
 import { useSocket } from '../../Context/SocketIO';
 import { setVideoCall } from '../../Redux/Slice/doctorSlice';
 import { useDispatch } from 'react-redux';
 import { format } from 'date-fns';
+import { fetchTwoMememberChat } from '../../services/doctorServices';
 
 const DoctorChatUI = () => {
     const location = useLocation();
@@ -29,15 +29,9 @@ const DoctorChatUI = () => {
         const fetchChatHistory = async () => {
             try {
                 console.log("state", appointment)
-                const response = await doctorAxiosUrl.get(`/api/chat/fetchTwoMembersChat`, {
-                    params: {
-                        doctorID: appointment?.doctorId,
-                        userID: appointment?.userId,
-                        sender: "doctor"
-                    }
-                });
-                setChatHistory(response.data.chatResult.messages);
-                setNewImg(response.data.signedDoctorImageUrl)
+                const response = await fetchTwoMememberChat(appointment?.doctorId as string, appointment?.userId as string)
+                setChatHistory(response?.data.chatResult.messages);
+                setNewImg(response?.data.signedDoctorImageUrl)
 
                 socket.emit("joinChatRoom", {
                     doctorID: appointment?.doctorId,
@@ -134,37 +128,35 @@ const DoctorChatUI = () => {
                 </CardTitle>
             </CardHeader>
             <CardContent className="flex-grow overflow-hidden">
-      <div className="h-full pr-4 overflow-auto" ref={scrollAreaRef}>
-        {chatHistory?.length > 0 ? (
-          chatHistory.map((chat, index) => (
-            <div key={index} className={`flex ${chat.sender === "doctor" ? "justify-end" : "justify-start"} mb-4`}>
-              <div className={`flex ${chat.sender === "doctor" ? "flex-row-reverse" : "flex-row"} items-end`}>
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={chat.sender === "doctor" ? newImg : "P"} alt={`${chat.sender} profile`} />
-                  <AvatarFallback>{chat.sender === "doctor" ? "D" : "P"}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col mx-2">
-                  <div className={`py-2 px-3 rounded-lg ${
-                    chat.sender === "doctor"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
-                  }`}>
-                    <p>{chat.message}</p>
-                  </div>
-                  <span className={`text-xs mt-1 ${
-                    chat.sender === "doctor" ? "text-right" : "text-left"
-                  } text-muted-foreground`}>
-                    {format(new Date(chat.createdAt), 'MMM d, yyyy h:mm a')}
-                  </span>
+                <div className="h-full pr-4 overflow-auto" ref={scrollAreaRef}>
+                    {chatHistory?.length > 0 ? (
+                        chatHistory.map((chat, index) => (
+                            <div key={index} className={`flex ${chat.sender === "doctor" ? "justify-end" : "justify-start"} mb-4`}>
+                                <div className={`flex ${chat.sender === "doctor" ? "flex-row-reverse" : "flex-row"} items-end`}>
+                                    <Avatar className="w-8 h-8">
+                                        <AvatarImage src={chat.sender === "doctor" ? newImg : "P"} alt={`${chat.sender} profile`} />
+                                        <AvatarFallback>{chat.sender === "doctor" ? "D" : "P"}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex flex-col mx-2">
+                                        <div className={`py-2 px-3 rounded-lg ${chat.sender === "doctor"
+                                            ? "bg-primary text-primary-foreground"
+                                            : "bg-secondary text-secondary-foreground"
+                                            }`}>
+                                            <p>{chat.message}</p>
+                                        </div>
+                                        <span className={`text-xs mt-1 ${chat.sender === "doctor" ? "text-right" : "text-left"
+                                            } text-muted-foreground`}>
+                                            {format(new Date(chat.createdAt), 'MMM d, yyyy h:mm a')}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center text-muted-foreground">No messages yet...</p>
+                    )}
                 </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-center text-muted-foreground">No messages yet...</p>
-        )}
-      </div>
-    </CardContent>
+            </CardContent>
             <CardFooter className="border-t">
                 <form onSubmit={(e) => { e.preventDefault(); sendMessage(newMsg); }} className="flex w-full items-center space-x-2">
                     <Input

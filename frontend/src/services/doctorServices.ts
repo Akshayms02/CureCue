@@ -1,3 +1,4 @@
+import axios from "axios";
 import doctorAxiosUrl from "../Utils/doctorAxios";
 
 export const getSpecializations = async () => {
@@ -126,3 +127,121 @@ export const getDoctorData = async (doctorId: string) => {
     }
   }
 };
+
+export const cancelAppointment = async (appointmentId: string, reason: string) => {
+  try {
+    const response = await doctorAxiosUrl
+      .put("/api/doctor/cancelAppointment", {
+        appointmentId: appointmentId,
+        reason: reason,
+      })
+
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const addPrescription = async (appointmentId: string, reason: string) => {
+  try {
+    const response = await doctorAxiosUrl
+      .put("/api/doctor/addPrescription", {
+        appointmentId: appointmentId,
+        prescription: reason,
+      })
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const getMedicalRecords = async (userId: string) => {
+  try {
+    const response = await doctorAxiosUrl.get(`/api/doctor/getMedicalRecords/${userId}`)
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const getAllAppointments = async (doctorId: string, currentPage: number, statusFilter: string) => {
+  try {
+    const response = await doctorAxiosUrl.get(
+      `/api/doctor/appointments/${doctorId}`,
+      {
+        params: {
+          page: currentPage,
+          status: statusFilter !== 'all' ? statusFilter : undefined,
+          limit: 4
+        },
+      }
+    )
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const fetchTwoMememberChat = async (doctorId: string, userId: string) => {
+  try {
+    const response = await doctorAxiosUrl.get(`/api/chat/fetchTwoMembersChat`, {
+      params: {
+        doctorID: doctorId,
+        userID: userId,
+        sender: "doctor"
+      }
+    });
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const getDashboardData = async (doctorId: string) => {
+  try {
+    const response = await doctorAxiosUrl.get('/api/doctor/dashboardData', {
+      params: { doctorId: doctorId },
+    });
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const getWalletData = async (doctorId: string, status: string, page: number) => {
+  try {
+    const response = await doctorAxiosUrl.get(`/api/doctor/getWallet/${doctorId}`, {
+      params: { status, page, limit: 7 }
+    })
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const withDrawMoney = async (doctorId: string, value: string) => {
+  try {
+    const response = await doctorAxiosUrl.post(`/api/doctor/withdraw/${doctorId}`, {
+      withdrawAmount: value,
+    })
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}

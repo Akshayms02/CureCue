@@ -194,3 +194,24 @@ export const endCall = async (appointmentId: string) => {
     }
   }
 }
+
+export const getNotifications = async (userId:string) => {
+  try {
+    const response= await axiosUrl.get(`/api/notification/getNotifications/${userId}`);
+    return response
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}
+
+export const deleteNotification = async(notificationId:string,id:string)=>{
+  try {
+    await axiosUrl.post(`/api/notification/deleteNotification?id=${notificationId}&notificationId=${id}`)
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message)
+    }
+  }
+}

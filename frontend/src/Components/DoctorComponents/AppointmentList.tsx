@@ -20,8 +20,8 @@ import {
 } from "../../../components/ui/select"
 import { Badge } from "../../../components/ui/badge"
 import { toast } from 'sonner'
-import doctorAxiosUrl from '../../Utils/doctorAxios'
 import { useNavigate } from 'react-router-dom'
+import { getAllAppointments } from '../../services/doctorServices'
 
 interface Appointment {
     _id: string
@@ -46,18 +46,10 @@ export default function AppointmentList() {
         const fetchAppointments = async () => {
             setLoading(true)
             try {
-                const response = await doctorAxiosUrl.get(
-                    `/api/doctor/appointments/${parsedDocData.doctorId}`,
-                    {
-                        params: {
-                            page: currentPage,
-                            status: statusFilter !== 'all' ? statusFilter : undefined,
-                            limit:4
-                        },
-                    }
-                )
-                setAppointments(response.data.appointments)
-                setTotalPages(response.data.totalPages)
+                const response = await getAllAppointments(parsedDocData?.doctorId as string, currentPage as number, statusFilter as string)
+                console.log(response)
+                setAppointments(response?.data.appointments)
+                setTotalPages(response?.data.totalPages)
             } catch (err: any) {
                 console.log(err)
                 toast.error('Failed to fetch appointments.')

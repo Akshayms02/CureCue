@@ -22,7 +22,7 @@ const AddSlotModal: React.FC<{ setIsModalOpen: React.Dispatch<React.SetStateActi
     const [endTime, setEndTime] = useState<Date | null>(null);
     const [isLoading, setIsLoading] = useState(false); //Loading state
     const DoctorData = useSelector((state: RootState) => state.doctor);
-console.log("parent date",Pdate)
+    console.log("parent date", Pdate)
 
     const handleDateChange = (date: Date | null) => {
         setSelectedDate(date);
@@ -138,7 +138,7 @@ console.log("parent date",Pdate)
                     isBooked: false,  // Assuming new slots are not booked
                     isOnHold: false   // Assuming new slots are not on hold
                 }));
-                console.log(Pdate,selectedDate)
+                console.log(Pdate, selectedDate)
                 if (selectedDate?.toISOString() === Pdate.toISOString()) {
                     setAvailableSlots((prevSlots) => [...prevSlots, ...newAvailableSlots]);
                 }
