@@ -286,11 +286,16 @@ export class DoctorRepository implements IDoctorRepository {
       }
     }
   }
-  async findAppointmentsByDoctor(doctorId: string, page: number, limit: number, status: string) {
+  async findAppointmentsByDoctor(
+    doctorId: string,
+    page: number,
+    limit: number,
+    status: string
+  ) {
     try {
       const skip = (page - 1) * limit; // Calculate how many documents to skip
       const query: any = { doctorId: doctorId };
-      console.log(status)
+      console.log(status);
       if (status !== "All") {
         query.status = status;
       }
@@ -346,10 +351,10 @@ export class DoctorRepository implements IDoctorRepository {
       // Calculate total revenue from transactions
       const totalRevenue = wallet
         ? wallet.transactions.reduce((acc, transaction) => {
-          return transaction.transactionType === "credit"
-            ? acc + transaction.amount
-            : acc; // Ignore debit amounts
-        }, 0)
+            return transaction.transactionType === "credit"
+              ? acc + transaction.amount
+              : acc; // Ignore debit amounts
+          }, 0)
         : 0;
 
       // Get current date and calculate the start of 12 months ago
@@ -454,13 +459,16 @@ export class DoctorRepository implements IDoctorRepository {
         throw new Error("Appointment not found");
       }
 
+      if (appointment.fees == null) {
+        throw new Error("Appointment fees are not defined");
+      }
       let wallet = await walletModel.findOne({
         doctorId: appointment.doctorId,
       });
 
       const transactionId =
         "txn_" + Date.now() + Math.floor(Math.random() * 10000);
-      const transactionAmount = 0.9 * appointment.fees;
+      const transactionAmount = 0.9 * appointment?.fees;
 
       const transaction: ITransaction = {
         amount: transactionAmount,
@@ -618,7 +626,7 @@ export class DoctorRepository implements IDoctorRepository {
           const matchingSlot = slotUpdation.timeSlots.find(
             (slot: any) =>
               new Date(slot.start).getTime() ===
-              new Date(appointment.start).getTime()
+              new Date(appointment.start as Date).getTime()
           );
 
           if (matchingSlot) {

@@ -26,6 +26,7 @@ export interface IDoctor extends Document {
   createdAt: Date;
   lastLogin: Date;
   isBlocked: boolean;
+  profileUrl: string;
 }
 
 enum KYCStatus {
@@ -45,7 +46,6 @@ const imageFieldSchema = new Schema<ImageField>({
     required: true,
   },
 });
-
 
 const doctorSchema = new Schema<IDoctor>({
   doctorId: {

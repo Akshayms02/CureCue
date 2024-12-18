@@ -6,9 +6,12 @@ export interface IUser extends Document {
   email: string;
   phone: string;
   password: string;
-  DOB?:Date;
-  gender?:string;
-  image?:string
+  DOB?: Date;
+  gender?: string;
+  image?: {
+    type: string;
+    url: string;
+  };
   createdAt?: Date;
   lastLogin?: Date;
   referral?: string;

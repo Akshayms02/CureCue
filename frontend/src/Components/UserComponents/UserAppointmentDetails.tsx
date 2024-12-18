@@ -145,6 +145,7 @@ export default function UserAppointmentDetails() {
             } else {
                 console.error("no prescription")
             }
+
         } catch (error) {
             console.log(error)
         }
@@ -207,15 +208,27 @@ export default function UserAppointmentDetails() {
                     </div>
                     <div>
                         <CardDescription>Time</CardDescription>
-                        <p className="font-medium">{moment(appointment?.start).format('h:mm A')} -  {moment(appointment?.end).format('h:mm A')}</p>
+                        <p className="font-medium">
+                            {moment(appointment?.start).format('h:mm A')} - {moment(appointment?.end).format('h:mm A')}
+                        </p>
                     </div>
                 </div>
 
+                {/* Medicine Details Section */}
+                <div className="medicine-details-container bg-gray-50 p-6 rounded-2xl shadow-md" id="prescription">
+                    <CardDescription className="text-xl font-bold text-primary">Prescription</CardDescription>
+                    <div className="medicine-info w-full rounded-md border p-4 bg-white">
+                        {appointment?.prescription ? (
+                            <p className="text-gray-600">{appointment.prescription}</p>
+                        ) : (
+                            <p className="text-gray-500">No prescription available.</p>
+                        )}
+                    </div>
 
+                </div>
 
                 <div className="payment-details-container bg-gray-50 p-6 rounded-2xl shadow-md">
                     <CardDescription className="text-xl font-bold text-primary">Payment Details</CardDescription>
-
                     <div className="payment-info w-full rounded-md border p-4 bg-white">
                         <div className="payment-method flex justify-between items-center mb-4">
                             <span className="font-medium text-gray-600">Payment Method:</span>
@@ -227,7 +240,9 @@ export default function UserAppointmentDetails() {
                         </div>
                         <div className="payment-status flex justify-between items-center mb-4">
                             <span className="font-medium text-gray-600">Payment Status:</span>
-                            <span className={`text-lg font-bold ${appointment?.paymentStatus === "payment completed" ? "text-green-600" : "text-red-600"}`}>{appointment?.paymentStatus || "N/A"}</span>
+                            <span className={`text-lg font-bold ${appointment?.paymentStatus === "payment completed" ? "text-green-600" : "text-red-600"}`}>
+                                {appointment?.paymentStatus || "N/A"}
+                            </span>
                         </div>
                         <div className="payment-id flex justify-between items-center">
                             <span className="font-medium text-gray-600">Payment ID:</span>
@@ -256,7 +271,6 @@ export default function UserAppointmentDetails() {
                         <Dialog>
                             <DialogTrigger asChild>
                                 <Button variant="destructive">Cancelled by Doctor</Button>
-
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
@@ -329,5 +343,6 @@ export default function UserAppointmentDetails() {
                 </DialogContent>
             </Dialog>
         </Card>
+
     );
 }

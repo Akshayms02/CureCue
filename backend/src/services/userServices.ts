@@ -9,12 +9,13 @@ import { createToken, createRefreshToken } from "../config/jwtConfig";
 import mongoose from "mongoose";
 import razorpay from "../config/razorpay";
 import { IUserServices } from "../interfaces/IUserServices";
+import { IAppointment } from "../models/appointmentModel";
 
 export class userServices implements IUserServices {
   constructor(
     private userRepositary: IUserRepository,
     private S3Service: AwsConfig
-  ) { }
+  ) {}
 
   private getFolderPathByFileType(fileType: string): string {
     switch (fileType) {
@@ -202,15 +203,12 @@ export class userServices implements IUserServices {
   }
   async getSpecialization(page: number, limit: number) {
     try {
-
       const skip = (page - 1) * limit;
 
-
-      const { specializations, total } = await this.userRepositary.getSpecializations(skip, limit);
-
+      const { specializations, total } =
+        await this.userRepositary.getSpecializations(skip, limit);
 
       const totalPages = Math.ceil(total / limit);
-
 
       return {
         specializations,
@@ -224,7 +222,6 @@ export class userServices implements IUserServices {
       throw new Error("Error fetching specializations");
     }
   }
-
 
   async getDepDoctors(departmentId: string): Promise<any> {
     try {
@@ -258,7 +255,7 @@ export class userServices implements IUserServices {
     }
   }
 
-  async getDoctorData(doctorId: string) {
+  async getDoctorData(doctorId: string): Promise<any> {
     try {
       const response = await this.userRepositary.getDoctorData(
         doctorId as string
@@ -286,23 +283,31 @@ export class userServices implements IUserServices {
     }
   }
 
-  async getSlots(doctorId: string, date: string) {
+  async getSlots(
+    doctorId: string,
+    date: string
+  ): Promise<{ start: Date; end: Date; isAvailable: boolean }[]> {
     try {
       const parsedDate = new Date(date);
-      const response = await this.userRepositary.getSlots(
-        doctorId as string,
-        parsedDate as Date
-      );
+      if (isNaN(parsedDate.getTime())) {
+        throw new Error("Invalid date format");
+      }
+
+      const response = await this.userRepositary.getSlots(doctorId, parsedDate);
+
+      if (!response) {
+        throw new Error("No response received from the repository");
+      }
 
       return response;
-    } catch (error: any) {
-      if (error instanceof Error) {
-        throw new Error(error.message);
-      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(errorMessage);
     }
   }
 
-  async createAppointment(data: any) {
+  async createAppointment(data: any): Promise<IAppointment> {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -371,7 +376,7 @@ export class userServices implements IUserServices {
     startTime: Date,
     userId: string,
     holdDurationMinutes: number = 5
-  ) {
+  ): Promise<{ success: boolean; message: string }> {
     console.log("holding time slot service");
     console.log(startTime);
     return await this.userRepositary.holdSlot(
@@ -383,7 +388,18 @@ export class userServices implements IUserServices {
     );
   }
 
-  async checkHold(doctorId: string, date: Date, startTime: Date) {
+  async checkHold(
+    doctorId: string,
+    date: Date,
+    startTime: Date
+  ): Promise<
+    {
+      slotId: string;
+      userId: string;
+      isOnHold: boolean;
+      timeSlots: [{ start: Date; end: Date; isOnHold: boolean }];
+    }[]
+  > {
     return await this.userRepositary.checkHold(doctorId, date, startTime);
   }
 
@@ -394,7 +410,13 @@ export class userServices implements IUserServices {
     gender: string;
     phone: string;
     email: string;
-  }): Promise<any> {
+  }): Promise<{
+    name: string;
+    email: string;
+    userId: string;
+    phone: string;
+    isBlocked: boolean;
+  }> {
     try {
       const updatedUser = await this.userRepositary.updateProfile(updateData);
 
@@ -416,7 +438,7 @@ export class userServices implements IUserServices {
         isBlocked: updatedUser.isBlocked,
       };
 
-      return { userInfo };
+      return userInfo;
     } catch (error: any) {
       console.error("Error in updateProfile:", error.message);
       throw new Error(`Failed to update profile: ${error.message}`);
@@ -441,7 +463,9 @@ export class userServices implements IUserServices {
         return response;
       } else {
         console.error("Failed to get appointments: Response is invalid");
-        throw new Error("Something went wrong while fetching the appointments.");
+        throw new Error(
+          "Something went wrong while fetching the appointments."
+        );
       }
     } catch (error: any) {
       console.error("Error in getAppointments:", error.message);
@@ -449,8 +473,7 @@ export class userServices implements IUserServices {
     }
   }
 
-
-  async getAppointment(appointmentId: string) {
+  async getAppointment(appointmentId: string): Promise<any> {
     try {
       const response = await this.userRepositary.getAppointment(appointmentId);
 
@@ -459,8 +482,8 @@ export class userServices implements IUserServices {
 
         const updatedAppointment = {
           ...response,
-          start: new Date(response.start),
-          end: new Date(response.end),
+          start: new Date(response.start as Date),
+          end: new Date(response.end as Date),
         };
 
         console.log("updated appointment", updatedAppointment);
@@ -530,11 +553,14 @@ export class userServices implements IUserServices {
       if (response) {
         const paymentId = response.paymentId;
 
-
         if (paymentId) {
           const paymentDetails = await razorpay.payments.fetch(paymentId);
           console.log("Payment Details:", paymentDetails);
-          const captureResponse = await razorpay.payments.capture(paymentId, response.fees * 100, "INR");
+          const captureResponse = await razorpay.payments.capture(
+            paymentId,
+            response.fees * 100,
+            "INR"
+          );
           console.log("Payment Captured:", captureResponse);
           const refundOptions = {
             amount: response.fees * 100,
@@ -545,8 +571,11 @@ export class userServices implements IUserServices {
           };
 
           // Call Razorpay's refund API
-          const refund = await razorpay.payments.refund(paymentId, refundOptions);
-          console.log("refund was successful : ", refund)
+          const refund = await razorpay.payments.refund(
+            paymentId,
+            refundOptions
+          );
+          console.log("refund was successful : ", refund);
           return response;
         } else {
           throw new Error("No payment ID available for refund");
@@ -558,16 +587,23 @@ export class userServices implements IUserServices {
     }
   }
 
-  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<any> {
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ): Promise<any> {
     const user = await this.userRepositary.getUserById(userId);
 
     if (!user) {
-      throw new Error('User not found.');
+      throw new Error("User not found.");
     }
 
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
     if (!isPasswordValid) {
-      throw new Error('Current password is incorrect.');
+      throw new Error("Current password is incorrect.");
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);

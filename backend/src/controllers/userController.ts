@@ -122,21 +122,19 @@ export default class UserController implements IUserController {
   }
   async getSpecializations(req: Request, res: Response): Promise<void> {
     try {
-      console.log("get specializations reached")
+      console.log("get specializations reached");
       const page = parseInt(req.query.page as string, 10) || 1;
       const limit = parseInt(req.query.limit as string, 10) || 10;
 
-
       const response = await this.userService.getSpecialization(page, limit);
 
-      console.log(response)
+      console.log(response);
       res.status(200).json(response);
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Failed to fetch specializations" });
     }
   }
-
 
   async getDepDoctors(req: Request, res: Response): Promise<void> {
     try {
@@ -321,12 +319,13 @@ export default class UserController implements IUserController {
       const userId = req.params.userId;
       const { status, page = 1, limit = 5 } = req.query;
 
-      const { appointments, totalPages } = await this.userService.getAppointments(
-        userId,
-        status as string,
-        parseInt(page as string),
-        parseInt(limit as string)
-      );
+      const { appointments, totalPages } =
+        await this.userService.getAppointments(
+          userId,
+          status as string,
+          parseInt(page as string),
+          parseInt(limit as string)
+        );
 
       res.status(200).json({
         message: "Appointments fetched successfully",
@@ -337,7 +336,9 @@ export default class UserController implements IUserController {
       console.error("Error fetching appointments:", error.message);
 
       if (error.message.includes("Failed to get appointments")) {
-        res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+        res
+          .status(400)
+          .json({ message: `Failed to get appointments: ${error.message}` });
       } else {
         res.status(500).json({
           message: "An unexpected error occurred",
@@ -346,7 +347,6 @@ export default class UserController implements IUserController {
       }
     }
   }
-
 
   async getAppointment(req: Request, res: Response): Promise<void> {
     try {
@@ -436,7 +436,10 @@ export default class UserController implements IUserController {
 
       res
         .status(200)
-        .json({ message: "Appointment cancelled successfully", data: response });
+        .json({
+          message: "Appointment cancelled successfully",
+          data: response,
+        });
     } catch (error: any) {
       console.error("Error canceling appointment:", error.message);
 
@@ -457,10 +460,16 @@ export default class UserController implements IUserController {
     const { currentPassword, newPassword, userId } = req.body;
 
     try {
-      await this.userService.changePassword(userId, currentPassword, newPassword);
-      res.status(200).json({ message: 'Password changed successfully.' });
+      await this.userService.changePassword(
+        userId,
+        currentPassword,
+        newPassword
+      );
+      res.status(200).json({ message: "Password changed successfully." });
     } catch (error: any) {
-      res.status(400).json({ message: error.message || 'Failed to change password.' });
+      res
+        .status(400)
+        .json({ message: error.message || "Failed to change password." });
     }
   }
 }

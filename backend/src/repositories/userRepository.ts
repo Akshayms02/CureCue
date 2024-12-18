@@ -15,11 +15,14 @@ export class UserRepository implements IUserRepository {
   }
 
   async getUserById(userId: string): Promise<IUser | null> {
-    return await userModel.findOne({ userId: userId })
+    return await userModel.findOne({ userId: userId });
   }
 
   async updatePassword(userId: string, hashedPassword: string): Promise<any> {
-    return await userModel.findOneAndUpdate({ userId: userId }, { password: hashedPassword });
+    return await userModel.findOneAndUpdate(
+      { userId: userId },
+      { password: hashedPassword }
+    );
   }
   async createUser(userData: IUser): Promise<IUser> {
     try {
@@ -92,14 +95,15 @@ export class UserRepository implements IUserRepository {
   }
   async getSpecializations(skip: number, limit: number) {
     try {
-
-      const specializations = await specializationModel.find({ isListed: true })
+      const specializations = await specializationModel
+        .find({ isListed: true })
         .skip(skip)
         .limit(limit)
         .lean();
 
-
-      const total = await specializationModel.countDocuments({ isListed: true });
+      const total = await specializationModel.countDocuments({
+        isListed: true,
+      });
 
       return { specializations, total };
     } catch (error: any) {
@@ -110,8 +114,7 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-
-  async getDepDoctors(departmentId: string) {
+  async getDepDoctors(departmentId: string): Promise<any> {
     try {
       const doctors = await doctorModel
         .find(
@@ -137,7 +140,7 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  async getDoctorData(doctorId: string) {
+  async getDoctorData(doctorId: string): Promise<any> {
     try {
       const response = await doctorModel
         .findOne(
@@ -166,16 +169,19 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  async getSlots(doctorId: string, date: Date) {
+  async getSlots(doctorId: string, date: Date): Promise<any> {
     try {
       console.log(date);
       const response = await Slot.findOne({
         doctorId: doctorId,
         date: date,
-        "timeSlots.end": { $gte: new Date() }
+        "timeSlots.end": { $gte: new Date() },
       }).lean();
       if (response) {
-        return response.timeSlots.filter(slot => new Date(slot.end) >= new Date());
+        console.log(response);
+        return response.timeSlots.filter(
+          (slot) => new Date(slot.end) >= new Date()
+        );
       } else {
         return [];
       }
@@ -191,7 +197,7 @@ export class UserRepository implements IUserRepository {
     start: string,
     date: Date,
     session: mongoose.ClientSession
-  ) {
+  ): Promise<any> {
     date.setUTCHours(0, 0, 0, 0);
     const convertedDate = date.toISOString().replace("Z", "+00:00");
     const slot = await Slot.findOne({
@@ -204,7 +210,11 @@ export class UserRepository implements IUserRepository {
     }).session(session); // Include session for transaction
     return slot;
   }
-  async bookSlot(slot: any, userId: string, session: mongoose.ClientSession) {
+  async bookSlot(
+    slot: any,
+    userId: string,
+    session: mongoose.ClientSession
+  ): Promise<any> {
     const timeSlot = slot.timeSlots.find(
       (ts: any) => ts.heldBy === userId && ts.isOnHold === true
     );
@@ -255,7 +265,7 @@ export class UserRepository implements IUserRepository {
     startTime: Date,
     userId: string,
     holdDurationMinutes: number = 5
-  ) {
+  ): Promise<any> {
     console.log(date, startTime);
     date.setUTCHours(0, 0, 0, 0);
     const convertedDate = date.toISOString().replace("Z", "+00:00");
@@ -290,7 +300,7 @@ export class UserRepository implements IUserRepository {
       { new: true }
     ).lean();
   }
-  async checkHold(doctorId: string, date: Date, startTime: Date) {
+  async checkHold(doctorId: string, date: Date, startTime: Date): Promise<any> {
     date.setUTCHours(0, 0, 0, 0);
     const convertedDate = date.toISOString().replace("Z", "+00:00");
     const convertedDateString = startTime.toISOString().replace("Z", "+00:00");
@@ -311,7 +321,6 @@ export class UserRepository implements IUserRepository {
     email: string;
   }) {
     try {
-
       const user = await userModel.findOne({ userId: updateData.userId });
       if (!user) {
         throw new Error("User not found");
@@ -336,24 +345,21 @@ export class UserRepository implements IUserRepository {
   ) {
     try {
       const query: any = { userId: userId };
-      console.log(status)
+      console.log(status);
       if (status[0] !== "All") {
         query.status = status[0];
       }
-
-
 
       const skip = (page - 1) * limit;
 
       const appointments = await appointmentModel
         .find(query)
         .skip(skip)
-        .limit(limit).sort({ createdAt: -1 })
+        .limit(limit)
+        .sort({ createdAt: -1 })
         .lean();
 
-
       const totalAppointments = await appointmentModel.countDocuments(query);
-
 
       const totalPages = Math.ceil(totalAppointments / limit);
 
@@ -373,8 +379,7 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-
-  async getAppointment(appointmentId: string) {
+  async getAppointment(appointmentId: string): Promise<any> {
     try {
       const appointment = await appointmentModel.findById(appointmentId).lean();
 
@@ -529,7 +534,7 @@ export class UserRepository implements IUserRepository {
           const matchingSlot = slotUpdation.timeSlots.find(
             (slot: any) =>
               new Date(slot.start).getTime() ===
-              new Date(appointment.start).getTime()
+              new Date(appointment.start as Date).getTime()
           );
 
           if (matchingSlot) {

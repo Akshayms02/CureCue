@@ -1,22 +1,22 @@
 import mongoose, { Document, Schema, model } from "mongoose";
 
-interface IAppointment extends Document {
-  userId: string;
-  doctorId: string;
+export interface IAppointment extends Document {
+  userId?: string;
+  doctorId?: string;
   patientName: string;
-  date: Date;
-  start: Date;
-  end: Date;
-  locked: mongoose.Types.ObjectId | null;
-  status:
+  date?: Date;
+  start?: Date;
+  end?: Date;
+  locked?: mongoose.Types.ObjectId | null;
+  status?:
     | "pending"
     | "prescription pending"
     | "completed"
     | "cancelled"
     | "cancelled by Dr";
-  fees: number;
-  paymentMethod: "razorpay" | "wallet";
-  paymentStatus:
+  fees?: number;
+  paymentMethod?: "razorpay" | "wallet";
+  paymentStatus?:
     | "payment pending"
     | "payment completed"
     | "payment failed"

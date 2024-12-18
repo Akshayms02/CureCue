@@ -1,31 +1,74 @@
 import { IUser } from "../models/userModel";
+import { IAppointment } from "../models/appointmentModel";
+import { IDoctor } from "../models/doctorModel";
+import { ISpecialization } from "../models/specializationModel";
+import mongoose from "mongoose";
 
 export interface IUserRepository {
   existUser(email: string): Promise<IUser | null>;
+  getUserById(userId: string): Promise<IUser | null>;
+  updatePassword(userId: string, hashedPassword: string): Promise<IUser>;
   createUser(userData: IUser): Promise<IUser>;
-  userLoginValidate(email: string, password: string): Promise<IUser>;
-  getDoctors(): Promise<any>;
-  getSpecializations(skip: number, limit: number): Promise<any>;
-  getDepDoctors(departmentId: string): Promise<any>;
-  getDoctorData(doctorId: string): Promise<any>;
-  getSlots(doctorId: string, date: Date): Promise<any>;
+  userLoginValidate(email: string, password: string): Promise<IUser | null>;
+  getDoctors(): Promise<IDoctor[]>;
+  getSpecializations(
+    skip: number,
+    limit: number
+  ): Promise<{ specializations: ISpecialization[]; total: number }>;
+  getDepDoctors(departmentId: string): Promise<IDoctor[]>;
+  getDoctorData(doctorId: string): Promise<IDoctor | null>;
+  getSlots(
+    doctorId: string,
+    date: Date
+  ): Promise<{ start: Date; end: Date; isAvailable: boolean }[]>;
   findAvailableSlot(
-    doctorId: any,
-    userId: any,
-    start: any,
-    date: any,
-    session: any
-  ): Promise<any>;
-  bookSlot(slot: any, userId: any, session: any): Promise<any>;
-  createAppointment(data: any, session: any): Promise<any>;
+    doctorId: string,
+    userId: string,
+    start: string,
+    date: Date,
+    session: mongoose.ClientSession
+  ): Promise<{
+    slotId: string;
+    doctorId: string;
+    userId: string;
+    startTime: Date;
+    endTime: Date;
+    timeSlots: [{ start: Date; end: Date }];
+  } | null>;
+  bookSlot(
+    slot: {
+      slotId: string;
+      doctorId: string;
+      userId: string;
+      startTime: Date;
+      endTime: Date;
+    },
+    userId: string,
+    session: mongoose.ClientSession
+  ): Promise<IAppointment>;
+  createAppointment(
+    data: any,
+    session: mongoose.ClientSession
+  ): Promise<IAppointment>;
   holdSlot(
-    doctorId: any,
-    date: any,
-    startTime: any,
-    userId: any,
-    holdDurationMinutes: any
-  ): Promise<any>;
-  checkHold(doctorId: any, date: any, startTime: any): Promise<any>;
+    doctorId: string,
+    date: Date,
+    startTime: Date,
+    userId: string,
+    holdDurationMinutes?: number
+  ): Promise<{ success: boolean; message: string }>;
+  checkHold(
+    doctorId: string,
+    date: Date,
+    startTime: Date
+  ): Promise<
+    {
+      slotId: string;
+      userId: string;
+      isOnHold: boolean;
+      timeSlots: [{ start: Date; end: Date; isOnHold: boolean }];
+    }[]
+  >;
   updateProfile(updateData: {
     userId: string;
     name: string;
@@ -33,19 +76,23 @@ export interface IUserRepository {
     gender: string;
     phone: string;
     email: string;
-  }): Promise<any>;
-  getAllAppointments(userId: string,
+  }): Promise<IUser>;
+  cancelAppointment(appointmentId: string): Promise<any>;
+  getAllAppointments(
+    userId: string,
     status: string,
     page: number,
-    limit: number): Promise<any>;
-  getAppointment(appointmentId: string): Promise<any>;
+    limit: number
+  ): Promise<{ appointments: IAppointment[]; totalPages: number }>;
+  getAppointment(appointmentId: string): Promise<IAppointment | null>;
   addReview(
     appointmentId: string,
     rating: number,
-    review: string
-  ): Promise<any>;
-  getDoctorReview(doctorId: string): Promise<any>;
-  cancelAppointment(appointmentId: string): Promise<any>;
-  updatePassword(userId: string, hashedPassword: string): Promise<any>
-  getUserById(userId: string): Promise<IUser | null>
+    reviewText: string
+  ): Promise<IAppointment>;
+  getDoctorReview(doctorId: string): Promise<{
+    doctorId: string;
+    reviews: { rating: number; reviewText: string }[];
+    image: { type: string; url: string };
+  }>;
 }
