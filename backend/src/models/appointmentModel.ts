@@ -8,20 +8,10 @@ export interface IAppointment extends Document {
   start?: Date;
   end?: Date;
   locked?: mongoose.Types.ObjectId | null;
-  status?:
-    | "pending"
-    | "prescription pending"
-    | "completed"
-    | "cancelled"
-    | "cancelled by Dr";
+  status?:string;
   fees?: number;
   paymentMethod?: "razorpay" | "wallet";
-  paymentStatus?:
-    | "payment pending"
-    | "payment completed"
-    | "payment failed"
-    | "refunded"
-    | "anonymous";
+  paymentStatus?:string;
   paymentId?: string | null;
   prescription?: string | null;
   review?: {

@@ -291,7 +291,7 @@ export class DoctorRepository implements IDoctorRepository {
     page: number,
     limit: number,
     status: string
-  ) {
+  ): Promise<any> {
     try {
       const skip = (page - 1) * limit; // Calculate how many documents to skip
       const query: any = { doctorId: doctorId };
@@ -351,10 +351,10 @@ export class DoctorRepository implements IDoctorRepository {
       // Calculate total revenue from transactions
       const totalRevenue = wallet
         ? wallet.transactions.reduce((acc, transaction) => {
-            return transaction.transactionType === "credit"
-              ? acc + transaction.amount
-              : acc; // Ignore debit amounts
-          }, 0)
+          return transaction.transactionType === "credit"
+            ? acc + transaction.amount
+            : acc; // Ignore debit amounts
+        }, 0)
         : 0;
 
       // Get current date and calculate the start of 12 months ago

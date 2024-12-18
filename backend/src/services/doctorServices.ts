@@ -315,7 +315,7 @@ export class doctorServices implements IDoctorService {
         formattedTimeSlots,
         doctorId
       );
-      if (response.status) {
+      if (response?.status) {
         return { status: true };
       } else {
         throw new Error("Some of the slots here are already scheduled");
@@ -350,7 +350,7 @@ export class doctorServices implements IDoctorService {
         doctorId as string,
         date as string
       );
-      if (reponse.status) {
+      if (reponse?.status) {
         return { status: true };
       }
     } catch (error: any) {
@@ -425,26 +425,26 @@ export class doctorServices implements IDoctorService {
     }
   }
 
-  async getAppointments(doctorId: string, page: number, limit: number,status:string) {
+  async getAppointments(doctorId: string, page: number, limit: number, status: string): Promise<any> {
     try {
-        const { appointments, total } = await this.doctorRepository.findAppointmentsByDoctor(
-            doctorId,
-            page,
-            limit,
-            status,
-        );
+      const { appointments, total } = await this.doctorRepository.findAppointmentsByDoctor(
+        doctorId,
+        page,
+        limit,
+        status,
+      );
 
-        return {
-            appointments,
-            total,
-            currentPage: page,
-            totalPages: Math.ceil(total / limit),
-        };
+      return {
+        appointments,
+        total,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+      };
     } catch (error: any) {
-        console.log(error);
-        throw new Error("Error fetching appointments from service");
+      console.log(error);
+      throw new Error("Error fetching appointments from service");
     }
-}
+  }
 
   async updateProfile(updateData: {
     doctorId: string;
