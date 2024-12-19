@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { IAuthService } from "../../interfaces/user/Auth.service.interface";
 import { cookieSettings } from "../../config/cookieConfig";
+import HTTP_statusCode from "../../enums/HTTPstatusCode";
 
 
 export class AuthController {
@@ -13,12 +14,12 @@ export class AuthController {
     async register(req: Request, res: Response): Promise<any> {
         try {
             const user = await this.AuthService.registeUser(req.body);
-            res.status(201).json(user);
+            res.status(HTTP_statusCode.updated).json(user);
         } catch (error: unknown) {
             if (error instanceof Error) {
-                res.status(400).json({ message: error.message });
+                res.status(HTTP_statusCode.BadRequest).json({ message: error.message });
             } else {
-                res.status(400).json({ message: "An unknow error has occured" });
+                res.status(HTTP_statusCode.BadRequest).json({ message: "An unknow error has occured" });
             }
         }
     }
@@ -27,7 +28,7 @@ export class AuthController {
             const data = req.body;
 
             await this.AuthService.otpVerify(data.email, data.otp);
-            res.status(200).json({ message: "verified" });
+            res.status(HTTP_statusCode.OK).json({ message: "verified" });
         } catch (error: unknown) {
             if (error instanceof Error) {
                 throw new Error("somekind of error");
@@ -47,17 +48,17 @@ export class AuthController {
 
             const { accessToken, userInfo } = result;
             const Credentials = { accessToken, userInfo };
-            res.status(200).json({ message: "Login Successful", Credentials });
+            res.status(HTTP_statusCode.OK).json({ message: "Login Successful", Credentials });
         } catch (error: unknown) {
             if (error instanceof Error) {
                 if (error.message === "User doesnt Exist") {
-                    res.status(400).json({ message: "User Doesnt Exist" });
+                    res.status(HTTP_statusCode.BadRequest).json({ message: "User Doesnt Exist" });
                 } else if (error.message === "User is blocked") {
-                    res.status(400).json({ message: "User is blocked" });
+                    res.status(HTTP_statusCode.BadRequest).json({ message: "User is blocked" });
                 } else if (error.message === "Invalid Password") {
-                    res.status(400).json({ message: "Password is wrong" });
+                    res.status(HTTP_statusCode.BadRequest).json({ message: "Password is wrong" });
                 } else {
-                    res.status(500).json({ message: "Internal Server Error" });
+                    res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
                 }
             }
         }
@@ -67,7 +68,7 @@ export class AuthController {
         try {
             const { email } = req.body;
             const result = await this.AuthService.resendOtp(email);
-            res.status(200).json({
+            res.status(HTTP_statusCode.OK).json({
                 success: true,
                 message: "OTP has been resent successfully.",
                 result,
@@ -93,10 +94,10 @@ export class AuthController {
                 sameSite: "strict",
             });
             res
-                .status(200)
+                .status(HTTP_statusCode.OK)
                 .json({ message: "You have been logged Out Successfully" });
         } catch (error: any) {
-            res.status(500).json({
+            res.status(HTTP_statusCode.InternalServerError).json({
                 message: `Internal server error : ${error}`,
             });
         }

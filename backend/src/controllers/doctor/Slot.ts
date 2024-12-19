@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { ISlotService } from "../../interfaces/doctor/Slot.service.interface";
+import HTTP_statusCode from "../../enums/HTTPstatusCode";
 
 
 export class SlotController {
@@ -12,7 +13,7 @@ export class SlotController {
             const { date, timeSlots, doctorId } = req.body;
             if (!doctorId || !date || !timeSlots || timeSlots.length === 0) {
                 res
-                    .status(400)
+                    .status(HTTP_statusCode.BadRequest)
                     .json({ message: "Doctor ID, date, and time slots are required." });
             }
             const response = await this.SlotService.scheduleSlot(
@@ -22,11 +23,11 @@ export class SlotController {
             );
 
             if (response) {
-                res.status(200).json({
+                res.status(HTTP_statusCode.OK).json({
                     message: "Successful",
                 });
             } else {
-                res.status(500).json({ message: "Something went wrong" });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "Something went wrong" });
             }
         } catch (error: any) {
             if (error instanceof Error) {
@@ -35,7 +36,7 @@ export class SlotController {
                         message: "Some of the requested slots are already scheduled.",
                     });
                 } else {
-                    res.status(500).json({ message: "Internal Server Error" });
+                    res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
                 }
             }
         }
@@ -51,14 +52,14 @@ export class SlotController {
             );
 
             if (response) {
-                res.status(200).json(response);
+                res.status(HTTP_statusCode.OK).json(response);
             }
         } catch (error: any) {
             if (error instanceof Error) {
                 if (error.message === "No slots on this date Exists") {
                     res.status(204).json({ message: "No slots found" });
                 } else {
-                    res.status(500).json({ message: "Internal Server Error" });
+                    res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
                 }
             }
         }
@@ -67,7 +68,7 @@ export class SlotController {
     async checkAvialability(req: Request, res: Response): Promise<void> {
         const { doctorId, date, start, end } = req.body;
         if (!doctorId || !date || !start || !end) {
-            res.status(400).json({ error: "Missing required fields" });
+            res.status(HTTP_statusCode.BadRequest).json({ error: "Missing required fields" });
         }
 
         try {
@@ -78,12 +79,12 @@ export class SlotController {
                 end as string
             );
             if (response) {
-                res.status(200).json(response);
+                res.status(HTTP_statusCode.OK).json(response);
             }
         } catch (error: any) {
             if (error instanceof Error) {
                 console.log(error);
-                res.status(500).json({ message: "Internal server Error" });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal server Error" });
             }
         }
     }
@@ -98,12 +99,12 @@ export class SlotController {
                 date as string
             );
             if (response) {
-                res.status(200).json({ message: "Slot successfully deleted" });
+                res.status(HTTP_statusCode.OK).json({ message: "Slot successfully deleted" });
             }
         } catch (error: any) {
             if (error instanceof Error) {
                 console.log(error);
-                res.status(500).json({ message: "Internal Server Error" });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
             }
         }
     }
@@ -113,10 +114,10 @@ export class SlotController {
             const { email } = req.params;
             const response = await this.SlotService.checkStatus(email as string);
 
-            res.status(200).json(response);
+            res.status(HTTP_statusCode.OK).json(response);
         } catch (error: any) {
             if (error instanceof Error) {
-                res.status(500).json({ message: "Internal Server Error" });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
             }
         }
     }

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { IUserService } from "../../interfaces/user/User.service.interface";
+import HTTP_statusCode from "../../enums/HTTPstatusCode";
 
 
 export class UserController {
@@ -18,10 +19,10 @@ export class UserController {
             const response = await this.UserService.getSpecialization(page, limit);
 
             console.log(response);
-            res.status(200).json(response);
+            res.status(HTTP_statusCode.OK).json(response);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "Failed to fetch specializations" });
+            res.status(HTTP_statusCode.InternalServerError).json({ error: "Failed to fetch specializations" });
         }
     }
 
@@ -33,10 +34,10 @@ export class UserController {
             );
             console.log(response);
 
-            res.status(200).json(response);
+            res.status(HTTP_statusCode.OK).json(response);
         } catch (error: any) {
             if (error instanceof Error) {
-                res.status(500).json({ message: "Internal Server Error" });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
             }
         }
     }
@@ -44,9 +45,9 @@ export class UserController {
     async getDoctors(req: Request, res: Response): Promise<void> {
         try {
             const response = await this.UserService.getAllDoctors();
-            res.status(200).json(response);
+            res.status(HTTP_statusCode.OK).json(response);
         } catch (error: any) {
-            res.status(400).json({ message: `Internal Server Error:${error}` });
+            res.status(HTTP_statusCode.BadRequest).json({ message: `Internal Server Error:${error}` });
         }
     }
 
@@ -56,11 +57,11 @@ export class UserController {
             const { doctorId } = req.params;
             const response = await this.UserService.getDoctorData(doctorId as string);
             if (response) {
-                res.status(200).json(response);
+                res.status(HTTP_statusCode.OK).json(response);
             }
         } catch (error: any) {
             if (error instanceof Error) {
-                res.status(500).json({ message: "Internal Server Error" });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
             }
         }
     }
@@ -80,15 +81,15 @@ export class UserController {
             });
 
             res
-                .status(200)
+                .status(HTTP_statusCode.OK)
                 .json({ message: "Profile updated successfully", response });
         } catch (error: any) {
             console.error("Error updating profile:", error.message);
 
             if (error.message.includes("something went wrong")) {
-                res.status(400).json({ message: "Error updating profile." });
+                res.status(HTTP_statusCode.BadRequest).json({ message: "Error updating profile." });
             } else {
-                res.status(500).json({
+                res.status(HTTP_statusCode.InternalServerError).json({
                     message: "An unexpected error occurred",
                     error: error.message,
                 });
@@ -105,10 +106,10 @@ export class UserController {
                 currentPassword,
                 newPassword
             );
-            res.status(200).json({ message: "Password changed successfully." });
+            res.status(HTTP_statusCode.OK).json({ message: "Password changed successfully." });
         } catch (error: any) {
             res
-                .status(400)
+                .status(HTTP_statusCode.BadRequest)
                 .json({ message: error.message || "Failed to change password." });
         }
     }
@@ -119,18 +120,18 @@ export class UserController {
 
             const response = await this.UserService.getReviewData(doctorId);
 
-            res.status(200).json({ message: "successfully", response });
+            res.status(HTTP_statusCode.OK).json({ message: "successfully", response });
         } catch (error: any) {
             if (
                 error.message ===
                 "Something went wrong while creating the specialization."
             ) {
-                res.status(400).json({
+                res.status(HTTP_statusCode.BadRequest).json({
                     message: "Something went wrong while creating the specialization.",
                 });
             } else {
                 console.log(error);
-                res.status(500).json({
+                res.status(HTTP_statusCode.InternalServerError).json({
                     message: "An unexpected error occurred",
                     error: error.message,
                 });
@@ -143,10 +144,10 @@ export class UserController {
             const { email } = req.params;
             const response = await this.UserService.checkStatus(email);
             if (response) {
-                res.status(200).json({ isBlocked: response.isBlocked });
+                res.status(HTTP_statusCode.OK).json({ isBlocked: response.isBlocked });
             }
         } catch (error: any) {
-            res.status(400).json({ message: `Something went wrong:${error}` });
+            res.status(HTTP_statusCode.BadRequest).json({ message: `Something went wrong:${error}` });
         }
     }
 

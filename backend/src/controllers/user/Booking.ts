@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { IBookingService } from "../../interfaces/user/Booking.service.interface";
+import HTTP_statusCode from "../../enums/HTTPstatusCode";
 
 
 export class BookingController {
@@ -36,12 +37,12 @@ export class BookingController {
                 timeslotId,
             });
 
-            return res.status(201).json({
+            return res.status(HTTP_statusCode.updated).json({
                 message: "Appointment created successfully",
                 appointment,
             });
         } catch (error: any) {
-            return res.status(500).json({
+            return res.status(HTTP_statusCode.InternalServerError).json({
                 message: "Failed to create appointment",
                 error: error.message,
             });
@@ -55,7 +56,7 @@ export class BookingController {
             const response = await this.BookingService.cancelAppointment(appointmentId);
 
             res
-                .status(200)
+                .status(HTTP_statusCode.OK)
                 .json({
                     message: "Appointment cancelled successfully",
                     data: response,
@@ -65,10 +66,10 @@ export class BookingController {
 
             if (error.message.includes("Failed to cancel appointment")) {
                 res
-                    .status(400)
+                    .status(HTTP_statusCode.BadRequest)
                     .json({ message: `Failed to cancel appointment: ${error.message}` });
             } else {
-                res.status(500).json({
+                res.status(HTTP_statusCode.InternalServerError).json({
                     message: "An unexpected error occurred",
                     error: error.message,
                 });

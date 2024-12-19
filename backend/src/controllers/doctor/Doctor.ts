@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { IDoctorService } from "../../interfaces/doctor/Doctor.service.interface";
 import { DoctorFiles } from "../../interfaces/doctorInterfaces";
+import HTTP_statusCode from "../../enums/HTTPstatusCode";
 
 
 export class DoctorController {
@@ -16,7 +17,7 @@ export class DoctorController {
             const { status, page = 1, limit = 10 } = req.query; // Default page 1, limit 10
 
             if (!doctorId) {
-                res.status(400).json({ message: "Doctor ID is required." });
+                res.status(HTTP_statusCode.BadRequest).json({ message: "Doctor ID is required." });
                 return;
             }
 
@@ -27,7 +28,7 @@ export class DoctorController {
                 parseInt(limit as string, 10)
             );
 
-            res.status(200).json({
+            res.status(HTTP_statusCode.OK).json({
                 success: true,
                 message: "Wallet data fetched successfully",
                 response,
@@ -36,13 +37,13 @@ export class DoctorController {
             console.error("Error fetching wallet data:", error.message);
 
             if (error.message.includes("Failed to get wallet details")) {
-                res.status(400).json({
+                res.status(HTTP_statusCode.BadRequest).json({
                     success: false,
                     message: `Failed to get wallet details: ${error.message}`,
                 });
             } else {
                 res
-                    .status(500)
+                    .status(HTTP_statusCode.InternalServerError)
                     .json({ success: false, message: "An unexpected error occurred." });
             }
         }
@@ -58,12 +59,12 @@ export class DoctorController {
 
             if (response) {
                 console.log(response);
-                res.status(200).json(response);
+                res.status(HTTP_statusCode.OK).json(response);
             } else {
-                res.status(400).json({ message: "Something went wrong" });
+                res.status(HTTP_statusCode.BadRequest).json({ message: "Something went wrong" });
             }
         } catch (error: any) {
-            res.status(400).json({ message: `Invalid file format : ${error}` });
+            res.status(HTTP_statusCode.BadRequest).json({ message: `Invalid file format : ${error}` });
         }
     }
 
@@ -77,12 +78,12 @@ export class DoctorController {
 
             if (!doctorId) {
                 res
-                    .status(400)
+                    .status(HTTP_statusCode.BadRequest)
                     .json({ success: false, message: "Doctor ID is required." });
                 return;
             }
             if (isNaN(withdrawalAmount) || withdrawalAmount <= 0) {
-                res.status(400).json({
+                res.status(HTTP_statusCode.BadRequest).json({
                     success: false,
                     message: "A valid withdrawal amount is required.",
                 });
@@ -95,19 +96,19 @@ export class DoctorController {
             );
 
             res
-                .status(200)
+                .status(HTTP_statusCode.OK)
                 .json({ success: true, message: "Withdrawal successful", response });
         } catch (error: any) {
             console.error("Error fetching wallet data:", error.message);
 
             if (error.message.includes("Failed to get wallet details")) {
-                res.status(400).json({
+                res.status(HTTP_statusCode.BadRequest).json({
                     success: false,
                     message: `Failed to get wallet details: ${error.message}`,
                 });
             } else {
                 res
-                    .status(500)
+                    .status(HTTP_statusCode.InternalServerError)
                     .json({ success: false, message: "An unexpected error occurred." });
             }
         }
@@ -121,12 +122,12 @@ export class DoctorController {
             );
             console.log(response);
             if (response) {
-                res.status(200).json(response);
+                res.status(HTTP_statusCode.OK).json(response);
             }
         } catch (error: any) {
             if (error instanceof Error) {
                 console.log(error);
-                res.status(500).json({ message: "Internal server Error" });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal server Error" });
             }
         }
     }
@@ -139,7 +140,7 @@ export class DoctorController {
             );
 
             res
-                .status(200)
+                .status(HTTP_statusCode.OK)
                 .json({ message: "Dashboard data retrieved successfully", response });
         } catch (error: any) {
             console.error("Error in getDashboardData controller:", error.message);
@@ -148,9 +149,9 @@ export class DoctorController {
                 error.message ===
                 "Something went wrong while retrieving dashboard data."
             ) {
-                res.status(400).json({ message: "Failed to retrieve dashboard data." });
+                res.status(HTTP_statusCode.BadRequest).json({ message: "Failed to retrieve dashboard data." });
             } else {
-                res.status(500).json({
+                res.status(HTTP_statusCode.InternalServerError).json({
                     message: "An unexpected error occurred",
                     error: error.message,
                 });
@@ -172,15 +173,15 @@ export class DoctorController {
             });
 
             res
-                .status(200)
+                .status(HTTP_statusCode.OK)
                 .json({ message: "Profile updated successfully", response });
         } catch (error: any) {
             console.error("Error updating profile:", error.message);
 
             if (error.message.includes("something went wrong")) {
-                res.status(400).json({ message: "Error updating profile." });
+                res.status(HTTP_statusCode.BadRequest).json({ message: "Error updating profile." });
             } else {
-                res.status(500).json({
+                res.status(HTTP_statusCode.InternalServerError).json({
                     message: "An unexpected error occurred",
                     error: error.message,
                 });
@@ -193,11 +194,11 @@ export class DoctorController {
             const { email } = req.params;
             const response = await this.DoctorService.checkStatus(email as string);
 
-            res.status(200).json(response);
+            res.status(HTTP_statusCode.OK).json(response);
         } catch (error: any) {
             if (error instanceof Error) {
                 console.log(error)
-                res.status(500).json({ message: "Internal Server Error" });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
             }
         }
     }

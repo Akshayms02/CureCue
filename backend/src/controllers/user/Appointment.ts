@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { IAppointmentService } from "../../interfaces/user/Appointment.service.interface";
+import HTTP_statusCode from "../../enums/HTTPstatusCode";
 
 
 export class AppointmentController {
@@ -17,11 +18,11 @@ export class AppointmentController {
                 date as string
             );
             if (response) {
-                res.status(200).json(response);
+                res.status(HTTP_statusCode.OK).json(response);
             }
         } catch (error: any) {
             if (error instanceof Error) {
-                res.status(500).json({ message: "Internal Server Error" });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
             }
         }
     }
@@ -45,7 +46,7 @@ export class AppointmentController {
 
                     if (timeslot[0].isOnHold == true) {
                         return res
-                            .status(400)
+                            .status(HTTP_statusCode.BadRequest)
                             .json({ success: false, message: "Failed to hold timeslot." });
                     }
                 }
@@ -62,7 +63,7 @@ export class AppointmentController {
             console.log(result);
 
             if (result) {
-                return res.status(200).json({
+                return res.status(HTTP_statusCode.OK).json({
                     success: true,
                     message: "Timeslot held successfully.",
                     result,
@@ -70,17 +71,17 @@ export class AppointmentController {
             } else {
                 console.log("hello");
                 return res
-                    .status(400)
+                    .status(HTTP_statusCode.BadRequest)
                     .json({ success: false, message: "Failed to hold timeslot." });
             }
         } catch (error: any) {
             console.log(error);
             if (error.message == "Invalid User") {
                 return res
-                    .status(401)
+                    .status(HTTP_statusCode.Unauthorized)
                     .json({ success: false, message: "Invalid User" });
             } else {
-                return res.status(500).json({
+                return res.status(HTTP_statusCode.InternalServerError).json({
                     success: false,
                     message: "Error holding timeslot.",
                     error: error.message,
@@ -105,7 +106,7 @@ export class AppointmentController {
                     parseInt(limit as string)
                 );
 
-            res.status(200).json({
+            res.status(HTTP_statusCode.OK).json({
                 message: "Appointments fetched successfully",
                 data: appointments,
                 totalPages,
@@ -115,10 +116,10 @@ export class AppointmentController {
 
             if (error.message.includes("Failed to get appointments")) {
                 res
-                    .status(400)
+                    .status(HTTP_statusCode.BadRequest)
                     .json({ message: `Failed to get appointments: ${error.message}` });
             } else {
-                res.status(500).json({
+                res.status(HTTP_statusCode.InternalServerError).json({
                     message: "An unexpected error occurred",
                     error: error.message,
                 });
@@ -136,17 +137,17 @@ export class AppointmentController {
             );
 
             res
-                .status(200)
+                .status(HTTP_statusCode.OK)
                 .json({ message: "Review added successfully", data: response });
         } catch (error: any) {
             console.error("Error adding review:", error.message);
 
             if (error.message.includes("Failed to add review")) {
                 res
-                    .status(400)
+                    .status(HTTP_statusCode.BadRequest)
                     .json({ message: `Failed to add review: ${error.message}` });
             } else {
-                res.status(500).json({
+                res.status(HTTP_statusCode.InternalServerError).json({
                     message: "An unexpected error occurred",
                     error: error.message,
                 });
@@ -161,7 +162,7 @@ export class AppointmentController {
             const response = await this.AppointmentService.getAppointment(appointmentId);
 
             res
-                .status(200)
+                .status(HTTP_statusCode.OK)
                 .json({ message: "Appointment fetched successfully", data: response });
         } catch (error: any) {
             console.error(
@@ -171,10 +172,10 @@ export class AppointmentController {
 
             if (error.message.includes("Failed to get appointments")) {
                 res
-                    .status(400)
+                    .status(HTTP_statusCode.BadRequest)
                     .json({ message: `Failed to get appointments: ${error.message}` });
             } else {
-                res.status(500).json({
+                res.status(HTTP_statusCode.InternalServerError).json({
                     message: "An unexpected error occurred",
                     error: error.message,
                 });

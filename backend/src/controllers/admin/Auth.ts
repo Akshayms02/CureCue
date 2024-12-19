@@ -1,4 +1,5 @@
 import { adminCookieSettings } from "../../config/cookieConfig";
+import HTTP_statusCode from "../../enums/HTTPstatusCode";
 import { IAuthService } from "../../interfaces/admin/Auth.service.interface";
 import { Request, Response } from "express";
 
@@ -24,16 +25,16 @@ export class AuthController {
 
             res.cookie("adminRefreshToken", loginResponse.adminRefreshToken, adminCookieSettings);
 
-            res.status(200).json({ message: "Login successful", response });
+            res.status(HTTP_statusCode.OK).json({ message: "Login successful", response });
         } catch (error: any) {
             if (error.message === "Admin Doesn't exist") {
-                res.status(400).json({ message: "Admin Doesn't exist" });
+                res.status(HTTP_statusCode.BadRequest).json({ message: "Admin Doesn't exist" });
             }
             if (error.message === "Password is wrong") {
-                res.status(400).json({ message: "Password is wrong" });
+                res.status(HTTP_statusCode.BadRequest).json({ message: "Password is wrong" });
             }
             if (error.message === "Admin is Blocked") {
-                res.status(400).json({ message: "Admin is Blocked" });
+                res.status(HTTP_statusCode.BadRequest).json({ message: "Admin is Blocked" });
             }
         }
     }
@@ -46,10 +47,10 @@ export class AuthController {
                 sameSite: "strict",
             });
             res
-                .status(200)
+                .status(HTTP_statusCode.OK)
                 .json({ message: "You have been logged Out Successfully" });
         } catch (error: any) {
-            res.status(500).json({ message: `Something went wrong:${error}` });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: `Something went wrong:${error}` });
         }
     }
 

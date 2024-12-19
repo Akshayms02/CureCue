@@ -1,3 +1,4 @@
+import HTTP_statusCode from "../../enums/HTTPstatusCode";
 import { IAppointmentService } from "../../interfaces/doctor/Appointment.service.interface";
 import { Request, Response } from "express";
 
@@ -18,10 +19,10 @@ export class AppointmentController {
 
         try {
             const result = await this.AppointmentService.getAppointments(doctorId, page, limit, status);
-            res.status(200).json(result);
+            res.status(HTTP_statusCode.OK).json(result);
         } catch (error: any) {
             res
-                .status(500)
+                .status(HTTP_statusCode.InternalServerError)
                 .json({ message: "Error fetching appointments", error: error.message });
         }
     }
@@ -34,12 +35,12 @@ export class AppointmentController {
                 reason
             );
             res
-                .status(200)
+                .status(HTTP_statusCode.OK)
                 .json({ message: "Appointment has been cancelled", data: response });
         } catch (error: any) {
             console.error(error);
             res
-                .status(500)
+                .status(HTTP_statusCode.InternalServerError)
                 .json({ success: false, message: "An unexpected error has occured" });
         }
     }
@@ -59,17 +60,17 @@ export class AppointmentController {
             console.log("Add Prescription Response:", response);
 
             res
-                .status(200)
+                .status(HTTP_statusCode.OK)
                 .json({ message: "Prescription added successfully", data: response });
         } catch (error: any) {
             console.error("Error adding prescription:", error.message);
 
             if (error.message.includes("Failed to add prescription")) {
                 res
-                    .status(400)
+                    .status(HTTP_statusCode.BadRequest)
                     .json({ message: `Failed to add prescription: ${error.message}` });
             } else {
-                res.status(500).json({
+                res.status(HTTP_statusCode.InternalServerError).json({
                     message: "An unexpected error occurred",
                     error: error.message,
                 });
@@ -83,17 +84,17 @@ export class AppointmentController {
 
             const response = await this.AppointmentService.getMedicalRecords(userId);
 
-            res.status(200).json({ message: "successfully", response });
+            res.status(HTTP_statusCode.OK).json({ message: "successfully", response });
         } catch (error: any) {
             if (
                 error.message ===
                 "Something went wrong while creating the specialization."
             ) {
-                res.status(400).json({
+                res.status(HTTP_statusCode.BadRequest).json({
                     message: "Something went wrong while creating the specialization.",
                 });
             } else {
-                res.status(500).json({
+                res.status(HTTP_statusCode.InternalServerError).json({
                     message: "An unexpected error occurred",
                     error: error.message,
                 });
