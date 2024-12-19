@@ -1,86 +1,94 @@
 import { Router } from "express";
-import AdminController from "../controllers/adminController";
-import { AdminRepository } from "../repositories/adminRepository";
-import { adminServices } from "../services/adminServices";
+import { AdminRepository } from "../repositories/admin/Admin";
 import { AwsConfig } from "../config/awsConfig";
+import { AdminService } from "../services/admin/Admin";
+import { AdminController } from "../controllers/admin/Admin";
+
 import { verifyAdminToken } from "../config/jwtConfig";
+import { AuthRepository } from "../repositories/admin/Auth";
+import { AuthService } from "../services/admin/Auth";
+import { AuthController } from "../controllers/admin/Auth";
 
 const route = Router();
-const adminRepository = new AdminRepository();
+const AdminRepositoryInstance = new AdminRepository();
 const S3ServiceInstance = new AwsConfig();
-const adminService = new adminServices(adminRepository, S3ServiceInstance);
-const adminController = new AdminController(adminService);
+const AdminServiceInstance = new AdminService(AdminRepositoryInstance, S3ServiceInstance);
+const AdminControllerInstance = new AdminController(AdminServiceInstance)
 
-route.post("/login", adminController.loginAdmin.bind(adminController));
+const AuthRepositoyInstance = new AuthRepository();
+const AuthServiceInstance = new AuthService(AuthRepositoyInstance);
+const AuthControllerInstance = new AuthController(AuthServiceInstance)
+
+route.post("/login", AuthControllerInstance.loginAdmin.bind(AuthControllerInstance));
 route.post(
   "/addSpecialization",
   verifyAdminToken,
-  adminController.addSpecialization.bind(adminController)
+  AdminControllerInstance.addSpecialization.bind(AdminControllerInstance)
 );
-route.post("/logout", adminController.adminLogout.bind(adminController));
+route.post("/logout", AuthControllerInstance.adminLogout.bind(AuthControllerInstance));
 route.get(
   "/getSpecializations",
   verifyAdminToken,
-  adminController.getSpecialization.bind(adminController)
+  AdminControllerInstance.getSpecialization.bind(AdminControllerInstance)
 );
 route.put(
   "/updateSpecialization",
   verifyAdminToken,
-  adminController.editSpecialization.bind(adminController)
+  AdminControllerInstance.editSpecialization.bind(AdminControllerInstance)
 );
 route.put(
   "/listUnlistSpecialization",
   verifyAdminToken,
-  adminController.listUnlistSpecialization.bind(adminController)
+  AdminControllerInstance.listUnlistSpecialization.bind(AdminControllerInstance)
 );
 route.get(
   "/getUsers",
   verifyAdminToken,
-  adminController.getUsers.bind(adminController)
+  AdminControllerInstance.getUsers.bind(AdminControllerInstance)
 );
 route.put(
   "/listUnlistUser/:userId",
   verifyAdminToken,
-  adminController.listUnlistUser.bind(adminController)
+  AdminControllerInstance.listUnlistUser.bind(AdminControllerInstance)
 );
 route.get(
   "/getDoctors",
   verifyAdminToken,
-  adminController.getDoctors.bind(adminController)
+  AdminControllerInstance.getDoctors.bind(AdminControllerInstance)
 );
 route.put(
   "/listUnlistDoctor/:doctorId",
   verifyAdminToken,
-  adminController.listUnlistDoctor.bind(adminController)
+  AdminControllerInstance.listUnlistDoctor.bind(AdminControllerInstance)
 );
 
 route.get(
   "/getApplications",
   verifyAdminToken,
-  adminController.getAllApplications.bind(adminController)
+  AdminControllerInstance.getAllApplications.bind(AdminControllerInstance)
 );
 
 route.get(
   "/doctorApplication/:id",
   verifyAdminToken,
-  adminController.getDoctorApplication.bind(adminController)
+  AdminControllerInstance.getDoctorApplication.bind(AdminControllerInstance)
 );
 
 route.post(
   "/accept-doctor/:doctorId",
   verifyAdminToken,
-  adminController.acceptApplication.bind(adminController)
+  AdminControllerInstance.acceptApplication.bind(AdminControllerInstance)
 );
 
 route.get(
   "/getDoctor",
-  adminController.getDoctorData.bind(adminController)
+  AdminControllerInstance.getDoctorData.bind(AdminControllerInstance)
 );
 
 route.get(
   "/dashboardData",
   verifyAdminToken,
-  adminController.getDashboardData.bind(adminController)
+  AdminControllerInstance.getDashboardData.bind(AdminControllerInstance)
 );
 
 export default route;

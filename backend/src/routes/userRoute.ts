@@ -1,78 +1,99 @@
 import { Router } from "express";
-import { UserRepository } from "../repositories/userRepository";
-import UserController from "../controllers/userController";
-import { userServices } from "../services/userServices";
 import { refreshTokenHandler } from "../config/refreshTokenConfig";
 import { AwsConfig } from "../config/awsConfig";
 import { verifyToken } from "../config/jwtConfig";
 import userAuth from "../config/Auth";
+import { AuthRepository } from "../repositories/user/Auth";
+import { AuthService } from "../services/user/Auth";
+import { AuthController } from "../controllers/user/Auth";
+import { UserRepository } from "../repositories/user/User";
+
+import { UserService } from "../services/user/User";
+import { UserController } from "../controllers/user/User";
+import { AppointmentRepository } from "../repositories/user/Appointment";
+import { AppointmentService } from "../services/user/Appointment";
+import { AppointmentController } from "../controllers/user/Appointment";
+import { BookingRepository } from "../repositories/user/Booking";
+import { BookingService } from "../services/user/Booking";
+import { BookingController } from "../controllers/user/Booking";
 
 const route = Router();
 
-const userRepositary = new UserRepository();
-const S3ServiceInstance = new AwsConfig();
-const userService = new userServices(userRepositary, S3ServiceInstance);
+const AuthRepositoryInstance = new AuthRepository();
+const AuthServiceInstance = new AuthService(AuthRepositoryInstance);
+const AuthControllerInstance = new AuthController(AuthServiceInstance);
+const S3ServiceInstance = new AwsConfig()
 
-//UserService is injected into the userController's instance
-const userController = new UserController(userService);
+const UserRepositoryInstance = new UserRepository();
+const UserServiceInstance = new UserService(UserRepositoryInstance, S3ServiceInstance);
+const UserControllerInstance = new UserController(UserServiceInstance);
 
-route.post("/signup", userController.register.bind(userController));
-route.post("/verifyOtp", userController.verifyOtp.bind(userController));
-route.post("/resendOtp", userController.resendOtp.bind(userController));
-route.post("/login", userController.verifyLogin.bind(userController));
+const AppointmentRepositoryInstance = new AppointmentRepository();
+const AppointmentServiceInstance = new AppointmentService(AppointmentRepositoryInstance);
+const AppointmentControllerInstance = new AppointmentController(AppointmentServiceInstance);
+
+const BookingRepositoryInstance = new BookingRepository();
+const BookingServiceInstance = new BookingService(BookingRepositoryInstance);
+const BookingControllerInstance = new BookingController(BookingServiceInstance);
+
+
+route.post("/signup", AuthControllerInstance.register.bind(AuthControllerInstance));
+route.post("/verifyOtp", AuthControllerInstance.verifyOtp.bind(AuthControllerInstance));
+route.post("/resendOtp", AuthControllerInstance.resendOtp.bind(AuthControllerInstance));
+route.post("/login", AuthControllerInstance.verifyLogin.bind(AuthControllerInstance));
 route.get(
   "/check-status/:email",
   verifyToken,
-  userController.checkStatus.bind(userController)
+  UserControllerInstance.checkStatus.bind(UserControllerInstance)
 );
-route.post("/logout", userController.logoutUser.bind(userController));
-route.get("/getDoctors", userController.getDoctors.bind(userController));
+route.post("/logout", AuthControllerInstance.logoutUser.bind(AuthControllerInstance));
+route.get("/getDoctors", UserControllerInstance.getDoctors.bind(UserControllerInstance));
 route.get(
   "/specializations",
-  userController.getSpecializations.bind(userController)
+  UserControllerInstance.getSpecializations.bind(UserControllerInstance)
 );
-route.get("/getDepDoctors", userController.getDepDoctors.bind(userController));
+route.get("/getDepDoctors", UserControllerInstance.getDepDoctors.bind(UserControllerInstance));
 route.get(
   "/getDoctorData/:doctorId",
-  userController.getDoctorData.bind(userController)
+  UserControllerInstance.getDoctorData.bind(UserControllerInstance)
 );
 route.get(
   "/getSlots/:doctorId/:date",
-  userController.getSlots.bind(userController)
+  AppointmentControllerInstance.getSlots.bind(AppointmentControllerInstance)
 );
 route.post(
   "/createAppointment",
   verifyToken,
-  userController.createAppointment.bind(userController)
+  BookingControllerInstance.createAppointment.bind(BookingControllerInstance)
 );
 route.post(
   "/holdTimeslot",
   verifyToken,
-  userController.holdSlot.bind(userController)
+  AppointmentControllerInstance.holdSlot.bind(AppointmentControllerInstance)
 );
 route.put(
   "/updateUser",
   verifyToken, userAuth,
-  userController.updateUserProfile.bind(userController)
+  UserControllerInstance.updateUserProfile.bind(UserControllerInstance)
 );
 route.get(
   "/getAppointments/:userId",
   verifyToken,
-  userController.getAllAppointments.bind(userController)
+  AppointmentControllerInstance.getAllAppointments.bind(AppointmentControllerInstance)
 );
 route.get(
   "/getAppointment/:appointmentId",
   verifyToken,
-  userController.getAppointment.bind(userController)
+  AppointmentControllerInstance.getAppointment.bind(AppointmentControllerInstance)
 );
 route.post(
   "/addReview",
   verifyToken,
-  userController.addReview.bind(userController)
+  AppointmentControllerInstance.addReview.bind(AppointmentControllerInstance)
 );
-route.get("/doctorReviews/:doctorId", userController.getReviews.bind(userController));
-route.put('/cancelAppointment/:appointmentId', verifyToken, userController.cancelAppointment.bind(userController));
-route.post('/changePassword', verifyToken, userController.changePassword.bind(userController))
+route.get("/doctorReviews/:doctorId", UserControllerInstance.getReviews.bind(UserControllerInstance));
+route.put('/cancelAppointment/:appointmentId', verifyToken, BookingControllerInstance.cancelAppointment.bind(BookingControllerInstance));
+route.post('/changePassword', verifyToken, UserControllerInstance.changePassword.bind(UserControllerInstance))
 route.post("/refresh-token", refreshTokenHandler);
 
 export default route;

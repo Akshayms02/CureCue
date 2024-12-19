@@ -25,6 +25,8 @@ function DoctorProtectedRoute({ children }: DoctorProtectedRouteProps) {
           const { data } = await doctorAxiosUrl.get(
             `/api/doctor/check-status/${email}`
           );
+          console.log(data, "jjj");
+
 
           if (data.isBlocked === true) {
             await doctorAxiosUrl.post("/api/doctor/logout");

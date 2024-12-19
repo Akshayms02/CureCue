@@ -30,13 +30,6 @@ interface IStatisticsResult {
   numberOfPatients: number;
 }
 
-// interface IWalletDetailsResult {
-//   transactions: ITransaction[];
-//   totalCount: number;
-//   totalPages: number;
-//   currentPage: number;
-//   balance: number;
-// }
 
 export interface IDoctorRepository {
   existUser(email: string): Promise<IDoctor | null>;

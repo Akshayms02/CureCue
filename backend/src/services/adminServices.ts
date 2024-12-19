@@ -2,8 +2,9 @@
 import { IAdminRepository } from "../interfaces/IAdminRepository";
 import { AwsConfig } from "../config/awsConfig";
 import { createAdminToken, createRefreshToken } from "../config/jwtConfig";
+import { IAdminService } from "../interfaces/IAdminService";
 
-export class adminServices {
+export class adminServices implements IAdminService {
   constructor(
     private adminRepository: IAdminRepository,
     private S3Service: AwsConfig
@@ -226,7 +227,7 @@ export class adminServices {
     }
   }
 
-  async getDoctorApplication(id: string) {
+  async getDoctorApplication(id: string):Promise<any> {
     try {
       const response = await this.adminRepository.getSingleDoctorApplication(
         id as string
@@ -267,7 +268,7 @@ export class adminServices {
     }
   }
 
-  async getDoctorData(doctorId: string) {
+  async getDoctorData(doctorId: string):Promise<any> {
     try {
       const response = await this.adminRepository.getDoctorData(
         doctorId as string
@@ -284,16 +285,16 @@ export class adminServices {
       }
 
       const doctorInfo = {
-        name: response.name,
-        email: response.email,
-        doctorId: response.doctorId,
-        phone: response.phone,
-        isBlocked: response.isBlocked,
-        docStatus: response.kycStatus,
-        DOB: response.DOB,
-        fees: response.fees,
-        gender: response.gender,
-        department: response.department,
+        name: response?.name,
+        email: response?.email,
+        doctorId: response?.doctorId,
+        phone: response?.phone,
+        isBlocked: response?.isBlocked,
+        docStatus: response?.kycStatus,
+        DOB: response?.DOB,
+        fees: response?.fees,
+        gender: response?.gender,
+        department: response?.department,
         image: imageUrl,
       };
       if (response) {

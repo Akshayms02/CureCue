@@ -200,7 +200,7 @@ export class AdminRepository implements IAdminRepository {
     }
   }
 
-  async getDoctorData(doctorId: string) {
+  async getDoctorData(doctorId: string): Promise<any> {
     try {
       console.log(doctorId);
       const response = await doctorModel

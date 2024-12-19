@@ -1,11 +1,13 @@
-import { IUser } from "../models/userModel";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import redisClient from "../utils/redisCaching";
 import sendEmailOtp from "../config/nodemailer";
 import { createRefreshToken, createToken } from "../config/jwtConfig";
 
-import { IDoctorRepository } from "../interfaces/IDoctorRepository";
+import {
+  IAppointmentWithDetails,
+  IDoctorRepository,
+} from "../interfaces/IDoctorRepository";
 import {
   docDetails,
   DoctorFiles,
@@ -14,6 +16,8 @@ import {
 } from "../interfaces/doctorInterfaces";
 import { AwsConfig } from "../config/awsConfig";
 import { IDoctorService } from "../interfaces/IDoctorServices";
+import { IDoctor } from "../models/doctorModel";
+import { IWallet } from "../models/walletModel";
 
 interface ITimeSlot {
   start: string;
@@ -39,7 +43,7 @@ export class doctorServices implements IDoctorService {
     }
   }
 
-  async registeUser(userData: IUser): Promise<void | boolean> {
+  async registeUser(userData: IDoctor): Promise<void | boolean> {
     try {
       const existingUser = await this.doctorRepository.existUser(
         userData.email
@@ -282,13 +286,18 @@ export class doctorServices implements IDoctorService {
       throw new Error(error.message);
     }
   }
-  async checkStatus(email: string): Promise<{ isBlocked: boolean; kycStatus: string } | undefined> {
+  async checkStatus(
+    email: string
+  ): Promise<{ isBlocked: boolean; kycStatus: string } | undefined> {
     try {
       const user = await this.doctorRepository.existUser(email);
       if (!user) {
         throw new Error("User not found");
       }
-      return { isBlocked: user.isBlocked as boolean, kycStatus: user.kycStatus as string };
+      return {
+        isBlocked: user.isBlocked as boolean,
+        kycStatus: user.kycStatus as string,
+      };
     } catch (error: any) {
       if (error instanceof Error) {
         throw new Error(error.message);
@@ -425,14 +434,20 @@ export class doctorServices implements IDoctorService {
     }
   }
 
-  async getAppointments(doctorId: string, page: number, limit: number, status: string): Promise<any> {
+  async getAppointments(
+    doctorId: string,
+    page: number,
+    limit: number,
+    status: string
+  ): Promise<any> {
     try {
-      const { appointments, total } = await this.doctorRepository.findAppointmentsByDoctor(
-        doctorId,
-        page,
-        limit,
-        status,
-      );
+      const { appointments, total } =
+        await this.doctorRepository.findAppointmentsByDoctor(
+          doctorId,
+          page,
+          limit,
+          status
+        );
 
       return {
         appointments,
@@ -541,7 +556,7 @@ export class doctorServices implements IDoctorService {
     status: string,
     page: number,
     limit: number
-  ) {
+  ):Promise<IWallet> {
     try {
       const response = await this.doctorRepository.getWalletDetails(
         doctorId,
@@ -555,7 +570,7 @@ export class doctorServices implements IDoctorService {
       throw new Error(`Failed to get wallet details: ${error.message}`);
     }
   }
-  async getMedicalRecords(userId: string): Promise<any> {
+  async getMedicalRecords(userId: string): Promise<IAppointmentWithDetails[]> {
     try {
       const response = await this.doctorRepository.getMedicalRecords(userId);
 
@@ -580,7 +595,10 @@ export class doctorServices implements IDoctorService {
     }
   }
 
-  async cancelAppointment(appointmentId: string, reason: string): Promise<any> {
+  async cancelAppointment(
+    appointmentId: string,
+    reason: string
+  ): Promise<void> {
     try {
       const response = this.doctorRepository.cancelAppointment(
         appointmentId,

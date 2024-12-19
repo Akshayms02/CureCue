@@ -166,7 +166,7 @@ export default class DoctorController implements IDoctorController {
     try {
       const { email } = req.params;
       const response = await this.doctorService.checkStatus(email as string);
-
+      
       res.status(200).json(response);
     } catch (error: any) {
       if (error instanceof Error) {

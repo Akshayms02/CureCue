@@ -15,7 +15,7 @@ export class userServices implements IUserServices {
   constructor(
     private userRepositary: IUserRepository,
     private S3Service: AwsConfig
-  ) {}
+  ) { }
 
   private getFolderPathByFileType(fileType: string): string {
     switch (fileType) {
@@ -502,7 +502,7 @@ export class userServices implements IUserServices {
     appointmentId: string,
     rating: number,
     review: string
-  ): Promise<any> {
+  ): Promise<IAppointment> {
     try {
       const response = await this.userRepositary.addReview(
         appointmentId,

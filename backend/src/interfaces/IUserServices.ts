@@ -64,6 +64,7 @@ export interface IUserServices {
     phone: string;
     isBlocked: boolean;
   }>;
+  cancelAppointment(appointmentId: string): Promise<any>
   getAppointments(
     userId: string,
     status: string,
@@ -71,4 +72,10 @@ export interface IUserServices {
     limit: number
   ): Promise<{ appointments: IAppointment[]; totalPages: number }>;
   getAppointment(appointmentId: string): Promise<IAppointment>;
+  addReview(
+    appointmentId: string,
+    rating: number,
+    review: string
+  ): Promise<IAppointment>
+
 }

@@ -13,7 +13,8 @@ interface IKYCDetails {
   adharNumber: string;
 }
 
-interface IDoctorApplication extends Document {
+export
+  interface IDoctorApplication extends Document {
   doctorId: mongoose.Types.ObjectId;
   name: string;
   DOB: Date;
