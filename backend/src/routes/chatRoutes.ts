@@ -1,10 +1,7 @@
 import { Router } from "express";
-import { chatService } from "../services/chatServices";
-import { chatRepository } from "../repositories/chatRepository";
-import { chatController } from "../controllers/chatController";
-
-
-
+import { chatService } from "../services/chat/chat";
+import { chatRepository } from "../repositories/chat/chat";
+import { chatController } from "../controllers/chat/chat";
 
 
 const route = Router()

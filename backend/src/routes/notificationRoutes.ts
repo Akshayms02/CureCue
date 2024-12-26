@@ -1,7 +1,7 @@
 import express from "express";
-import NotificationController from "../controllers/notificationController";
-import { NotificationService } from "../services/notificationServices";
-import { NotificationRepository } from "../repositories/notificationRepository";
+import NotificationController from "../controllers/notify/Notification";
+import { NotificationService } from "../services/notify/Notification";
+import { NotificationRepository } from "../repositories/notify/Notification";
 
 const router = express.Router();
 
