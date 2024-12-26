@@ -33,7 +33,7 @@ export class SlotService implements ISlotService {
     async scheduleSlot(date: string, timeSlots: ITimeSlot[], doctorId: string) {
         try {
             const parsedDate = new Date(date);
-            console.log(timeSlots);
+
 
             // Format the timeSlots array to match the schema
             const formattedTimeSlots = timeSlots.map((slot: any) => ({

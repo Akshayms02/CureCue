@@ -197,8 +197,7 @@ export class AuthService implements IAuthService {
             if (!user) {
                 throw new Error("User not found");
             }
-            console.log(user, "hjsdhjdhhdhd");
-            
+
             return {
                 isBlocked: user.isBlocked as boolean,
                 kycStatus: user.kycStatus as string,

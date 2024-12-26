@@ -117,7 +117,7 @@ export class AuthService implements IAuthService {
                 gender: user.gender,
             };
 
-            console.log(userInfo);
+
 
             return { userInfo, accessToken, refreshToken };
         } catch (error: unknown) {

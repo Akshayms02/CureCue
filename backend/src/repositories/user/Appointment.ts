@@ -12,7 +12,7 @@ export class AppointmentRepository implements IAppointmentRepository {
         date.setUTCHours(0, 0, 0, 0);
         const convertedDate = date.toISOString().replace("Z", "+00:00");
         const convertedDateString = startTime.toISOString().replace("Z", "+00:00");
-        console.log(convertedDate, convertedDateString);
+
         return await Slot.find({
             doctorId,
             date: convertedDate,
@@ -27,7 +27,7 @@ export class AppointmentRepository implements IAppointmentRepository {
     ) {
         try {
             const query: any = { userId: userId };
-            console.log(status);
+
             if (status[0] !== "All") {
                 query.status = status[0];
             }
@@ -62,7 +62,7 @@ export class AppointmentRepository implements IAppointmentRepository {
     }
     async cancelAppointment(appointmentId: string): Promise<any> {
         try {
-            console.log(appointmentId);
+
             const appointment = await appointmentModel.findOneAndUpdate(
                 { _id: new mongoose.Types.ObjectId(appointmentId) },
                 { status: "cancelled", paymentStatus: "refunded" },
@@ -181,14 +181,14 @@ export class AppointmentRepository implements IAppointmentRepository {
 
     async getSlots(doctorId: string, date: Date): Promise<any> {
         try {
-            console.log(date);
+
             const response = await Slot.findOne({
                 doctorId: doctorId,
                 date: date,
                 "timeSlots.end": { $gte: new Date() },
             }).lean();
             if (response) {
-                console.log(response);
+
                 return response.timeSlots.filter(
                     (slot) => new Date(slot.end) >= new Date()
                 );
@@ -208,13 +208,13 @@ export class AppointmentRepository implements IAppointmentRepository {
         userId: string,
         holdDurationMinutes: number = 5
     ): Promise<any> {
-        console.log(date, startTime);
+
         date.setUTCHours(0, 0, 0, 0);
         const convertedDate = date.toISOString().replace("Z", "+00:00");
         const convertedDateString = startTime.toISOString().replace("Z", "+00:00");
         const holdExpiresAt = new Date();
         holdExpiresAt.setMinutes(holdExpiresAt.getMinutes() + holdDurationMinutes);
-        console.log(convertedDate, convertedDateString);
+
         console.log(
             doctorId,
             " ",

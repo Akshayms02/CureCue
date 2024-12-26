@@ -12,7 +12,7 @@ class NotificationRepository implements INotificationRepository {
     }
 
     async deleteNotification(id: string, notificationId: string): Promise<any> {
-        console.log(id, notificationId)
+
         const result = await NotificationModel.findByIdAndUpdate(
             id,
             {

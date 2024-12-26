@@ -58,7 +58,7 @@ export class UserService implements IUserService {
     async getDepDoctors(departmentId: string): Promise<any> {
         try {
             const response = await this.UserRepository.getDepDoctors(departmentId);
-            console.log(departmentId);
+
             const docs = await Promise.all(
                 response.map(async (doctor: any) => {
                     let profileUrl = "";
@@ -133,7 +133,7 @@ export class UserService implements IUserService {
                         response.profileUrl = profileUrl;
                     }
                 }
-                console.log(response);
+
 
                 return response;
             }

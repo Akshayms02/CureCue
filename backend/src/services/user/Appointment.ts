@@ -42,8 +42,8 @@ export class AppointmentService implements IAppointmentService {
         userId: string,
         holdDurationMinutes: number = 5
     ): Promise<{ success: boolean; message: string }> {
-        console.log("holding time slot service");
-        console.log(startTime);
+
+
         return await this.AppointmentRepository.holdSlot(
             doctorId,
             date,
@@ -124,7 +124,7 @@ export class AppointmentService implements IAppointmentService {
             const response = await this.AppointmentRepository.getAppointment(appointmentId);
 
             if (response) {
-                console.log("appointments", response);
+
 
                 const updatedAppointment = {
                     ...response,
@@ -132,7 +132,7 @@ export class AppointmentService implements IAppointmentService {
                     end: new Date(response.end as Date),
                 };
 
-                console.log("updated appointment", updatedAppointment);
+
 
                 return updatedAppointment;
             } else {

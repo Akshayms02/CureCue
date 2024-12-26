@@ -29,7 +29,7 @@ export class AppointmentController {
 
     async holdSlot(req: Request, res: Response): Promise<any> {
         const { doctorId, date, startTime, userId } = req.body;
-        console.log(req.body);
+
 
         try {
             const checkHold = await this.AppointmentService.checkHold(
@@ -38,7 +38,7 @@ export class AppointmentController {
                 new Date(startTime)
             );
             if (checkHold) {
-                console.log(checkHold);
+
                 if (checkHold.length > 0) {
                     const timeslot = checkHold[0].timeSlots.filter((element: any) => {
                         return element.start.toISOString() == startTime;
@@ -60,7 +60,7 @@ export class AppointmentController {
                 new Date(startTime),
                 userId
             );
-            console.log(result);
+
 
             if (result) {
                 return res.status(HTTP_statusCode.OK).json({
@@ -69,13 +69,13 @@ export class AppointmentController {
                     result,
                 });
             } else {
-                console.log("hello");
+
                 return res
                     .status(HTTP_statusCode.BadRequest)
                     .json({ success: false, message: "Failed to hold timeslot." });
             }
         } catch (error: any) {
-            console.log(error);
+
             if (error.message == "Invalid User") {
                 return res
                     .status(HTTP_statusCode.Unauthorized)

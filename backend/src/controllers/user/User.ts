@@ -12,13 +12,13 @@ export class UserController {
 
     async getSpecializations(req: Request, res: Response): Promise<void> {
         try {
-            console.log("get specializations reached");
+
             const page = parseInt(req.query.page as string, 10) || 1;
             const limit = parseInt(req.query.limit as string, 10) || 10;
 
             const response = await this.UserService.getSpecialization(page, limit);
 
-            console.log(response);
+
             res.status(HTTP_statusCode.OK).json(response);
         } catch (error) {
             console.error(error);
@@ -32,7 +32,7 @@ export class UserController {
             const response = await this.UserService.getDepDoctors(
                 departmentId as string
             );
-            console.log(response);
+
 
             res.status(HTTP_statusCode.OK).json(response);
         } catch (error: any) {
@@ -130,7 +130,7 @@ export class UserController {
                     message: "Something went wrong while creating the specialization.",
                 });
             } else {
-                console.log(error);
+
                 res.status(HTTP_statusCode.InternalServerError).json({
                     message: "An unexpected error occurred",
                     error: error.message,

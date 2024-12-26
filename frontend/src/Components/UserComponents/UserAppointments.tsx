@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
-import Swal from "sweetalert2";
-import { toast } from "sonner";
+
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
-import { cancelAppointment, getAllAppointments } from "../../services/userServices";
+import { getAllAppointments } from "../../services/userServices";
 
 interface Appointment {
     _id: string;
@@ -55,34 +54,34 @@ export default function UserAppointmentsList() {
         setCurrentPage(1); // Reset to the first page when status changes
     };
 
-    const handleCancelAppointment = (appointmentId: string) => {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "Do you want to cancel this appointment?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, cancel it!",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                cancelAppointment(appointmentId)
-                    .then(() => {
-                        toast.success("Appointment cancelled");
-                        Swal.fire(
-                            "Cancelled!",
-                            "The appointment has been cancelled. Your money will be refunded to your bank account.",
-                            "success"
-                        );
-                        fetchAppointments(status, currentPage, 3);
-                    })
-                    .catch((error) => {
-                        console.error("Error canceling appointment:", error);
-                        Swal.fire("Failed!", "Failed to cancel the appointment. Please try again.", "error");
-                    });
-            }
-        });
-    };
+    // const handleCancelAppointment = (appointmentId: string) => {
+    //     Swal.fire({
+    //         title: "Are you sure?",
+    //         text: "Do you want to cancel this appointment?",
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#d33",
+    //         cancelButtonColor: "#3085d6",
+    //         confirmButtonText: "Yes, cancel it!",
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             cancelAppointment(appointmentId)
+    //                 .then(() => {
+    //                     toast.success("Appointment cancelled");
+    //                     Swal.fire(
+    //                         "Cancelled!",
+    //                         "The appointment has been cancelled. Your money will be refunded to your bank account.",
+    //                         "success"
+    //                     );
+    //                     fetchAppointments(status, currentPage, 3);
+    //                 })
+    //                 .catch((error) => {
+    //                     console.error("Error canceling appointment:", error);
+    //                     Swal.fire("Failed!", "Failed to cancel the appointment. Please try again.", "error");
+    //                 });
+    //         }
+    //     });
+    // };
 
     const handleViewAppointment = (appointment: any) => {
         navigate("/viewAppointment", { state: { appointmentId: appointment._id } });
@@ -145,11 +144,7 @@ export default function UserAppointmentsList() {
                                         <Button variant="outline" onClick={() => handleViewAppointment(appointment)}>
                                             View Details
                                         </Button>
-                                        {appointment.status !== "cancelled" && appointment.status !== "cancelled by Doctor" && appointment.status !== "completed" && appointment.status != "prescription pending" && (
-                                            <Button variant="destructive" onClick={() => handleCancelAppointment(appointment._id)}>
-                                                Cancel
-                                            </Button>
-                                        )}
+
                                     </div>
                                 </CardContent>
                             </Card>

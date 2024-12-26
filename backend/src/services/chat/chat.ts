@@ -12,7 +12,7 @@ export class chatService implements IChatService {
 
     async createChat(messageDetails: any) {
         try {
-            console.log(messageDetails);
+
             const savedChat = await this.chatRepository.createChat(messageDetails);
             return savedChat;
         } catch (error: any) {
@@ -21,7 +21,7 @@ export class chatService implements IChatService {
         }
     }
     async updateAppointment(appointmentId: string): Promise<any> {
-        console.log("appoinmttt", appointmentId);
+
         return await this.chatRepository.updateAppointment(appointmentId);
     }
 

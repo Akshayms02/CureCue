@@ -185,7 +185,7 @@ export class AdminRepository implements IAdminRepository {
     }
     async getDoctorData(doctorId: string): Promise<any> {
         try {
-            console.log(doctorId);
+            
             const response = await doctorModel
                 .findOne(
                     { _id: new mongoose.Types.ObjectId(doctorId) },

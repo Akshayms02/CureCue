@@ -159,7 +159,7 @@ export class AppointmentRepository implements IAppointmentRepository {
         try {
             const skip = (page - 1) * limit; // Calculate how many documents to skip
             const query: any = { doctorId: doctorId };
-            console.log(status);
+
             if (status !== "All") {
                 query.status = status;
             }

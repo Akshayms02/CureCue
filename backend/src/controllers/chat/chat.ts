@@ -16,7 +16,7 @@ export class chatController {
             const chatHistory = await this.chatService.getChat(doctorID, userID);
             res.status(200).json(chatHistory);
         } catch (error) {
-            console.log("chat:= get chat error", error);
+
             res.status(400).json(error);
         }
     };
@@ -24,14 +24,14 @@ export class chatController {
         try {
             const { appointmentId } = req.body;
 
-            console.log("call completed:", appointmentId);
+
 
 
             const response = await this.chatService.updateAppointment(appointmentId);
 
             res.status(200).json(response);
         } catch (error) {
-            console.log("chat:= get chat error", error);
+
             res.status(400).json(error);
         }
     };

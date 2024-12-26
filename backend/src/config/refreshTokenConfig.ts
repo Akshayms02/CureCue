@@ -8,7 +8,7 @@ dotenv.config();
 const secret_key = process.env.JWT_SECRET as string;
 
 const refreshTokenHandler = (req: Request, res: Response) => {
-  console.log("token refreshed",req.body);
+
   const { userId } = req.body;
 
   if (!userId) {
@@ -30,8 +30,36 @@ const refreshTokenHandler = (req: Request, res: Response) => {
 
     const newAccessToken = createToken(userId, "user");
 
+
+    res.json({ accessToken: newAccessToken });
+  });
+};
+const doctorRefreshTokenHandler = (req: Request, res: Response) => {
+
+  const { doctorId } = req.body;
+
+  if (!doctorId) {
+    return res.status(400).json({ message: "User ID is required." });
+  }
+
+  const docrefreshToken = req.cookies.docrefreshToken;
+
+  if (!docrefreshToken) {
+    return res.status(401).json({ message: "Refresh token is missing." });
+  }
+
+  jwt.verify(docrefreshToken, secret_key, (err: jwt.VerifyErrors | null) => {
+    if (err) {
+      return res
+        .status(401)
+        .json({ message: "Invalid or expired refresh token." });
+    }
+
+    const newAccessToken = createToken(doctorId, "doctor");
+
+
     res.json({ accessToken: newAccessToken });
   });
 };
 
-export { refreshTokenHandler };
+export { refreshTokenHandler, doctorRefreshTokenHandler };

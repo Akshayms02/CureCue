@@ -172,7 +172,7 @@ export class DoctorService implements IDoctorService {
         try {
             const response = await this.DoctorRepository.getDoctorData(doctorId);
             let imageUrl = "";
-            console.log(response);
+
 
             if (response?.image) {
                 const folderPath = this.getFolderPathByFileType(response?.image?.type);
@@ -183,7 +183,7 @@ export class DoctorService implements IDoctorService {
                 imageUrl = signedUrl;
             }
             response.imageUrl = imageUrl;
-            console.log(response);
+
             if (response) {
                 return response;
             }
@@ -200,7 +200,7 @@ export class DoctorService implements IDoctorService {
         phone: string;
     }): Promise<any> {
         try {
-            console.log(updateData);
+
             const updatedDoctor = await this.DoctorRepository.updateProfile(
                 updateData
             );
@@ -239,14 +239,14 @@ export class DoctorService implements IDoctorService {
     }
     async getDashboardData(doctorId: string) {
         try {
-            console.log("Entering getDashboardData method in docService");
+
 
             const response = await this.DoctorRepository.getAllStatistics(
                 doctorId as string
             );
 
             if (response) {
-                console.log("Dashboarddd data successfully retrieved:", response);
+
                 return response;
             } else {
                 console.error("Failed to retrieve dashboard data: Response is invalid");

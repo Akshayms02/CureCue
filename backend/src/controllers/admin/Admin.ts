@@ -266,14 +266,14 @@ export class AdminController {
     async getDoctorData(req: Request, res: Response): Promise<void> {
         try {
             const { doctorId } = req.query;
-            console.log(req.query);
-            console.log(doctorId);
+
+
             const response = await this.AdminService.getDoctorData(
                 doctorId as string
             );
             res.status(HTTP_statusCode.OK).json(response);
         } catch (error: any) {
-            console.log(error);
+
             res.status(HTTP_statusCode.InternalServerError).json(error.message);
         }
     }

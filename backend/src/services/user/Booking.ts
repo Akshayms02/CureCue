@@ -27,7 +27,7 @@ export class BookingService implements IBookingService {
                 timeslotId,
             } = data;
             const parseDate = new Date(date);
-            console.log(data);
+
 
             // Call the repository to find a valid slot
             const slot = await this.BookingRepository.findAvailableSlot(
@@ -37,7 +37,7 @@ export class BookingService implements IBookingService {
                 new Date(date),
                 session
             );
-            console.log(slot);
+
             if (!slot) {
                 throw new Error("No valid time slot found");
             }
@@ -68,7 +68,8 @@ export class BookingService implements IBookingService {
             return newAppointment;
         } catch (error: any) {
             // Rollback transaction on error
-            console.log(error);
+            console.error(error)
+
             await session.abortTransaction();
             session.endSession();
             throw new Error("Failed to book appointment");
@@ -85,14 +86,14 @@ export class BookingService implements IBookingService {
                 const paymentId = response.paymentId;
 
                 if (paymentId) {
-                    const paymentDetails = await razorpay.payments.fetch(paymentId);
-                    console.log("Payment Details:", paymentDetails);
-                    const captureResponse = await razorpay.payments.capture(
+                    await razorpay.payments.fetch(paymentId);
+
+                    await razorpay.payments.capture(
                         paymentId,
                         response.fees * 100,
                         "INR"
                     );
-                    console.log("Payment Captured:", captureResponse);
+
                     const refundOptions = {
                         amount: response.fees * 100,
                         speed: "normal",
@@ -102,11 +103,11 @@ export class BookingService implements IBookingService {
                     };
 
                     // Call Razorpay's refund API
-                    const refund = await razorpay.payments.refund(
+                    await razorpay.payments.refund(
                         paymentId,
                         refundOptions
                     );
-                    console.log("refund was successful : ", refund);
+
                     return response;
                 } else {
                     throw new Error("No payment ID available for refund");

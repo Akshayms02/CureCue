@@ -80,7 +80,7 @@ export class SlotRepository implements ISlotRepository {
             }
 
             const availableSlots = slot?.timeSlots?.map((element) => element);
-            console.log("slot:", availableSlots);
+
 
             return availableSlots;
         } catch (error: any) {
@@ -142,5 +142,5 @@ export class SlotRepository implements ISlotRepository {
 
     async existUser(email: string): Promise<IUser | null> {
         return await userModel.findOne({ email });
-      }
+    }
 }

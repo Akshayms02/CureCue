@@ -49,15 +49,15 @@ export class AppointmentController {
         try {
             const { appointmentId, prescription } = req.body;
 
-            console.log("Received appointmentId:", appointmentId);
-            console.log("Received prescription:", prescription);
+            
+            
 
             const response = await this.AppointmentService.addPrescription(
                 appointmentId,
                 prescription
             );
 
-            console.log("Add Prescription Response:", response);
+            
 
             res
                 .status(HTTP_statusCode.OK)

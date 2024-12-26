@@ -83,7 +83,7 @@ export class SlotController {
             }
         } catch (error: any) {
             if (error instanceof Error) {
-                console.log(error);
+                
                 res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal server Error" });
             }
         }
@@ -92,7 +92,7 @@ export class SlotController {
     async deleteSlot(req: Request, res: Response): Promise<void> {
         try {
             const { start, doctorId, date } = req.body;
-            console.log(date);
+            
             const response = await this.SlotService.deleteSlot(
                 start as string,
                 doctorId as string,
@@ -103,7 +103,7 @@ export class SlotController {
             }
         } catch (error: any) {
             if (error instanceof Error) {
-                console.log(error);
+                
                 res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
             }
         }

@@ -2,6 +2,9 @@ import axios from "axios";
 
 const URL = "http://localhost:5000";
 
+
+
+
 const doctorAxiosUrl = axios.create({
   baseURL: URL,
   withCredentials: true,
@@ -34,11 +37,12 @@ doctorAxiosUrl.interceptors.response.use(
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
-
+      const doctorInfo = localStorage.getItem("doctorInfo");
+      const parsedDoctorInfo = JSON.parse(doctorInfo as string)
       try {
         const response = await axios.post(
           `${URL}/api/doctor/refresh-token`,
-          {},
+          { doctorId: parsedDoctorInfo?.doctorId },
           {
             withCredentials: true,
           }

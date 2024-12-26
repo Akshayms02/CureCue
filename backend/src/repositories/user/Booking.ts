@@ -20,7 +20,7 @@ export class BookingRepository implements IBookingRepository {
             patientName,
             date,
         } = data;
-        console.log(data);
+
         const appointment = new appointmentModel({
             doctorId: doctorId,
             userId: userId,
@@ -146,7 +146,7 @@ export class BookingRepository implements IBookingRepository {
 
     async cancelAppointment(appointmentId: string): Promise<any> {
         try {
-            console.log(appointmentId);
+
             const appointment = await appointmentModel.findOneAndUpdate(
                 { _id: new mongoose.Types.ObjectId(appointmentId) },
                 { status: "cancelled", paymentStatus: "refunded" },

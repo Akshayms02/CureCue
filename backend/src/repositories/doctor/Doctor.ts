@@ -14,7 +14,7 @@ export class DoctorRepository implements IDoctorRepository {
         limit: number
     ) {
         try {
-            console.log(status, page, limit);
+
 
             const skip = (page - 1) * limit;
             const query: any = { doctorId };
@@ -76,7 +76,7 @@ export class DoctorRepository implements IDoctorRepository {
 
     async getDoctorData(doctorId: string) {
         try {
-            console.log(doctorId);
+
             const user = await doctorModel
                 .findOne(
                     { doctorId },
@@ -142,9 +142,9 @@ export class DoctorRepository implements IDoctorRepository {
         }
     }
 
-    async existUser(email: string): Promise<IDoctor| null> {
+    async existUser(email: string): Promise<IDoctor | null> {
         return await doctorModel.findOne({ email });
-      }
+    }
     async updateProfile(updateData: {
         doctorId: string;
         fees: number;
@@ -153,7 +153,7 @@ export class DoctorRepository implements IDoctorRepository {
     }) {
         try {
             // Find the doctor by ID
-            console.log(updateData);
+
             const doctor = await doctorModel.findOne({
                 doctorId: updateData.doctorId,
             });

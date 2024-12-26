@@ -49,7 +49,7 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
             .status(401)
             .json({ message: "Access denied. Insufficient role." });
         }
-        console.log("verified user");
+
         next();
       }
     });
@@ -69,7 +69,7 @@ const verifyDocToken = async (req: Request, res: Response, next: NextFunction) =
   if (!token) {
     return res.status(401).send("Authorization failed.");
   }
-console.log(token)
+
   if (token) {
     jwt.verify(token, secret_key, async (err, decoded) => {
       if (err) {
@@ -81,7 +81,7 @@ console.log(token)
             .status(401)
             .json({ message: "Access denied. Insufficient role." });
         }
-        console.log("verified doctor");
+
         next();
       }
     });
@@ -113,7 +113,7 @@ const verifyAdminToken = async (req: Request, res: Response, next: NextFunction)
             .status(401)
             .json({ message: "Access denied. Insufficient role." });
         }
-        console.log("verified admin");
+
         next();
       }
     });

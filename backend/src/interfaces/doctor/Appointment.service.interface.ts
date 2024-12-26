@@ -1,5 +1,10 @@
-import { IAppointmentWithDetails } from "../IDoctorRepository";
+import { IAppointment } from "../../models/appointmentModel";
 
+
+export interface IAppointmentWithDetails extends IAppointment {
+  userId: string;
+  doctorId: string;
+}
 export interface IAppointmentService {
   getAppointments(
     doctorId: string,

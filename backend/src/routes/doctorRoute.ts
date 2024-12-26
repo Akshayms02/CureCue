@@ -1,8 +1,5 @@
 import { Router } from "express";
-// import { DoctorRepository } from "../repositories/doctorRepository";
-// import DoctorController from "../controllers/doctorController";
-// import { doctorServices } from "../services/doctorServices";
-import { refreshTokenHandler } from "../config/refreshTokenConfig";
+import { doctorRefreshTokenHandler } from "../config/refreshTokenConfig";
 import multer from "multer";
 import { AwsConfig } from "../config/awsConfig";
 import { verifyDocToken } from "../config/jwtConfig";
@@ -51,18 +48,6 @@ const AppointmentRepositoryInstance = new AppointmentRepository();
 const AppointmentServiceInstance = new AppointmentService(AppointmentRepositoryInstance);
 const AppointmentControllerInstance = new AppointmentController(AppointmentServiceInstance);
 
-// const doctorRepositary = new DoctorRepository();
-// const S3Service = new AwsConfig();
-// const doctorService = new doctorServices(doctorRepositary, S3Service);
-
-// //UserService is injected into the doctorController's instance
-// const doctorController = new DoctorController(doctorService);
-
-
-
-
-
-
 
 route.post("/signup", AuthControllerInstance.register.bind(AuthControllerInstance));
 route.post("/verifyOtp", AuthControllerInstance.verifyOtp.bind(AuthControllerInstance));
@@ -104,7 +89,7 @@ route.post(
   SlotControllerInstance.checkAvialability.bind(SlotControllerInstance)
 );
 
-route.post("/refresh-token", refreshTokenHandler);
+route.post("/refresh-token", doctorRefreshTokenHandler);
 
 route.get(
   "/getDoctorData/:doctorId",
@@ -126,7 +111,7 @@ route.put(
 
 route.get(
   "/dashboardData",
-
+  verifyDocToken,
   DoctorControllerInstance.getDashboardData.bind(DoctorControllerInstance)
 );
 

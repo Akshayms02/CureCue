@@ -102,14 +102,14 @@ export class UserRepository implements IUserRepository {
 
     async getSlots(doctorId: string, date: Date): Promise<any> {
         try {
-            console.log(date);
+
             const response = await Slot.findOne({
                 doctorId: doctorId,
                 date: date,
                 "timeSlots.end": { $gte: new Date() },
             }).lean();
             if (response) {
-                console.log(response);
+
                 return response.timeSlots.filter(
                     (slot) => new Date(slot.end) >= new Date()
                 );
@@ -160,7 +160,7 @@ export class UserRepository implements IUserRepository {
             if (!user) {
                 throw new Error("User not found");
             }
-            console.log(updateData);
+
             Object.assign(user, updateData);
 
             const updatedUser = await user.save();
@@ -179,13 +179,13 @@ export class UserRepository implements IUserRepository {
         userId: string,
         holdDurationMinutes: number = 5
     ): Promise<any> {
-        console.log(date, startTime);
+
         date.setUTCHours(0, 0, 0, 0);
         const convertedDate = date.toISOString().replace("Z", "+00:00");
         const convertedDateString = startTime.toISOString().replace("Z", "+00:00");
         const holdExpiresAt = new Date();
         holdExpiresAt.setMinutes(holdExpiresAt.getMinutes() + holdDurationMinutes);
-        console.log(convertedDate, convertedDateString);
+
         console.log(
             doctorId,
             " ",
@@ -221,7 +221,7 @@ export class UserRepository implements IUserRepository {
 
     async existUser(email: string): Promise<IUser | null> {
         return await userModel.findOne({ email });
-      }
+    }
 
     async getDoctorReview(doctorId: string) {
         try {

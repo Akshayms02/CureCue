@@ -271,12 +271,12 @@ export class AdminService implements IAdminService {
 
     async getDashboardData() {
         try {
-            console.log("Entering getDashboardData method in adminService");
+
 
             const response = await this.adminRepository.getAllStatistics();
 
             if (response) {
-                console.log("Dashboardsss data successfully retrieved:", response);
+
                 return response;
             } else {
                 console.error("Failed to retrieve dashboard data: Response is invalid");

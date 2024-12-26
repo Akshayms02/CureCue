@@ -1,6 +1,6 @@
 import { IAppointmentRepository } from "../../interfaces/doctor/Appointment.repository.interface";
 import { IAppointmentService } from "../../interfaces/doctor/Appointment.service.interface";
-import { IAppointmentWithDetails } from "../../interfaces/IDoctorRepository";
+import { IAppointmentWithDetails } from "../../interfaces/doctor/Appointment.repository.interface";
 
 
 export class AppointmentService implements IAppointmentService {
@@ -45,7 +45,7 @@ export class AppointmentService implements IAppointmentService {
                 totalPages: Math.ceil(total / limit),
             };
         } catch (error: any) {
-            console.log(error);
+            console.error(error)
             throw new Error("Error fetching appointments from service");
         }
     }

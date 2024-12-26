@@ -51,14 +51,14 @@ export class DoctorController {
 
     async uploadDoctorDetails(req: Request, res: Response): Promise<void> {
         try {
-            console.log("hellop");
+            
             const response = await this.DoctorService.uploadDoctorData(
                 req.body,
                 req.files as DoctorFiles
             );
 
             if (response) {
-                console.log(response);
+                
                 res.status(HTTP_statusCode.OK).json(response);
             } else {
                 res.status(HTTP_statusCode.BadRequest).json({ message: "Something went wrong" });
@@ -72,9 +72,9 @@ export class DoctorController {
         try {
             const doctorId = req.params.doctorId;
             const withdrawalAmount = req.body.withdrawAmount;
-            console.log(req.body);
-            console.log(withdrawalAmount);
-            console.log(typeof withdrawalAmount);
+            
+            
+            
 
             if (!doctorId) {
                 res
@@ -120,13 +120,13 @@ export class DoctorController {
             const response = await this.DoctorService.getDoctorData(
                 doctorId as string
             );
-            console.log(response);
+            
             if (response) {
                 res.status(HTTP_statusCode.OK).json(response);
             }
         } catch (error: any) {
             if (error instanceof Error) {
-                console.log(error);
+                
                 res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal server Error" });
             }
         }
@@ -163,7 +163,7 @@ export class DoctorController {
     async updateDoctorProfile(req: Request, res: Response): Promise<void> {
         try {
             const { doctorId, fees, gender, phone } = req.body;
-            console.log(req.body);
+            
 
             const response = await this.DoctorService.updateProfile({
                 doctorId,
@@ -197,7 +197,7 @@ export class DoctorController {
             res.status(HTTP_statusCode.OK).json(response);
         } catch (error: any) {
             if (error instanceof Error) {
-                console.log(error)
+                
                 res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
             }
         }
