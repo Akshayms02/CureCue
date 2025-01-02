@@ -15,10 +15,10 @@ import fs from 'fs';
 import path from 'path';
 
 connectDB();
-serverMiddlewares(app)
-routes(app)
 const server = createServer(app);
 configSocketIO(server);
+serverMiddlewares(app)
+routes(app)
 
 const logDirectory = path.join(__dirname, 'logs');
 if (!fs.existsSync(logDirectory)) {
