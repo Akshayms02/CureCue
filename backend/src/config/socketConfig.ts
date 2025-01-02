@@ -25,8 +25,8 @@ const configSocketIO = (server: HttpServer) => {
 
     io = new SocketServer(server, {
       cors: {
-        origin: ["https://akshayms.site"],
-      },
+        origin: ["https://akshayms.site"]
+      }, transports: ["websocket"]
     });
 
     io.on("connection", (socket) => {
