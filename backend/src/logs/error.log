@@ -1,0 +1,1 @@
+::1 - - [02/Jan/2025:17:40:04 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "http://localhost:5000/socket.io/?userId=c0986d31-030d-4772-9910-cb7ac4420b40&EIO=4&transport=polling&t=lz7ixxsk" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
