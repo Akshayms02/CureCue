@@ -8,6 +8,8 @@ const serverMiddlewares = (app: any) => {
     // CORS
     const corsOptions = {
         origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization'],
         credentials: true,
     };
     app.use(cors(corsOptions));
