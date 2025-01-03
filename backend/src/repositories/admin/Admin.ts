@@ -60,21 +60,23 @@ export class AdminRepository implements IAdminRepository {
             throw new Error(error.message);
         }
     }
-    async getAllUsers(page: number = 1, limit: number = 10) {
+    async getAllUsersAndDoctors(role: string, searchFilter: any, sortOption: any, skip: number, pageSize: number): Promise<any> {
         try {
-            const skip = (page - 1) * limit;
-            const users = await userModel.find()
+            // const skip = (page - 1) * limit;
+            // const users = await userModel.find()
+            //     .skip(skip)
+            //     .limit(limit);
+            const response = role==="user"? await userModel.find(searchFilter)
+                .sort(sortOption)
                 .skip(skip)
-                .limit(limit);
+                .limit(pageSize):await doctorModel.find(searchFilter)
+                .sort(sortOption)
+                .skip(skip)
+                .limit(pageSize);;
 
-            const totalUsers = await userModel.countDocuments();
+            const totalUsers = role==="user"?await userModel.countDocuments(searchFilter): await doctorModel.countDocuments(searchFilter)
 
-            return {
-                users,
-                totalUsers,
-                totalPages: Math.ceil(totalUsers / limit),
-                currentPage: page,
-            };
+            return { response, totalUsers }
         } catch (error: any) {
             throw new Error(error.message);
         }
@@ -94,10 +96,13 @@ export class AdminRepository implements IAdminRepository {
             if (!user) {
                 throw new Error("user not found");
             }
-
+          
             user.isBlocked = !user.isBlocked;
 
             const updatedUser = await user.save();
+            console.log(id)
+            console.log("user blocked", updatedUser)
+
 
             return updatedUser;
         } catch (error: any) {
@@ -110,10 +115,12 @@ export class AdminRepository implements IAdminRepository {
             if (!doctor) {
                 throw new Error("doctor not found");
             }
+            console.log(id)
 
             doctor.isBlocked = !doctor.isBlocked;
 
             const updatedDoctor = await doctor.save();
+            console.log(updatedDoctor)
 
             return updatedDoctor;
         } catch (error: any) {
@@ -185,7 +192,7 @@ export class AdminRepository implements IAdminRepository {
     }
     async getDoctorData(doctorId: string): Promise<any> {
         try {
-            
+
             const response = await doctorModel
                 .findOne(
                     { _id: new mongoose.Types.ObjectId(doctorId) },

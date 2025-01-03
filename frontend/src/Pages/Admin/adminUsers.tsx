@@ -1,9 +1,11 @@
 import UserManagement from "../../Components/AdminComponents/userManagement";
 
-function AdminUsers() {
+function AdminUsers({role}) {
   return (
     <>
-      <UserManagement />
+      <div className="w-[100%] h-full  flex justify-center items-center">
+      <UserManagement role={role} />
+      </div>
     </>
   );
 }

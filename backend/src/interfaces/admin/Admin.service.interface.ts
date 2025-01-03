@@ -46,7 +46,7 @@ export interface IAdminService {
 
   listUnlistSpecialization(id: number): Promise<ISpecialization>;
 
-  getUsers(page: number, limit: number): Promise<IUserPaginationResult>;
+  getAllUsersAndDoctors(role: string,search:any, sort:any, order:any, page:any, limit:any ): Promise<IUserPaginationResult>;
 
   getDoctors(): Promise<IDoctor[]>;
 

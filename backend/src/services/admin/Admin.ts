@@ -1,6 +1,6 @@
 import { AwsConfig } from "../../config/awsConfig";
 import { IAdminRepository } from "../../interfaces/admin/Admin.repository.interface";
-import { IAdminService } from "../../interfaces/admin/Admin.service.interface";
+import { IAdminService, IUserPaginationResult } from "../../interfaces/admin/Admin.service.interface";
 
 
 export class AdminService implements IAdminService {
@@ -110,9 +110,19 @@ export class AdminService implements IAdminService {
         }
     }
 
-    async getUsers(page: number, limit: number) {
+    async getAllUsersAndDoctors(role: string,search: any, sort: any, order: any, page: any, limit: any): Promise<IUserPaginationResult> {
         try {
-            const response = await this.adminRepository.getAllUsers(page, limit);
+            const searchFilter = search
+                ? { name: { $regex: search, $options: 'i' } }
+                : {};
+            const sortOption = {
+                [sort]: order === 'asc' ? 1 : -1,
+            };
+            const pageNumber = parseInt(page, 10) || 1;
+            const pageSize = parseInt(limit, 10) || 10;
+            const skip = (pageNumber - 1) * pageSize;
+
+            const response = await this.adminRepository.getAllUsersAndDoctors(role,searchFilter, sortOption, skip, pageSize);
             return response;
         } catch (error: any) {
             throw new Error(`Failed to fetch users: ${error.message}`);
