@@ -66,15 +66,17 @@ export class AdminRepository implements IAdminRepository {
             // const users = await userModel.find()
             //     .skip(skip)
             //     .limit(limit);
-            const response = role==="user"? await userModel.find(searchFilter)
+            console.log(role)
+            const response = role === "user" ? await userModel.find(searchFilter)
                 .sort(sortOption)
                 .skip(skip)
-                .limit(pageSize):await doctorModel.find(searchFilter)
-                .sort(sortOption)
-                .skip(skip)
-                .limit(pageSize);;
+                .limit(pageSize) : await doctorModel.find(searchFilter)
+                    .sort(sortOption)
+                    .skip(skip)
+                    .limit(pageSize);;
+            console.log(response)
 
-            const totalUsers = role==="user"?await userModel.countDocuments(searchFilter): await doctorModel.countDocuments(searchFilter)
+            const totalUsers = role === "user" ? await userModel.countDocuments(searchFilter) : await doctorModel.countDocuments(searchFilter)
 
             return { response, totalUsers }
         } catch (error: any) {
@@ -96,7 +98,7 @@ export class AdminRepository implements IAdminRepository {
             if (!user) {
                 throw new Error("user not found");
             }
-          
+
             user.isBlocked = !user.isBlocked;
 
             const updatedUser = await user.save();
