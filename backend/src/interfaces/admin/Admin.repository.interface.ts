@@ -11,6 +11,10 @@ export interface IDepartment {
   description?: string;
 }
 
+interface SearchFilter {
+  [key: string]: any; // Dynamic object for search filters
+}
+
 export interface IUserPaginationResult {
   users: IUser[];
   totalUsers: number;
@@ -50,7 +54,10 @@ export interface IAdminRepository {
     description: string
   ): Promise<any>;
   changeSpecializationStatus(id: number): Promise<ISpecialization>;
-  getAllUsers(page?: number, limit?: number): Promise<IUserPaginationResult>;
+  getAllUsersAndDoctors ( role:string, searchFilter: SearchFilter,
+    sortOption: any,
+    skip: number,
+    pageSize: number): Promise<any>;
   getAllDoctors(): Promise<IDoctor[]>;
   changeUserStatus(id: string): Promise<IUser>;
   changeDoctorStatus(id: string): Promise<IDoctor>;

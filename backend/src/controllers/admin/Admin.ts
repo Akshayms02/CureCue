@@ -121,18 +121,13 @@ export class AdminController {
 
     async getUsers(req: Request, res: Response): Promise<void> {
         try {
-            const page = parseInt(req.query.page as string) || 1;
-            const limit = parseInt(req.query.limit as string) || 10;
+            const { search = '', sort = 'createdAt', order = 'asc', page = 1, limit = 10 ,role} = req.query;
+            // const page = parseInt(req.query.page as string) || 1;
+            // const limit = parseInt(req.query.limit as string) || 10;
 
-            const response = await this.AdminService.getUsers(page, limit);
+            const response = await this.AdminService.getAllUsersAndDoctors(role+"",search, sort, order, page, limit);
 
-            res.status(HTTP_statusCode.OK).json({
-                message: "Fetched users successfully",
-                response: response.users,
-                totalUsers: response.totalUsers,
-                totalPages: response.totalPages,
-                currentPage: response.currentPage,
-            });
+            res.status(HTTP_statusCode.OK).json(response)
         } catch (error: any) {
             if (
                 error.message ===

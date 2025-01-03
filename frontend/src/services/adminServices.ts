@@ -87,9 +87,15 @@ export const viewApplications = async (id: string) => {
   }
 };
 
-export const getDoctors = async () => {
+export const getDoctors = async (params: {
+  limit: number,
+  order: string,
+  page: number,
+  search: string,
+  sort: string
+}) => {
   try {
-    const response = await adminAxiosUrl.get("/api/admin/getDoctors");
+    const response = await adminAxiosUrl.get("/api/admin/getDoctors",{params});
     if (response) {
       return response.data.response;
     }
@@ -118,36 +124,46 @@ export const listUnlistDoctor = async (id: string) => {
 export const getAdminDashboard = async () => {
   try {
     const response = adminAxiosUrl.get("/api/admin/dashboardData");
-    return response
+    return response;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
     }
   }
+};
+
+export const getAllUsersAndDoctors= async (params: {
+  limit: number,
+  order: string,
+  page: number,
+  search: string,
+  sort: string
+  role:"user"|"doctor"
 }
 
-export const getAllUsers = async (page: number, limit: number) => {
+) => {
   try {
+    console.log(params);
     const response = await adminAxiosUrl.get("/api/admin/getUsers", {
-      params: { page, limit: limit },
+      params,
     });
 
-    return response
+    return response;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
     }
   }
-}
+};
 
-export const userBlockUnblock = async (id:string) => {
+export const userBlockUnblock = async (id: string) => {
   try {
     const response = await adminAxiosUrl.put(`/api/admin/listUnlistUser/${id}`);
 
-    return response
+    return response;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
     }
   }
-}
+};

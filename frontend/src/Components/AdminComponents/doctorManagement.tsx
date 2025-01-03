@@ -30,20 +30,21 @@ import {
 } from "../../../components/ui/table";
 import { getDoctors, listUnlistDoctor } from "../../services/adminServices";
 
-interface DoctorDetails {
+interface DoctorDetailsOrUserDetails {
   _id: string;
-  doctorId: string;
+  doctorId?: string;
   name: string;
   phone: string;
   email: string;
   isBlocked: boolean;
-  docStatus: string;
+  docStatus?: string;
   rejectedReason?: string;
+  userId?: string;
 }
 
 function DoctorManagement() {
   const navigate = useNavigate();
-  const [doctors, setDoctors] = useState<DoctorDetails[]>([]);
+  const [doctors, setDoctors] = useState<DoctorDetailsOrUserDetails[]>([]);
 
   const fetchDoctors = async () => {
     try {
