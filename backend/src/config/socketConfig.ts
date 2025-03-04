@@ -22,11 +22,10 @@ export const getReceiverSocketId = (userId: string) => {
 const configSocketIO = (server: HttpServer) => {
   try {
     console.log("socket");
-
     io = new SocketServer(server, {
       cors: {
-        origin: ["https://akshayms.site"]
-      }, transports: ["websocket"]
+        origin: ["http://localhost:5173"]
+      }, transports: ['polling', 'websocket']
     });
 
     io.on("connection", (socket) => {

@@ -21,9 +21,9 @@ export class SlotService implements ISlotService {
     private getFolderPathByFileType(fileType: string): string {
         switch (fileType) {
             case "profile image":
-                return "cureCue/doctorProfileImages";
+                return "curecue/doctorProfileImages";
             case "document":
-                return "cureCue/doctorDocuments";
+                return "curecue/doctorDocuments";
 
             default:
                 throw new Error(`Unknown file type: ${fileType}`);
