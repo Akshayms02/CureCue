@@ -11,6 +11,27 @@ export class DoctorController {
         this.DoctorService = DoctorService
     }
 
+    async updateDoctorProfileImage(req:Request,res:Response):Promise<void>{
+        try {
+            const doctorId=req.body.doctorId
+            const response= this.DoctorService.updateDoctorImage(doctorId,req.file);
+            res
+            .status(HTTP_statusCode.OK)
+            .json({ message: "Profile image updated successfully", response });
+        } catch (error:any) {
+            if (error.message.includes("Failed to update image")) {
+                res.status(HTTP_statusCode.BadRequest).json({
+                    success: false,
+                    message: `Failed to get wallet details: ${error.message}`,
+                });
+            } else {
+                res
+                    .status(HTTP_statusCode.InternalServerError)
+                    .json({ success: false, message: "An unexpected error occurred." });
+            }
+        }
+    }
+
     async getWallet(req: Request, res: Response): Promise<void> {
         try {
             const doctorId = req.params.doctorId;

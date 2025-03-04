@@ -29,6 +29,7 @@ export interface IDoctorRepository {
     balance: number;
     transactions: ITransaction[];
   }>;
+  uploadProfileImage(doctorId: string, file: any):Promise<any>
 
   getDoctorData(doctorId: string): Promise<any>;
   updateProfile(updateData: {

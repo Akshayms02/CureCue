@@ -7,6 +7,26 @@ import walletModel, { ITransaction } from "../../models/walletModel";
 
 
 export class DoctorRepository implements IDoctorRepository {
+
+    async uploadProfileImage(doctorId: string, file: any) {
+        try {
+            const doctor = await doctorModel.findById(doctorId);
+
+            if (!doctor) {
+                throw new Error("doctor not found");
+            }
+
+            doctor.image.url = file.profileUrl.url;
+            doctor.image.type = file.profileUrl.type;
+
+            const updatedDoctor = await doctor.save();
+
+            return updatedDoctor;
+        } catch (error: any) {
+            console.error("Repository error:", error.message);
+            throw new Error(error.message);
+        }
+    }
     async getWalletDetails(
         doctorId: string,
         status: string,
@@ -314,4 +334,6 @@ export class DoctorRepository implements IDoctorRepository {
             throw new Error(`Something went wrong : ${error}`);
         }
     }
+
+
 }

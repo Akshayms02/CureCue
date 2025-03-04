@@ -24,6 +24,7 @@ export interface IDoctorService {
     data: DoctorData,
     files: DoctorFiles
   ): Promise<IDoctor | undefined>;
+  updateDoctorImage(doctorId: string, file: any): Promise<any>
 
   withdraw(
     doctorId: string,

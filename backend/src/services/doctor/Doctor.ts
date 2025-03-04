@@ -26,7 +26,59 @@ export class DoctorService implements IDoctorService {
                 throw new Error(`Unknown file type: ${fileType}`);
         }
     }
+    async updateDoctorImage(doctorId: string, file: any): Promise<any> {
+        try {
+            const doctorProfileImage = {
+                profileUrl: {
+                    type: "",
+                    url: "",
+                },
+            };
+            const profileUrl = await this.S3Service.uploadFile(
+                "curecue/doctorProfileImages/",
+                file
+            );
+            doctorProfileImage.profileUrl.url = profileUrl;
+            doctorProfileImage.profileUrl.type = "profile image";
 
+            const response = await this.DoctorRepository.uploadProfileImage(
+                doctorId,
+                doctorProfileImage
+            );
+
+            if (response) {
+                const folderPath = this.getFolderPathByFileType(response.image.type);
+                const signedUrl = await this.S3Service.getFile(
+                    response.image.url,
+                    folderPath
+                );
+
+
+                const doctorInfo = {
+                    name: response.name,
+                    email: response.email,
+                    doctorId: response.doctorId,
+                    phone: response.phone,
+                    isBlocked: response.isBlocked,
+                    docStatus: response.kycStatus,
+                    DOB: response.DOB,
+                    fees: response.fees,
+                    gender: response.gender,
+                    department: response.department,
+                    image: signedUrl,
+                };
+
+                return { doctorInfo };
+            } else {
+                throw new Error("Image metadata could not be retrieved.");
+
+            }
+
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Profile image updated successfully , details:${error.message}`)
+        }
+    }
     async getWallet(
         doctorId: string,
         status: string,
@@ -91,7 +143,7 @@ export class DoctorService implements IDoctorService {
             if (files.image) {
                 uploadPromises.push(
                     uploadFileAndAssign(
-                        "cureCue/doctorProfileImages/",
+                        "curecue/doctorProfileImages/",
                         files.image[0],
                         "profileUrl",
                         "profile image"
@@ -101,7 +153,7 @@ export class DoctorService implements IDoctorService {
             if (files.aadhaarFrontImage) {
                 uploadPromises.push(
                     uploadFileAndAssign(
-                        "cureCue/doctorDocuments/",
+                        "curecue/doctorDocuments/",
                         files.aadhaarFrontImage[0],
                         "aadhaarFrontImageUrl",
                         "document"
@@ -111,7 +163,7 @@ export class DoctorService implements IDoctorService {
             if (files.aadhaarBackImage) {
                 uploadPromises.push(
                     uploadFileAndAssign(
-                        "cureCue/doctorDocuments/",
+                        "curecue/doctorDocuments/",
                         files.aadhaarBackImage[0],
                         "aadhaarBackImageUrl",
                         "document"
@@ -121,7 +173,7 @@ export class DoctorService implements IDoctorService {
             if (files.certificateImage) {
                 uploadPromises.push(
                     uploadFileAndAssign(
-                        "cureCue/doctorDocuments/",
+                        "curecue/doctorDocuments/",
                         files.certificateImage[0],
                         "certificateUrl",
                         "document"
@@ -131,7 +183,7 @@ export class DoctorService implements IDoctorService {
             if (files.qualificationImage) {
                 uploadPromises.push(
                     uploadFileAndAssign(
-                        "cureCue/doctorDocuments/",
+                        "curecue/doctorDocuments/",
                         files.qualificationImage[0],
                         "qualificationUrl",
                         "document"

@@ -109,6 +109,8 @@ route.put(
   DoctorControllerInstance.updateDoctorProfile.bind(DoctorControllerInstance)
 );
 
+route.put("/updateDoctorProfileImage",verifyDocToken,DoctorControllerInstance.updateDoctorProfileImage.bind(DoctorControllerInstance))
+
 route.get(
   "/dashboardData",
   verifyDocToken,
