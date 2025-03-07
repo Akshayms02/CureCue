@@ -10,10 +10,10 @@ export class DoctorRepository implements IDoctorRepository {
 
     async uploadProfileImage(doctorId: string, file: any) {
         try {
-            const doctor = await doctorModel.findById(doctorId);
+            const doctor = await doctorModel.findOne({ doctorId });
 
             if (!doctor) {
-                throw new Error("doctor not found");
+                throw new Error("Doctor not found");
             }
 
             doctor.image.url = file.profileUrl.url;

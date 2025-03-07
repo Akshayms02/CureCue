@@ -29,6 +29,8 @@ const uploadDoctorDataFiles = upload.fields([
   { name: "qualificationImage", maxCount: 1 },
 ]);
 
+const uploadUserFiles = upload.single('image');
+
 const route = Router();
 const DoctorRepositoryInstance = new DoctorRepository();
 const S3ServiceInstance = new AwsConfig();
@@ -109,7 +111,7 @@ route.put(
   DoctorControllerInstance.updateDoctorProfile.bind(DoctorControllerInstance)
 );
 
-route.put("/updateDoctorProfileImage",verifyDocToken,DoctorControllerInstance.updateDoctorProfileImage.bind(DoctorControllerInstance))
+route.put("/updateDoctorProfileImage",verifyDocToken,uploadUserFiles,DoctorControllerInstance.updateDoctorProfileImage.bind(DoctorControllerInstance))
 
 route.get(
   "/dashboardData",

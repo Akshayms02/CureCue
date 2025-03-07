@@ -28,12 +28,17 @@ export class DoctorService implements IDoctorService {
     }
     async updateDoctorImage(doctorId: string, file: any): Promise<any> {
         try {
+            if (!file || !file.buffer) {
+                throw new Error("Invalid file data received");
+            }
+
             const doctorProfileImage = {
                 profileUrl: {
                     type: "",
                     url: "",
                 },
             };
+
             const profileUrl = await this.S3Service.uploadFile(
                 "curecue/doctorProfileImages/",
                 file
@@ -53,7 +58,6 @@ export class DoctorService implements IDoctorService {
                     folderPath
                 );
 
-
                 const doctorInfo = {
                     name: response.name,
                     email: response.email,
@@ -70,13 +74,11 @@ export class DoctorService implements IDoctorService {
 
                 return { doctorInfo };
             } else {
-                throw new Error("Image metadata could not be retrieved.");
-
+                throw new Error("Failed to update profile image in database");
             }
-
         } catch (error: any) {
-            console.error(error)
-            throw new Error(`Profile image updated successfully , details:${error.message}`)
+            console.error("Error updating doctor image:", error);
+            throw new Error(`Failed to update profile image: ${error.message}`);
         }
     }
     async getWallet(

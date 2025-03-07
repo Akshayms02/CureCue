@@ -57,6 +57,7 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     await handleRefreshToken(req, res, next);
   }
 };
+
 const verifyDocToken = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers["authorization"];
 
@@ -75,13 +76,15 @@ const verifyDocToken = async (req: Request, res: Response, next: NextFunction) =
       if (err) {
         await handleRefreshToken(req, res, next);
       } else {
-        const { role } = decoded as jwt.JwtPayload;
+        const { role, user_id } = decoded as jwt.JwtPayload;
         if (role !== "doctor") {
           return res
             .status(401)
             .json({ message: "Access denied. Insufficient role." });
         }
 
+        // Set doctorId in request object
+        (req as any).doctorId = user_id;
         next();
       }
     });
@@ -89,6 +92,7 @@ const verifyDocToken = async (req: Request, res: Response, next: NextFunction) =
     await handleRefreshToken(req, res, next);
   }
 };
+
 const verifyAdminToken = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers["authorization"];
 

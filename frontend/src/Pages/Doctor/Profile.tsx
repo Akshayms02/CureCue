@@ -14,7 +14,7 @@ import {
 import { getDoctorData } from "../../services/doctorServices"
 import { defaultImg } from "../../assets/profile"
 import { useDispatch } from "react-redux"
-import { updateDoctorProfile } from "../../Redux/Actions/doctorActions"
+import { updateDoctorImage, updateDoctorProfile } from "../../Redux/Actions/doctorActions"
 
 interface Department {
   _id: string
@@ -80,9 +80,21 @@ export default function DoctorProfileCard() {
     }
   }
 
-  const handleImageSave = () => {
-    console.log("Image uploaded:", newImage)
-    // Implement actual image upload logic here
+  const handleImageSave = async () => {
+    if (!doctorData || !newImage) return;
+
+    const formData = new FormData();
+    formData.append('image', newImage, newImage.name);
+    
+    try {
+      const result = await dispatch(updateDoctorImage(formData));
+      if (result.payload) {
+        window.location.reload(); // Refresh to show new image
+      }
+      console.log("Image saved successfully.");
+    } catch (error) {
+      console.error("Error saving image:", error);
+    }
   }
 
   const toggleEditMode = () => setIsEditing((prev) => !prev)

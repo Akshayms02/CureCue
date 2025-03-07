@@ -4,6 +4,35 @@ import doctorAxiosUrl from "../../Utils/doctorAxios";
 
 const API = "/api/doctor";
 
+
+export const updateDoctorImage = createAsyncThunk(
+  "doctor/updateDoctorImage",
+  async (formData: FormData, { rejectWithValue }) => {
+    try {
+      const response = await doctorAxiosUrl.put(
+        "/api/doctor/updateDoctorProfileImage",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Image update response:", response.data);
+      return response.data.response;
+    } catch (error: any) {
+      if (error.response) {
+        const errorMessage = error.response.data.message || "Update failed";
+        console.log("Error response:", errorMessage);
+        return rejectWithValue(errorMessage);
+      } else if (error.request) {
+        return rejectWithValue("No response from server.");
+      } else {
+        return rejectWithValue(error.message || "Update failed");
+      }
+    }
+  }
+);
 export const signUp = (credentials: {
   name: string;
   email: string;

@@ -50,8 +50,9 @@ export class AwsConfig {
   }
 
   async uploadFile(folderPath: string, file: any) {
+    console.log(file)
     const uniqueName =
-      crypto.randomBytes(16).toString("hex") + "-" + file.originalname;
+      crypto.randomBytes(16).toString("hex") + "-" + file?.originalname;
     const params = {
       Bucket: this.bucketName,
       Key: `${folderPath}${uniqueName}`,

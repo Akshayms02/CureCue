@@ -11,23 +11,47 @@ export class DoctorController {
         this.DoctorService = DoctorService
     }
 
-    async updateDoctorProfileImage(req:Request,res:Response):Promise<void>{
+    async updateDoctorProfileImage(req: Request, res: Response): Promise<void> {
         try {
-            const doctorId=req.body.doctorId
-            const response= this.DoctorService.updateDoctorImage(doctorId,req.file);
-            res
-            .status(HTTP_statusCode.OK)
-            .json({ message: "Profile image updated successfully", response });
-        } catch (error:any) {
+            if (!req.file) {
+                res.status(HTTP_statusCode.BadRequest).json({ 
+                    success: false, 
+                    message: "No image file provided" 
+                });
+                return;
+            }
+
+            // Get doctorId from token
+            const doctorId = (req as any).doctorId;
+            if (!doctorId) {
+                res.status(HTTP_statusCode.BadRequest).json({
+                    success: false,
+                    message: "Doctor ID not found in token"
+                });
+                return;
+            }
+
+            const response = await this.DoctorService.updateDoctorImage(doctorId, req.file);
+            
+            res.status(HTTP_statusCode.OK)
+                .json({ 
+                    success: true,
+                    message: "Profile image updated successfully", 
+                    response 
+                });
+        } catch (error: any) {
+            console.error("Error updating profile image:", error);
             if (error.message.includes("Failed to update image")) {
                 res.status(HTTP_statusCode.BadRequest).json({
                     success: false,
-                    message: `Failed to get wallet details: ${error.message}`,
+                    message: error.message
                 });
             } else {
-                res
-                    .status(HTTP_statusCode.InternalServerError)
-                    .json({ success: false, message: "An unexpected error occurred." });
+                res.status(HTTP_statusCode.InternalServerError)
+                    .json({ 
+                        success: false, 
+                        message: "An unexpected error occurred while updating the image." 
+                    });
             }
         }
     }
@@ -72,14 +96,14 @@ export class DoctorController {
 
     async uploadDoctorDetails(req: Request, res: Response): Promise<void> {
         try {
-            
+
             const response = await this.DoctorService.uploadDoctorData(
                 req.body,
                 req.files as DoctorFiles
             );
 
             if (response) {
-                
+
                 res.status(HTTP_statusCode.OK).json(response);
             } else {
                 res.status(HTTP_statusCode.BadRequest).json({ message: "Something went wrong" });
@@ -93,9 +117,9 @@ export class DoctorController {
         try {
             const doctorId = req.params.doctorId;
             const withdrawalAmount = req.body.withdrawAmount;
-            
-            
-            
+
+
+
 
             if (!doctorId) {
                 res
@@ -141,13 +165,13 @@ export class DoctorController {
             const response = await this.DoctorService.getDoctorData(
                 doctorId as string
             );
-            
+
             if (response) {
                 res.status(HTTP_statusCode.OK).json(response);
             }
         } catch (error: any) {
             if (error instanceof Error) {
-                
+
                 res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal server Error" });
             }
         }
@@ -184,7 +208,7 @@ export class DoctorController {
     async updateDoctorProfile(req: Request, res: Response): Promise<void> {
         try {
             const { doctorId, fees, gender, phone } = req.body;
-            
+
 
             const response = await this.DoctorService.updateProfile({
                 doctorId,
@@ -218,7 +242,7 @@ export class DoctorController {
             res.status(HTTP_statusCode.OK).json(response);
         } catch (error: any) {
             if (error instanceof Error) {
-                
+
                 res.status(HTTP_statusCode.InternalServerError).json({ message: "Internal Server Error" });
             }
         }
