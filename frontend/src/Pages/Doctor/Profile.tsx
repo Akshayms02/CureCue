@@ -15,6 +15,7 @@ import { getDoctorData } from "../../services/doctorServices"
 import { defaultImg } from "../../assets/profile"
 import { useDispatch } from "react-redux"
 import { updateDoctorImage, updateDoctorProfile } from "../../Redux/Actions/doctorActions"
+import { toast } from "sonner"
 
 interface Department {
   _id: string
@@ -45,6 +46,7 @@ export default function DoctorProfileCard() {
   const dispatch: any = useDispatch()
   const [isEditing, setIsEditing] = useState(false)
   const [newImage, setNewImage] = useState<File | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editData, setEditData] = useState({
     email: "",
     phone: "",
@@ -88,11 +90,17 @@ export default function DoctorProfileCard() {
     
     try {
       const result = await dispatch(updateDoctorImage(formData));
-      if (result.payload) {
-        window.location.reload(); // Refresh to show new image
+      if (result.payload?.doctorInfo) {
+        setDoctorData({
+          ...doctorData,
+          imageUrl: result.payload.doctorInfo.image
+        });
+        setIsDialogOpen(false);
+        setNewImage(null);
+        toast.success("Profile image updated successfully");
       }
-      console.log("Image saved successfully.");
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update profile image");
       console.error("Error saving image:", error);
     }
   }
@@ -116,7 +124,7 @@ export default function DoctorProfileCard() {
         console.log("Saving updated doctor data:", updatedDoctorData)
         setDoctorData(updatedDoctorData)
         setIsEditing(false)
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error updating doctor data:", error)
       }
     }
@@ -144,7 +152,7 @@ export default function DoctorProfileCard() {
                 alt={doctorData.name}
                 className="h-28 w-28 rounded-full object-cover"
               />
-              <Dialog>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
                     size="icon"

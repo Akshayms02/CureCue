@@ -1,4 +1,3 @@
-
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import express, { NextFunction, Request, Response } from "express";
@@ -17,8 +16,8 @@ const serverMiddlewares = (app: any) => {
     app.use(cookieParser());
 
     // Body parsers
-    app.use(express.json({ limit: "50mb" })); // Adjust limit as needed
-    app.use(express.urlencoded({ extended: true }));
+    app.use(express.json({ limit: "50mb" }));
+    app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
     // Setting Rules
     app.use((req: Request, res: Response, next: NextFunction) => {
